@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "indomavel",
+      "runtimeExecutable": "C:\\Users\\nandi\\indomavel\\.venv\\Scripts\\python.exe",
+      "runtimeArgs": ["C:\\Users\\nandi\\indomavel\\rodar.py"],
+      "port": 5055,
+      "url": "http://127.0.0.1:5055"
+    },
+    {
+      "name": "indomavel-teste",
+      "runtimeExecutable": "C:\\Users\\nandi\\indomavel\\.venv\\Scripts\\python.exe",
+      "runtimeArgs": ["C:\\Users\\nandi\\indomavel\\rodar.py", "--porta", "5056"],
+      "port": 5056,
+      "url": "http://127.0.0.1:5056"
+    }
+  ]
+}

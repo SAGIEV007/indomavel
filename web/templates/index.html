@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Indomável</title>
+<link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+<header class="topo">
+  <div class="marca">
+    <span class="marca-nome">INDOMÁVEL</span>
+    <span class="marca-sub">cortes prontos a partir do Campaign Hub</span>
+  </div>
+  <div id="status-chub" class="chip chip-carregando">Conectando ao Chub…</div>
+  <button id="btn-exportacoes" class="botao-sec">Exportações <span id="contador-tarefas"></span></button>
+</header>
+<div id="faixa-servidor" class="faixa-servidor" hidden>
+  <span id="faixa-texto"></span>
+  <button id="faixa-botao" class="botao-pri pequeno" type="button" hidden>Recarregar</button>
+</div>
+
+<main class="grade">
+  <!-- Esquerda: vídeos do Chub e links colados -->
+  <aside class="coluna coluna-videos">
+    <div class="cabeca">
+      <form id="form-link" class="form-link" autocomplete="off">
+        <input id="link" type="text" placeholder="Colar link do YouTube">
+        <button class="botao-pri pequeno" type="submit">Abrir</button>
+      </form>
+      <div class="abas">
+        <button class="aba ativa" data-origem="chub" type="button">Chub</button>
+        <button class="aba" data-origem="local" type="button">Meus links <span id="contador-locais"></span></button>
+      </div>
+      <div id="filtros-chub" class="filtros">
+        <input id="busca" type="search" placeholder="Buscar pelo título" autocomplete="off">
+        <select id="fonte"><option value="">Todas as fontes</option></select>
+      </div>
+    </div>
+    <ul id="lista-videos" class="lista-videos"></ul>
+    <button id="mais-videos" class="botao-sec largo" hidden>Carregar mais</button>
+  </aside>
+
+  <!-- Centro: editor em tempo real -->
+  <section class="coluna coluna-centro">
+    <div id="vazio" class="vazio">Escolha um vídeo à esquerda ou cole um link do YouTube.</div>
+    <div id="editor" hidden>
+      <div class="editor-topo">
+        <div class="titulo-video">
+          <div class="rotulo">Vídeo de origem</div>
+          <h1 id="titulo-video"></h1>
+        </div>
+        <div class="formatos" role="group" aria-label="Formato">
+          <button type="button" data-formato="9:16">9:16</button>
+          <button type="button" data-formato="4:5">4:5</button>
+          <button type="button" data-formato="1:1">1:1</button>
+          <button type="button" data-formato="16:9">16:9</button>
+        </div>
+        <a id="link-youtube" class="botao-sec pequeno" target="_blank" rel="noopener">YouTube ↗</a>
+      </div>
+
+      <div id="palco-externo" class="palco-externo">
+        <div id="quadro" class="quadro">
+          <div id="area-video" class="area-video">
+            <div id="player-caixa" class="player-caixa"><div id="player"></div></div>
+          </div>
+          <img id="moldura" class="moldura" alt="">
+          <div id="legenda" class="legenda vazia"><span id="legenda-texto"></span></div>
+          <button id="clique-play" class="clique-play" type="button" aria-label="Tocar ou pausar"></button>
+        </div>
+      </div>
+
+      <div class="transporte">
+        <button id="play" class="botao-redondo" type="button" title="Tocar ou pausar (espaço)">▶</button>
+        <button id="tocar-corte" class="botao-sec" type="button">Tocar o corte</button>
+        <label class="check"><input type="checkbox" id="repetir"> Repetir</label>
+        <div class="tempos">
+          <span id="tempo-atual" class="tempo-grande">0:00,0</span>
+          <span id="tempo-no-corte" class="tempo-corte"></span>
+        </div>
+        <button id="mudo" class="botao-sec pequeno" type="button">Som ligado</button>
+        <button id="tela-cheia" class="botao-sec pequeno" type="button">Tela cheia</button>
+      </div>
+
+      <div class="linha-tempo">
+        <div class="linha-tempo-topo">
+          <div class="campo-tempo">
+            <span class="rotulo">Começa</span>
+            <button type="button" data-ajuste="inicio:-0.1" title="−0,1s">‹</button>
+            <input id="in-inicio" class="tempo" spellcheck="false" autocomplete="off">
+            <button type="button" data-ajuste="inicio:0.1" title="+0,1s">›</button>
+          </div>
+          <div class="campo-tempo">
+            <span class="rotulo">Termina</span>
+            <button type="button" data-ajuste="fim:-0.1" title="−0,1s">‹</button>
+            <input id="in-fim" class="tempo" spellcheck="false" autocomplete="off">
+            <button type="button" data-ajuste="fim:0.1" title="+0,1s">›</button>
+          </div>
+          <div class="campo-tempo duracao"><span class="rotulo">Duração</span><strong id="duracao-corte">—</strong></div>
+          <div class="zoom">
+            <label class="check" title="Segure Alt para soltar"><input type="checkbox" id="imantar" checked> Imã nas frases</label>
+            <button type="button" id="zoom-menos" title="Afastar">−</button>
+            <button type="button" id="zoom-ajustar">Ajustar</button>
+            <button type="button" id="zoom-mais" title="Aproximar">+</button>
+          </div>
+        </div>
+        <div id="visao-geral" class="visao-geral" title="Vídeo inteiro: clique para ir ao ponto">
+          <div id="janela-visivel" class="janela-visivel"></div>
+          <div id="cabeca-geral" class="cabeca-geral"></div>
+        </div>
+        <div id="trilha" class="trilha">
+          <div id="regua" class="regua"></div>
+          <div id="faixa-frases" class="faixa faixa-frases"></div>
+          <div id="faixa-legenda" class="faixa faixa-legenda"></div>
+          <div id="selecao" class="selecao" hidden>
+            <div class="alca alca-inicio" data-alca="inicio" title="Arraste para mudar o começo"></div>
+            <div class="alca alca-fim" data-alca="fim" title="Arraste para mudar o fim"></div>
+          </div>
+          <div id="cabeca" class="cabeca-leitura"><div id="cabeca-topo" class="cabeca-topo"></div></div>
+        </div>
+        <p class="dica">Arraste as alças amarelas para cortar, clique ou arraste na trilha para mover o vídeo. Roda do mouse aproxima; Shift + arrastar move o corte inteiro. Teclas: espaço, I, O, ← →.</p>
+      </div>
+
+      <div id="card-frases" class="card" hidden>
+        <div class="linha-rotulo">
+          <span class="rotulo">Transcrição do bloco</span>
+          <button id="copiar-transcricao" class="botao-link" type="button">Copiar o texto do corte</button>
+        </div>
+        <ol id="bloco-frases" class="frases"></ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Direita: blocos, estilo do card e da legenda, exportação -->
+  <aside class="coluna coluna-painel">
+    <div class="abas abas-painel">
+      <button class="aba ativa" data-painel="blocos" type="button">Blocos</button>
+      <button class="aba" data-painel="estilo" type="button">Card e legenda</button>
+      <button class="aba" data-painel="exportar" type="button">Exportar <span id="contador-painel"></span></button>
+      <button class="aba" data-painel="automatico" type="button">Em massa <span id="contador-automatico"></span></button>
+    </div>
+
+    <section id="painel-blocos" class="painel">
+      <div id="detalhe-bloco" class="card" hidden>
+        <div class="rotulo">Bloco selecionado</div>
+        <h3 id="bloco-titulo"></h3>
+        <p id="bloco-resumo" class="resumo"></p>
+        <div id="bloco-selos" class="selos"></div>
+        <div class="rotulo">Momentos fortes</div>
+        <ul id="bloco-destaques" class="destaques"></ul>
+      </div>
+      <div class="card">
+        <div class="abas abas-ordem">
+          <button class="aba ativa" data-ordem="potencial" type="button">Mais potencial</button>
+          <button class="aba" data-ordem="tempo" type="button">Em ordem</button>
+        </div>
+        <ul id="lista-blocos" class="lista-blocos"><li class="vazio-lista">Os blocos do vídeo aparecem aqui.</li></ul>
+      </div>
+    </section>
+
+    <section id="painel-estilo" class="painel" hidden>
+      <div class="card">
+        <div class="linha-rotulo"><span class="rotulo">Card do topo</span><label class="check"><input type="checkbox" data-estilo="card"> Mostrar</label></div>
+        <label class="campo">Etiqueta<input type="text" data-estilo="tag" list="etiquetas" maxlength="30"></label>
+        <datalist id="etiquetas"></datalist>
+        <label class="campo">Headline<textarea data-estilo="headline" rows="3" maxlength="160"></textarea></label>
+        <div class="linha-rotulo"><span class="rotulo">Sugestões do Gemini</span><button id="btn-sugerir" class="botao-link" type="button">Pedir de novo</button></div>
+        <ul id="sugestoes" class="sugestoes"><li class="vazio-lista">Escolha um bloco.</li></ul>
+        <p id="base-sugestoes" class="dica"></p>
+        <label class="campo">Tamanho da etiqueta <b data-valor-de="tamanho_tag"></b><input type="range" min="30" max="110" data-estilo="tamanho_tag"></label>
+        <label class="campo">Tamanho da headline <b data-valor-de="tamanho_headline"></b><input type="range" min="26" max="80" data-estilo="tamanho_headline"></label>
+      </div>
+      <div class="card">
+        <div class="linha-rotulo"><span class="rotulo">Legenda</span><label class="check"><input type="checkbox" data-estilo="legenda"> Mostrar</label></div>
+        <p id="info-legenda" class="dica"></p>
+        <label class="campo">Fonte
+          <select data-estilo="fonte_legenda">
+            <option value="bebas">Bebas Neue (padrão da Tropa)</option>
+            <option value="montserrat">Montserrat Black</option>
+          </select>
+        </label>
+        <label class="campo">Tamanho <b data-valor-de="tamanho_legenda"></b><input type="range" min="50" max="180" data-estilo="tamanho_legenda"></label>
+        <label class="campo">Altura na tela <b data-valor-de="posicao_legenda"></b><input type="range" min="0.1" max="0.95" step="0.01" data-estilo="posicao_legenda"></label>
+        <label class="campo">Contorno <b data-valor-de="contorno"></b><input type="range" min="0" max="16" data-estilo="contorno"></label>
+        <label class="campo">Palavras por vez <b data-valor-de="max_palavras"></b><input type="range" min="1" max="5" data-estilo="max_palavras"></label>
+        <div class="campo">Cor do texto<div id="cores-legenda" class="cores"></div></div>
+        <div class="campo">Cor do destaque<div id="cores-destaque" class="cores"></div></div>
+        <label class="check"><input type="checkbox" data-estilo="destacar_palavra"> Destacar uma palavra por vez</label>
+        <label class="check"><input type="checkbox" data-estilo="maiusculas"> Caixa alta</label>
+      </div>
+      <div class="card">
+        <span class="rotulo">Enquadramento do vídeo</span>
+        <label class="campo">Zoom <b data-valor-de="zoom"></b><input type="range" min="1" max="2.5" step="0.01" data-estilo="zoom"></label>
+        <label class="campo">Horizontal<input type="range" min="-1" max="1" step="0.01" data-estilo="enquadramento_x"></label>
+        <label class="campo">Vertical<input type="range" min="-1" max="1" step="0.01" data-estilo="enquadramento_y"></label>
+      </div>
+      <div class="card">
+        <div class="linha-rotulo"><span class="rotulo">Rodapé</span><label class="check"><input type="checkbox" data-estilo="rodape"> Mostrar</label></div>
+        <input type="text" class="campo-texto" data-estilo="texto_rodape" maxlength="140">
+      </div>
+      <button id="restaurar-estilo" class="botao-sec largo" type="button">Restaurar o padrão</button>
+    </section>
+
+    <section id="painel-exportar" class="painel" hidden>
+      <div class="card">
+        <span class="rotulo">Vídeo pronto para publicar</span>
+        <p id="resumo-exportacao" class="resumo"></p>
+        <button id="btn-exportar" class="botao-pri largo" type="button" disabled>Exportar vídeo pronto (MP4)</button>
+        <p class="dica">Sai igual ao preview: formato, card, legenda palavra por palavra e rodapé.</p>
+        <button id="btn-baixar-cru" class="botao-sec largo" type="button" disabled>Baixar só o trecho, sem edição (MP4 + .srt)</button>
+      </div>
+      <div class="card">
+        <span class="rotulo">Todos os blocos deste vídeo</span>
+        <p id="resumo-blocos-crus" class="resumo">Abra um vídeo à esquerda.</p>
+        <button id="btn-blocos-crus" class="botao-sec largo" type="button" disabled>Baixar todos os blocos, sem edição</button>
+        <p class="dica">Baixa o vídeo inteiro uma vez, na maior qualidade do YouTube, e recorta cada bloco do Chub sem recomprimir, com a legenda .srt ao lado. Sem recomprimir, cada corte começa no ponto limpo mais próximo antes do bloco (de 1 a 7 segundos antes) e termina 2 segundos depois.</p>
+      </div>
+      <div class="card">
+        <span class="rotulo">Exportações e downloads</span>
+        <ul id="lista-tarefas" class="lista-tarefas"><li class="vazio-lista">Nada exportado ainda.</li></ul>
+      </div>
+    </section>
+
+    <section id="painel-automatico" class="painel" hidden>
+      <div class="card">
+        <span class="rotulo">Baixar ou editar em massa</span>
+        <p class="dica">Pega os melhores momentos de cada vídeo marcado, pela ordem de potencial do Chub.</p>
+        <div class="massa-modos">
+          <label class="check"><input type="radio" name="massa-modo" value="baixar" checked> <span><b>Só baixar</b> os melhores momentos: o bloco inteiro com 2 s de folga e a legenda .srt, para cortar no CapCut</span></label>
+          <label class="check"><input type="radio" name="massa-modo" value="editar"> <span><b>Editar automaticamente</b>: um corte curto por momento, com card e headline; a legenda vem num .srt separado, sem queimar no vídeo</span></label>
+        </div>
+        <div class="auto-campos">
+          <label class="campo">Momentos por vídeo <b id="massa-quantos-valor">3</b><input type="range" id="massa-quantos" min="1" max="10" value="3"></label>
+          <label class="campo">Formato (editar)
+            <select id="massa-formato"><option>9:16</option><option selected>4:5</option><option>1:1</option><option>16:9</option></select>
+          </label>
+        </div>
+        <label class="check"><input type="checkbox" id="massa-so-prontos"> Só blocos prontos para short</label>
+        <div class="linha-rotulo massa-topo">
+          <span class="rotulo">Vídeos (<span id="massa-contagem">0</span> marcados)</span>
+          <span><button id="massa-marcar-dia" class="botao-link" type="button">Marcar últimas 48 h</button> · <button id="massa-limpar" class="botao-link" type="button">Limpar</button></span>
+        </div>
+        <ul id="massa-videos" class="massa-videos"></ul>
+        <button id="massa-comecar" class="botao-pri largo" type="button">Começar</button>
+        <ul id="massa-trabalhos" class="lista-tarefas"></ul>
+      </div>
+      <div class="card">
+        <div class="linha-rotulo"><span class="rotulo">Vigiar vídeos novos</span><label class="check"><input type="checkbox" id="auto-ligada"> Ligada</label></div>
+        <p id="auto-mensagem" class="dica"></p>
+        <p class="dica">Vigia os vídeos novos do Chub, escolhe os cortes, escreve o card e exporta com a legenda num .srt separado. Nada é publicado: tudo espera a sua revisão.</p>
+        <div class="auto-campos">
+          <label class="campo">Vídeos dos últimos
+            <select id="auto-dias"><option value="1">1 dia</option><option value="2">2 dias</option><option value="3">3 dias</option><option value="7">7 dias</option></select>
+          </label>
+          <label class="campo">Rodar a cada
+            <select id="auto-intervalo"><option value="30">30 min</option><option value="60">1 hora</option><option value="180">3 horas</option><option value="360">6 horas</option></select>
+          </label>
+          <label class="campo">Formato
+            <select id="auto-formato"><option>9:16</option><option>4:5</option><option>1:1</option><option>16:9</option></select>
+          </label>
+          <label class="campo">Cortes por rodada <b id="auto-max-valor"></b><input type="range" id="auto-max" min="1" max="12"></label>
+        </div>
+        <button id="auto-rodar" class="botao-pri largo" type="button">Rodar agora</button>
+      </div>
+      <div class="card">
+        <div class="abas abas-filtro">
+          <button class="aba ativa" data-filtro="para_revisar" type="button">Para revisar</button>
+          <button class="aba" data-filtro="aprovado" type="button">Aprovados</button>
+          <button class="aba" data-filtro="descartado" type="button">Descartados</button>
+        </div>
+        <ul id="auto-cortes" class="auto-cortes"></ul>
+      </div>
+    </section>
+  </aside>
+</main>
+
+<div id="aviso" class="aviso" hidden></div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

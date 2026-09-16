@@ -1,0 +1,3749 @@
+[
+ {
+  "resumo": {
+   "blocos_chub": 30,
+   "blocos_nossos": 26,
+   "precisao_inicios": 0.423,
+   "revocacao_inicios": 0.367,
+   "f1_inicios": 0.393,
+   "blocos_do_chub_com_par": 13,
+   "concordancia_renan_falando": 0.462,
+   "concordancia_precisa_contexto": 0.308,
+   "duracao_mediana_chub_s": 53.2,
+   "duracao_mediana_nossa_s": 81.9,
+   "prontos_chub": 2,
+   "prontos_nossos": 13,
+   "youtube_id": "DxN0m8JN94w",
+   "titulo": "ANÚNCIO ESPECIAL com Renan Santos",
+   "frases": 1523,
+   "segundos": 1039,
+   "modelos": [
+    "gemini-2.5-flash"
+   ]
+  },
+  "nossos": [
+   {
+    "id": "local-0",
+    "titulo": "Renan expressa sua ambição de vencer as eleições presidenciais e ir para o segundo turno.",
+    "resumo": "O orador reflete sobre um ano de pré-campanha e campanha, destacando a criação de um partido nacional e sua percepção de ser uma das maiores potências de discurso político. Ele manifesta seu desejo de \"ganhar as eleições para presidente\" e ir para o segundo turno, expressando frustração com a lentidão do progresso, mas afirmando que isso é um sinal de inconformismo, não de desânimo. Compara a situação a um time surpresa na Copa do Mundo que almeja a vitória final.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Campanha eleitoral",
+     "Ambição política",
+     "Partido Missão",
+     "Frustração",
+     "Estratégia de vitória"
+    ],
+    "inicio": 72.52,
+    "fim": 180.44,
+    "duracao": 107.92,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 85,
+    "autonomia": 90,
+    "pergunta": "Qual a ambição de Renan Santos para as eleições e como ele lida com o processo?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan Santos é o locutor principal, introduzindo o tópico da eleição e sua ambição pessoal. Há breves interjeições de outro locutor (frase 51), mas a fala dominante é de Renan.",
+    "motivo_autonomia": "O bloco apresenta uma tese clara sobre a ambição de campanha e a frustração do Renan, que pode ser compreendida sem informações externas.",
+    "frase_inicial": 25,
+    "frase_final": 60,
+    "destaques": [
+     {
+      "inicio": 98.0,
+      "fim": 105.76,
+      "texto": "Não apenas vencer do ponto de vista simbólico, ah, fizemos, não, quero ganhar as eleições para presidente, quero ir pro segundo turno e eu quero vocês pilhados nisso,",
+      "motivo": "Afirmação direta do objetivo eleitoral de vencer e ir para o segundo turno.",
+      "frase": 34
+     },
+     {
+      "inicio": 124.48,
+      "fim": 126.88,
+      "texto": "Isso é o que pessoas inconformadas fazem.",
+      "motivo": "Explica a motivação por trás de sua irritação, conectando-a à atitude de pessoas inconformadas.",
+      "frase": 43
+     },
+     {
+      "inicio": 170.0,
+      "fim": 176.16,
+      "texto": "Só que eu quero ganhar a eleição, eu quero pegar a Noruega e ir pra final da Copa e ganhar da Espanha e ser campeã.",
+      "motivo": "Metáfora forte de querer vencer a Copa, reforçando a ambição de vitória eleitoral.",
+      "frase": 57
+     }
+    ],
+    "potencial": 81.2,
+    "pronto": true,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-1",
+    "titulo": "Renan anuncia uma turnê nacional de motorhome na reta final da campanha para impulsionar a vitória eleitoral.",
+    "resumo": "Renan Santos anuncia o lançamento de uma turnê de motorhome na reta final da campanha, explicando que essa estratégia, inviável antes devido à logística, agora é ideal para a fase decisiva. Ele detalha a utilização de dois ônibus: um super moderno para convidados (como podcasts, candidatos e influenciadores) e outro para a equipe principal. O objetivo é criar uma \"live de 24 horas\" com transmissão em tempo real da rota, permitindo que apoiadores sigam a caravana de carro, com acompanhamento da Polícia Federal para segurança.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Campanha eleitoral",
+     "Estratégia de campanha",
+     "Motorhome",
+     "Engajamento de apoiadores",
+     "Live 24 horas"
+    ],
+    "inicio": 201.24,
+    "fim": 407.4,
+    "duracao": 206.16,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 3,
+    "forca": 90,
+    "autonomia": 95,
+    "pergunta": "Qual é o grande anúncio de campanha para a reta final e como ele funcionará?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan Santos é o principal locutor, apresentando a ideia do motorhome. Há uma interrupção breve de outro locutor (frase 90), mas Renan retoma o fio da ideia.",
+    "motivo_autonomia": "O bloco apresenta e contextualiza a ideia da turnê de motorhome de forma completa.",
+    "frase_inicial": 76,
+    "frase_final": 148,
+    "destaques": [
+     {
+      "inicio": 231.44,
+      "fim": 233.44,
+      "texto": "Nós estamos partindo pro motor home.",
+      "motivo": "Afirmação clara do lançamento da estratégia do motorhome.",
+      "frase": 84
+     },
+     {
+      "inicio": 266.32,
+      "fim": 269.6,
+      "texto": "Eu vou pegar um um ônibus, um não, dois ônibus.",
+      "motivo": "Destaque para a grandiosidade da jornada proposta com múltiplos ônibus.",
+      "frase": 98
+     },
+     {
+      "inicio": 348.24,
+      "fim": 352.08,
+      "texto": "Nós vamos estar em IRL o tempo todo, então tá todo mundo convidado.",
+      "motivo": "Reforça a dimensão da cobertura e engajamento pretendidos com a live 24 horas.",
+      "frase": 128
+     },
+     {
+      "inicio": 386.76,
+      "fim": 390.64,
+      "texto": "Naturalmente a Polícia Federal vai fazer o acompanhamento, então fiquem tranquilos, vai ser muito seguro.",
+      "motivo": "Garante a segurança da caravana, incentivando a participação.",
+      "frase": 142
+     }
+    ],
+    "potencial": 89.2,
+    "pronto": false,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-2",
+    "titulo": "Renan descreve o interior e as funcionalidades do seu motorhome oficial para a turnê de campanha.",
+    "resumo": "O orador descreve em detalhes o segundo ônibus, o \"ônibus oficial da turnê\", que será seu motorhome. Ele mostra imagens do interior, destacando um banheiro com box e aquecedor a gás, beliches, uma cama, ar condicionado, uma cozinha equipada com fogão e geladeira, e mesas com tomadas que se transformam em camas.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Campanha eleitoral",
+     "Motorhome",
+     "Logística de campanha",
+     "Vida na estrada"
+    ],
+    "inicio": 407.4,
+    "fim": 519.6,
+    "duracao": 112.2,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 1,
+    "forca": 70,
+    "autonomia": 90,
+    "pergunta": "Como é o motorhome oficial de Renan Santos para a turnê de campanha?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan Santos descreve o ônibus, com interrupções da equipe para gerenciar as imagens ou responder perguntas pontuais (frases 154, 159, 161, 162, 163, 177, 178, 184, 185).",
+    "motivo_autonomia": "O bloco detalha as características do motorhome, que é autoexplicativo.",
+    "frase_inicial": 149,
+    "frase_final": 188,
+    "destaques": [
+     {
+      "inicio": 514.0,
+      "fim": 516.88,
+      "texto": "E é isto o nosso buzão.",
+      "motivo": "Conclusão da descrição do ônibus, enfatizando a capacidade de abrigar uma equipe grande.",
+      "frase": 187
+     }
+    ],
+    "potencial": 69.2,
+    "pronto": true,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-3",
+    "titulo": "A turnê de motorhome de Renan contará com transmissão 24h, caravanas e festas de campanha em diversas cidades.",
+    "resumo": "Renan Santos detalha a estrutura de transmissão da turnê, que terá dois modelos de live: uma 24 horas por dia no canal da Missão, com roteirista acompanhando as \"aventuras\", e IRLs especiais em seu próprio canal. Ele explica que a caravana incluirá os dois ônibus e um \"paredão de som\" para organizar festas de campanha e encontros com apoiadores em todas as cidades que visitarem, transformando cada parada em um evento de engajamento.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Campanha eleitoral",
+     "Engajamento digital",
+     "Eventos de campanha",
+     "Live streaming",
+     "Turnê política"
+    ],
+    "inicio": 519.6,
+    "fim": 598.56,
+    "duracao": 78.96,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 90,
+    "autonomia": 95,
+    "pergunta": "Como serão as transmissões e os eventos da turnê de motorhome?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan Santos é o locutor principal, descrevendo a estrutura da turnê. Há breves interações com a equipe (frases 194, 195).",
+    "motivo_autonomia": "O bloco explica a logística de transmissão e eventos da turnê de forma completa.",
+    "frase_inicial": 189,
+    "frase_final": 216,
+    "destaques": [
+     {
+      "inicio": 529.88,
+      "fim": 534.12,
+      "texto": "Vai ficar no canal da missão 24 horas ao vivo.",
+      "motivo": "Anúncio da live ininterrupta no canal da Missão.",
+      "frase": 195
+     },
+     {
+      "inicio": 568.12,
+      "fim": 575.04,
+      "texto": "Então vai ser seguido esses dois anos por um carro paredão de som, porque nós vamos parar em todas as cidades e organizar",
+      "motivo": "Descreve a estratégia de campanha inovadora de parar e fazer festas em todas as cidades.",
+      "frase": 209
+     },
+     {
+      "inicio": 591.08,
+      "fim": 594.52,
+      "texto": "plau, próximo à cidade, plau, próxima cidade e vai",
+      "motivo": "Reafirma a dinâmica acelerada e contínua da turnê.",
+      "frase": 215
+     }
+    ],
+    "potencial": 85.5,
+    "pronto": true,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-4",
+    "titulo": "Renan e equipe discutem e corrigem a rota inicial da turnê apresentada no site, focando na primeira parada.",
+    "resumo": "Renan e sua equipe revisam a rota da turnê apresentada no site \"tour.renanpresidente.com.br\", que inicialmente mostrava Londrina como a primeira parada. Eles corrigem que o ônibus não voará para Londrina e que a rota no mapa está \"errada\" no seu início, definindo que a primeira parada do ônibus será Londrina, após uma saída de São Paulo, embora o mapa não desenhe o trecho inicial.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Logística de campanha",
+     "Planejamento de rota",
+     "Lançamento de site",
+     "Comunicação"
+    ],
+    "inicio": 626.44,
+    "fim": 670.6,
+    "duracao": 44.16,
+    "renan_falando": false,
+    "precisa_contexto": false,
+    "cortes_possiveis": 0,
+    "forca": 60,
+    "autonomia": 80,
+    "pergunta": "Qual a primeira parada da turnê de motorhome e como ela está sendo comunicada?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Diálogo entre Renan Santos e outro membro da equipe (provavelmente Rizo) para esclarecer a rota e o que está exibido no site.",
+    "motivo_autonomia": "O bloco é sobre a discussão da rota, que faz sentido por si só, mesmo sem o contexto visual do mapa.",
+    "frase_inicial": 229,
+    "frase_final": 258,
+    "destaques": [
+     {
+      "inicio": 639.68,
+      "fim": 640.0,
+      "texto": "É isso.",
+      "motivo": "Reconhecimento explícito de um erro na apresentação da rota, demonstrando transparência.",
+      "frase": 232
+     }
+    ],
+    "potencial": 57.0,
+    "pronto": false,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-5",
+    "titulo": "Renan Santos detalha início da caravana \"Onça Móvel\" com visita familiar e primeiros participantes.",
+    "resumo": "Renan Santos anuncia que a caravana \"Onça Móvel\" começará após sua sabatina na Rede Record, com uma visita à casa de seus pais em Vinhedo para um churrasco com a equipe. Ele apresenta Artur do Val como um dos motoristas do ônibus e menciona que figuras do universo MBL, como Ian Garcez e Coronel Medina, também participarão da viagem.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Campanha eleitoral",
+     "Caravana MBL",
+     "Artur do Val",
+     "Estratégia de campanha"
+    ],
+    "inicio": 671.4,
+    "fim": 792.48,
+    "duracao": 121.08,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 80,
+    "autonomia": 90,
+    "pergunta": "Como e onde a caravana \"Onça Móvel\" de Renan Santos irá começar e quem a acompanhará inicialmente?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan é o locutor principal, narrando os planos da caravana, com algumas interjeições de outro locutor que não é identificado mas interage com ele.",
+    "motivo_autonomia": "O bloco descreve o início da caravana de forma autônoma, sem depender de informações externas.",
+    "frase_inicial": 260,
+    "frase_final": 317,
+    "destaques": [
+     {
+      "inicio": 747.96,
+      "fim": 750.04,
+      "texto": "Então ele vai virar um personagem nas viagens.",
+      "motivo": "Apresenta o motorista do ônibus como personagem, mostrando a informalidade da campanha.",
+      "frase": 297
+     },
+     {
+      "inicio": 757.12,
+      "fim": 759.6,
+      "texto": "Então, Artur será um nossos motoristas também.",
+      "motivo": "Anuncia Artur do Val como um dos motoristas, o que é um fato interessante e inusitado para o público.",
+      "frase": 303
+     },
+     {
+      "inicio": 776.36,
+      "fim": 779.44,
+      "texto": "Então assim, grandes personagens do universo Mibelístico vão.",
+      "motivo": "Destaca a participação de 'grandes personagens do universo Mibelístico', gerando expectativa.",
+      "frase": 309
+     }
+    ],
+    "potencial": 78.5,
+    "pronto": false,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-6",
+    "titulo": "Renan Santos detalha modelo de campanha itinerante, roteiro por estados do Sul e Sudeste, e participação em debates.",
+    "resumo": "O orador explica que a caravana fará grandes eventos em cidades listadas e \"pequenos stops\" em cidades intermediárias, com o objetivo de \"contaminar\" pessoas e adesivar carros/motos. Ele descreve o roteiro detalhado por Paraná, Santa Catarina, Rio Grande do Sul, e a rota de retorno passando por São Paulo, Minas Gerais, Espírito Santo e Rio de Janeiro. Menciona que ele se ausentará da caravana em alguns momentos para participar de debates em São Paulo e no Rio.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Estratégia de campanha",
+     "Campanha itinerante",
+     "Mobilização eleitoral",
+     "Roteiro político",
+     "Debates eleitorais"
+    ],
+    "inicio": 792.48,
+    "fim": 1085.36,
+    "duracao": 292.88,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 3,
+    "forca": 85,
+    "autonomia": 95,
+    "pergunta": "Como a campanha itinerante de Renan Santos será organizada e qual o roteiro detalhado pela região Sul e Sudeste?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan é o locutor principal, detalhando o roteiro da campanha, com um breve diálogo com outro locutor sobre a rota para Vitória.",
+    "motivo_autonomia": "O bloco descreve de forma exaustiva o roteiro e a metodologia da campanha, sendo compreensível por si só.",
+    "frase_inicial": 318,
+    "frase_final": 414,
+    "destaques": [
+     {
+      "inicio": 839.72,
+      "fim": 842.8,
+      "texto": "E a ideia é isso, é contaminar as pessoas com a ideia",
+      "motivo": "Define o objetivo principal da campanha de rua: 'contaminar as pessoas com a ideia'.",
+      "frase": 333
+     },
+     {
+      "inicio": 866.96,
+      "fim": 876.64,
+      "texto": "Então, por exemplo, eh, se entre Cascavel e e Chapecó existem cidades pequenas que estão no caminho, que dá para parar para fazer um evento, vamos parar,",
+      "motivo": "Destaca a estratégia de visitar também pequenas cidades, mostrando alcance amplo.",
+      "frase": 341
+     },
+     {
+      "inicio": 901.4,
+      "fim": 903.32,
+      "texto": "É, é, é contaminar a galera.",
+      "motivo": "Enfatiza a energia e o envolvimento esperado dos eventos de rua.",
+      "frase": 353
+     },
+     {
+      "inicio": 934.4,
+      "fim": 939.28,
+      "texto": "E inclusive estou convidando os nossos candidatos a deputado federal de outros estados para se juntarem à aventura,",
+      "motivo": "Demonstra o convite à participação de outros candidatos, ampliando o escopo da campanha.",
+      "frase": 369
+     }
+    ],
+    "potencial": 86.5,
+    "pronto": false,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-7",
+    "titulo": "Renan Santos garante segurança da caravana e promete a \"campanha mais bonita já feita\", mirando o segundo turno.",
+    "resumo": "Renan Santos tranquiliza os apoiadores sobre a segurança da caravana, afirmando que o ônibus é blindado e haverá escolta da Polícia Federal. Ele declara que esta será \"a campanha mais bonita já feita na história do Brasil,\" vista como uma homenagem aos apoiadores e uma resposta à elite que não os financiou. Ele expressa a crença de que essa campanha \"única\" irá \"despertar o Brasil\" e levá-los ao segundo turno.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Segurança na campanha",
+     "Financiamento de campanha",
+     "Mobilização eleitoral",
+     "Segundo turno",
+     "Discurso motivacional"
+    ],
+    "inicio": 1085.36,
+    "fim": 1170.2,
+    "duracao": 84.84,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 90,
+    "autonomia": 95,
+    "pergunta": "Quais as medidas de segurança da caravana e qual a visão de Renan Santos sobre o impacto e o propósito desta campanha?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan é o locutor principal, com a fala 'Renan, o ônibus é blindado' indicando que se refere a si mesmo, ou que outro locutor fez a pergunta. O contexto é dominado pela voz de Renan.",
+    "motivo_autonomia": "O bloco aborda um tema claro de segurança e depois apresenta uma declaração de intenções e um discurso motivacional, que se sustentam bem sozinhos.",
+    "frase_inicial": 415,
+    "frase_final": 443,
+    "destaques": [
+     {
+      "inicio": 1103.96,
+      "fim": 1108.6,
+      "texto": "fiquem tranquilos, a gente tá criando os nossos dispositivos, ninguém vai conseguir me matar no caminho,",
+      "motivo": "Aborda diretamente a preocupação com a segurança e menciona a blindagem do ônibus.",
+      "frase": 421
+     },
+     {
+      "inicio": 1126.44,
+      "fim": 1130.84,
+      "texto": "Isso aqui vai ser a campanha mais bonita já feita na história do Brasil, tá?",
+      "motivo": "Declara a grandiosidade e o ineditismo da campanha, gerando impacto.",
+      "frase": 429
+     },
+     {
+      "inicio": 1143.8,
+      "fim": 1148.84,
+      "texto": "Então vai ser uma campanha feita com a nossa galera, com o dinheiro da nossa galera, com a cara da nossa galera.",
+      "motivo": "Ressalta o caráter popular e autêntico da campanha, diferenciando-a das tradicionais.",
+      "frase": 435
+     },
+     {
+      "inicio": 1148.84,
+      "fim": 1154.76,
+      "texto": "E mais, é um modelo de campanha tão bonito e tão único que isso vai despertar o Brasil e nós vamos pro segundo turno.",
+      "motivo": "Afirma o objetivo ambicioso de ir para o segundo turno, destacando a estratégia disruptiva.",
+      "frase": 436
+     }
+    ],
+    "potencial": 85.5,
+    "pronto": true,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-8",
+    "titulo": "Renan Santos convida podcasts e influenciadores a cobrir a caravana, idealizando eventos espontâneos e imersivos.",
+    "resumo": "Renan Santos convida podcasts como Três Irmãos, Redcast e Inteligência Limitada, além de outros influenciadores, a se juntarem à caravana para cobrir a viagem. Ele descreve a expectativa de momentos únicos e espontâneos, como churrascos em ranchos ou fazendas com fogueira, permitindo entrevistas e interação entre os participantes e personagens da campanha.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Mídia e campanha",
+     "Marketing de influência",
+     "Cobertura jornalística",
+     "Eventos espontâneos",
+     "Mobilização digital"
+    ],
+    "inicio": 1230.16,
+    "fim": 1298.28,
+    "duracao": 68.12,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 75,
+    "autonomia": 85,
+    "pergunta": "Como Renan Santos planeja envolver a mídia e influenciadores na cobertura da caravana e quais experiências eles podem esperar?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan é o locutor principal, fazendo o convite e descrevendo as situações hipotéticas.",
+    "motivo_autonomia": "O bloco explica a proposta de cobertura e a experiência esperada da caravana de forma clara.",
+    "frase_inicial": 467,
+    "frase_final": 484,
+    "destaques": [
+     {
+      "inicio": 1247.52,
+      "fim": 1252.6,
+      "texto": "Podcasts, entrem em contato se vocês quiserem fazer cobertura da viagem, venham fazer cobertura da viagem.",
+      "motivo": "Convite direto a podcasts e influenciadores para cobertura, indicando estratégia de mídia.",
+      "frase": 471
+     },
+     {
+      "inicio": 1255.68,
+      "fim": 1259.36,
+      "texto": "venham todos participar, vai ser bem legal, porque vamos ter momentos bonitos.",
+      "motivo": "Promete 'momentos bonitos' e uma experiência diferenciada para quem participar.",
+      "frase": 474
+     },
+     {
+      "inicio": 1266.4,
+      "fim": 1272.36,
+      "texto": "Aí chega meia-noite, descobre que tem um cara que tem um sítio, um rancho, uma fazenda, ó,",
+      "motivo": "Descreve um cenário de evento espontâneo e autêntico, ilustrando a atmosfera desejada.",
+      "frase": 478
+     }
+    ],
+    "potencial": 74.2,
+    "pronto": true,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-9",
+    "titulo": "Renan Santos descredibiliza Datafolha e Quest, afirmando que a campanha de rua mostrará o verdadeiro apoio popular.",
+    "resumo": "Renan Santos descarta a credibilidade das pesquisas Datafolha e Quest, chamando-as de \"piada\" ou \"má fé\", com base em experiências passadas e em sua recente recepção em Joinville, onde percebeu um apoio muito maior do que o indicado pelas pesquisas. Ele argumenta que há um \"problema estatístico\" colossal nas pesquisas, pois não captam o mundo real, e reitera que a campanha com o \"busão\" irá lotar as ruas e provar o crescimento do movimento.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Pesquisas eleitorais",
+     "Crítica à mídia",
+     "Apoio popular",
+     "Mobilização de rua",
+     "Crescimento de campanha"
+    ],
+    "inicio": 1309.08,
+    "fim": 1449.88,
+    "duracao": 140.8,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 3,
+    "forca": 90,
+    "autonomia": 95,
+    "pergunta": "Qual a posição de Renan Santos sobre as pesquisas eleitorais e como ele pretende provar o crescimento de sua campanha?",
+    "riscos": [
+     "ataque_pessoal"
+    ],
+    "avisos": [],
+    "nota_locutores": "Renan é o locutor principal e único nesse bloco, expressando sua opinião de forma contundente.",
+    "motivo_autonomia": "O bloco apresenta uma crítica clara às pesquisas e sua justificativa, com exemplos concretos, sendo autoexplicativo.",
+    "frase_inicial": 490,
+    "frase_final": 530,
+    "destaques": [
+     {
+      "inicio": 1320.96,
+      "fim": 1324.32,
+      "texto": "Primeira premissa, nós não temos aquela piada da da datafolha,",
+      "motivo": "Inicia a crítica contundente às pesquisas Datafolha, desqualificando-as.",
+      "frase": 492
+     },
+     {
+      "inicio": 1344.0,
+      "fim": 1346.36,
+      "texto": "E eu digo isso por eu tava agora em Joinville,",
+      "motivo": "Reafirma a falta de seriedade do Datafolha, estabelecendo sua posição.",
+      "frase": 501
+     },
+     {
+      "inicio": 1375.28,
+      "fim": 1385.0,
+      "texto": "Se não for mentira, basicamente má fé da parte de estudos como dataf, quest, que a gente sabe que tem uma fé e nós viemos a público, por exemplo, demonstrar como o Quest trabalha com com uma fé,",
+      "motivo": "Acusa os institutos de 'má fé' ou 'problema estatístico colossal', levantando dúvidas sobre a integridade das pesquisas.",
+      "frase": 512
+     },
+     {
+      "inicio": 1397.16,
+      "fim": 1402.64,
+      "texto": "Eh, e sim nós vamos crescer muito e sim vocês vão ver isso nessa nesses eventos.",
+      "motivo": "Contrapõe os números das pesquisas com a expectativa de lotar as ruas, mostrando confiança na mobilização.",
+      "frase": 517
+     },
+     {
+      "inicio": 1430.28,
+      "fim": 1431.88,
+      "texto": "Pô, isso é único.",
+      "motivo": "Descreve a eficácia e o impacto esperado dos eventos de rua, contrastando com a pesquisa.",
+      "frase": 525
+     }
+    ],
+    "potencial": 89.2,
+    "pronto": false,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-10",
+    "titulo": "MBL celebra sucesso de evento pago em Joinville e critica estratégia de \"voto útil\" de adversários",
+    "resumo": "O orador celebra o sucesso de um evento em Joinville com 970 pagantes, contrastando com adversários que pagam para levar pessoas a seus eventos. Ele destaca que o público pagante surpreendeu repórteres. Em seguida, ele critica a estratégia dos adversários de pedir \"voto útil no primeiro turno\" como uma tentativa de desviar a atenção de questões de corrupção.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Campanha eleitoral",
+     "Engajamento político",
+     "Voto útil",
+     "Corrupção",
+     "MBL"
+    ],
+    "inicio": 1579.84,
+    "fim": 1651.52,
+    "duracao": 71.68,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 85,
+    "autonomia": 90,
+    "pergunta": "Qual o balanço do evento em Joinville e como o MBL se posiciona frente às estratégias dos adversários?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan Santos é o locutor principal, discutindo os resultados do evento com outro interlocutor. A fala de Renan em 600-605, 624, e o tom geral indicam que ele é a voz dominante.",
+    "motivo_autonomia": "O bloco aborda a estratégia eleitoral e o sucesso do MBL em contraste com os adversários, sendo compreensível por si só, embora a identidade exata dos 'adversários' possa ser aprofundada externamente.",
+    "frase_inicial": 596,
+    "frase_final": 624,
+    "destaques": [
+     {
+      "inicio": 1605.08,
+      "fim": 1607.76,
+      "texto": "É pagante o público seu?\" \"Sim, eu nunca vi isso aí\".",
+      "motivo": "Demonstra a surpresa da mídia com a capacidade do MBL de atrair público pagante, destacando a autenticidade do engajamento.",
+      "frase": 605
+     },
+     {
+      "inicio": 1647.32,
+      "fim": 1651.52,
+      "texto": "Esse caros não, enquanto assim, enquanto a gente pensava no Brasil, vocês roubavam.",
+      "motivo": "Reforça a crítica direta e agressiva do MBL à corrupção dos adversários, contrastando com sua própria proposta.",
+      "frase": 624
+     }
+    ],
+    "potencial": 81.2,
+    "pronto": true,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-11",
+    "titulo": "Renan Santos acusa \"Pedro Sangue\" de crime eleitoral, deslumbramento e ligação com corrupção de adversários",
+    "resumo": "Renan Santos critica duramente \"Pedro Sangue\" (Tales Gomes), acusando-o de ser \"deslumbrado\" e de ter falado sobre crime eleitoral em podcast, além de ter um negócio de coaching com práticas financeiras questionáveis. Ele o associa à campanha de Flávio Bolsonaro e o acusa de ser \"aliado do crime organizado\", pedindo a quebra de sigilo de sua empresa para revelar irregularidades. Renan contrapõe a postura \"jeca\" de Gomes com sua própria discrição em negociações internacionais e reitera que os adversários tentam usar o \"voto útil\" para abafar escândalos de corrupção.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Corrupção",
+     "Crime eleitoral",
+     "Crítica política",
+     "Campanha eleitoral",
+     "Lavagem de dinheiro"
+    ],
+    "inicio": 1651.52,
+    "fim": 1860.88,
+    "duracao": 209.36,
+    "renan_falando": true,
+    "precisa_contexto": true,
+    "cortes_possiveis": 3,
+    "forca": 90,
+    "autonomia": 65,
+    "pergunta": "Quais as acusações do MBL contra \"Pedro Sangue\" e seus aliados, e como isso se relaciona com a estratégia eleitoral dos adversários?",
+    "riscos": [
+     "juridico_sensivel",
+     "ataque_pessoal",
+     "linguagem_ofensiva"
+    ],
+    "avisos": [],
+    "nota_locutores": "Renan Santos é o locutor principal, com interações pontuais do co-apresentador que reforçam suas afirmações.",
+    "motivo_autonomia": "O bloco faz referências a figuras e eventos específicos (Pedro Sangue, J Vance, Vorcaro, Rock Bridge, crime eleitoral em podcast) que, embora denunciados, não são totalmente contextualizados para um público externo.",
+    "frase_inicial": 625,
+    "frase_final": 709,
+    "destaques": [
+     {
+      "inicio": 1679.0,
+      "fim": 1683.96,
+      "texto": "Ele foi num podcast basicamente falar de crime eleitoral num podcast porque ele era advising.",
+      "motivo": "Aponta uma suposta confissão pública de crime eleitoral, o que é uma acusação grave.",
+      "frase": 636
+     },
+     {
+      "inicio": 1806.12,
+      "fim": 1808.2,
+      "texto": "quer ganhar ministério, Pedro Sangue, vai tomar no seu",
+      "motivo": "Contém um ataque pessoal direto e linguagem ofensiva, mas com forte carga editorial de denúncia.",
+      "frase": 688
+     },
+     {
+      "inicio": 1823.72,
+      "fim": 1828.2,
+      "texto": "Se alguém quebrar o sigilo daquela empresa, coisas serão descobertas, tá?",
+      "motivo": "Sugere que há provas contundentes de irregularidades financeiras que aguardam investigação.",
+      "frase": 694
+     }
+    ],
+    "potencial": 80.2,
+    "pronto": false,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-12",
+    "titulo": "Renan Santos convoca militância para reta final e critica bolsonaristas por normalizarem corrupção",
+    "resumo": "Renan Santos convoca a militância do MBL para intensificar a energia nas semanas finais da campanha, afirmando que isso forçará o \"Flávio\" a participar de debates. Ele critica a \"estratégia evasiva\" dos adversários, que evitam a discussão de propostas para esconder suas fraquezas. O orador também ataca os bolsonaristas por criar memes que, segundo ele, expressam um prazer em serem roubados por seus líderes, comparando essa atitude à estratégia do PT de normalizar a corrupção no passado.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Campanha eleitoral",
+     "Militância",
+     "Debates políticos",
+     "Estratégia política",
+     "Corrupção"
+    ],
+    "inicio": 1860.88,
+    "fim": 2035.44,
+    "duracao": 174.56,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 3,
+    "forca": 90,
+    "autonomia": 95,
+    "pergunta": "Qual a estratégia do MBL para a reta final da campanha e como Renan Santos avalia a postura de seus adversários e eleitores?",
+    "riscos": [
+     "linguagem_ofensiva"
+    ],
+    "avisos": [],
+    "nota_locutores": "Renan Santos é o locutor principal, com o co-apresentador fornecendo apoio e confirmação, como em 721-722.",
+    "motivo_autonomia": "O bloco aborda a estratégia de campanha e a crítica política de forma clara e compreensível, sem depender de informações externas cruciais para o entendimento.",
+    "frase_inicial": 710,
+    "frase_final": 788,
+    "destaques": [
+     {
+      "inicio": 1877.12,
+      "fim": 1878.76,
+      "texto": "A grande batalha final começa agora.",
+      "motivo": "Carga dramática e de urgência para mobilizar a militância na reta final da campanha.",
+      "frase": 719
+     },
+     {
+      "inicio": 1878.76,
+      "fim": 1885.0,
+      "texto": "Vocês precisam botar energia, até porque se a gente começa a botar energia e eles começam a ficar com medo, Flavinho vai ter que ir pro debate da Globo.",
+      "motivo": "Conecta diretamente o esforço da militância com a pressão para forçar o adversário a debater, expondo sua fragilidade.",
+      "frase": 720
+     },
+     {
+      "inicio": 1962.72,
+      "fim": 1966.76,
+      "texto": "O cara que produz um meme desses, ele tem prazer em ser roubado pelo Flávio.",
+      "motivo": "Afirmação chocante que busca expor a irracionalidade ou perversão da base bolsonarista, gerando forte repercussão.",
+      "frase": 760
+     }
+    ],
+    "potencial": 89.2,
+    "pronto": false,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-13",
+    "titulo": "Renan Santos descreve \"turnê gloriosa\" como campanha autêntica e prevê \"carnificina\" entre adversários",
+    "resumo": "O orador prevê que, na reta final da campanha, os adversários começarão a se atacar, expondo informações uns dos outros, inclusive entre Flávio e Lula. Em contraste, ele descreve a \"turnê gloriosa\" do MBL como uma campanha \"Mad Max\", com carros de som e sinalizadores, prometendo até churrascos. Ele afirma que o objetivo é fazer as pessoas \"viverem uma campanha de verdade\" e focar em propostas, em um evento \"muito bonito\".",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Campanha eleitoral",
+     "Estratégia política",
+     "Polarização",
+     "MBL",
+     "Turnê"
+    ],
+    "inicio": 2035.44,
+    "fim": 2102.88,
+    "duracao": 67.44,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 70,
+    "autonomia": 90,
+    "pergunta": "Como será a \"turnê gloriosa\" do MBL e qual a expectativa de Renan Santos para a reta final da campanha?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan Santos é o locutor principal, descrevendo a turnê e seus detalhes com o apoio e perguntas do co-apresentador.",
+    "motivo_autonomia": "O bloco descreve a visão do MBL para a reta final da campanha e a turnê de forma compreensível.",
+    "frase_inicial": 789,
+    "frase_final": 815,
+    "destaques": [
+     {
+      "inicio": 2052.84,
+      "fim": 2054.6,
+      "texto": "Então eles vão começar a se matar agora.",
+      "motivo": "Prevê um cenário de auto-destruição entre adversários na reta final da campanha.",
+      "frase": 795
+     },
+     {
+      "inicio": 2054.88,
+      "fim": 2062.88,
+      "texto": "E aí você tava imaginando a nessa turma um carro com som e aqueles batuc atrás, tipo Mad Max.",
+      "motivo": "Cria uma imagem forte e memorável da turnê, usando uma referência popular.",
+      "frase": 797
+     },
+     {
+      "inicio": 2097.96,
+      "fim": 2101.44,
+      "texto": "viverem o que é uma campanha de verdade, vamos falar de proposta,",
+      "motivo": "Reforça o compromisso com a discussão de ideias e o caráter positivo da campanha, apesar do tom agressivo contra adversários.",
+      "frase": 814
+     }
+    ],
+    "potencial": 73.0,
+    "pronto": true,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-14",
+    "titulo": "Renan Santos anuncia primeiros influenciadores e podcasters confirmados na 'Futuro Glorioso Tour'",
+    "resumo": "Renan Santos e o co-apresentador confirmam a participação do podcast Três Irmãos e Junior Masters (Radcast) na Futuro Glorioso Tour. Eles também convidam outros influenciadores, como Sacani e Nogar, propondo debates sobre temas como terras raras e saúde mental durante a caravana. A turnê é descrita como um \"circo viajante\" que permitirá ao público seguir os carros, comprar produtos e adesivá-los.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Campanha política",
+     "Tour",
+     "Caravana",
+     "Influenciadores",
+     "Podcasters"
+    ],
+    "inicio": 2277.72,
+    "fim": 2546.68,
+    "duracao": 268.96,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 3,
+    "forca": 80,
+    "autonomia": 90,
+    "pergunta": "Quais influenciadores e podcasters estão confirmados ou convidados para a 'Futuro Glorioso Tour' e quais são os detalhes da iniciativa?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan Santos é o interlocutor principal, interagindo com outro apresentador que o chama de \"Renatão\" e faz perguntas. As falas são atribuídas com base na direção da conversa.",
+    "motivo_autonomia": "O bloco apresenta claramente o objetivo da \"Futuro Glorioso Tour\" e os primeiros confirmados e convidados, além de detalhes da iniciativa.",
+    "frase_inicial": 898,
+    "frase_final": 1028,
+    "destaques": [
+     {
+      "inicio": 2302.28,
+      "fim": 2309.52,
+      "texto": "É no dia 24 o podcast Três Irmãos irá nos acompanhar aí.",
+      "motivo": "Anúncio da primeira grande confirmação de influenciador para a turnê.",
+      "frase": 911
+     },
+     {
+      "inicio": 2366.52,
+      "fim": 2369.36,
+      "texto": "Vamos, vamos fazer um bate-papo geológico com o Sacani.",
+      "motivo": "Sugestão de um formato de conteúdo editorial específico (bate-papo geológico) com um convidado.",
+      "frase": 940
+     },
+     {
+      "inicio": 2534.44,
+      "fim": 2543.92,
+      "texto": "Porque assim, o ônibus amarelo, Renato, quando separa ele, você abre um toldo, a gente vai criar uma feirinha ali, aí taca produto, compra produto, a gente adesiva o carro da galera.",
+      "motivo": "Descrição vívida e engajadora do formato da caravana como um evento de rua e interação.",
+      "frase": 1027
+     }
+    ],
+    "potencial": 82.2,
+    "pronto": false,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-15",
+    "titulo": "Renan Santos lista potenciais convidados e esclarece o propósito de sabatinas na turnê",
+    "resumo": "O orador sugere uma série de personalidades, incluindo De Leira, Igor F e Super Chandão, para participar da turnê. Ele esclarece que a participação em sabatinas ou entrevistas não implica em apoio político, mas sim em uma oportunidade para debates e aprendizado mútuo, incentivando os convidados a \"dar uma aula\".",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Turnê",
+     "Convidados",
+     "Sabatinas",
+     "Engajamento Político"
+    ],
+    "inicio": 2546.68,
+    "fim": 2642.72,
+    "duracao": 96.04,
+    "renan_falando": false,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 70,
+    "autonomia": 85,
+    "pergunta": "Quem são os potenciais convidados para a turnê e qual o propósito da sua participação?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Várias vozes masculinas interagem, listando nomes e fazendo comentários sobre potenciais convidados para a turnê. A frase final sobre o propósito das sabatinas é dita por uma voz não identificada como Renan.",
+    "motivo_autonomia": "O bloco explica claramente o tipo de pessoas que estão sendo convidadas e o propósito da participação delas, tornando-o compreensível por si só.",
+    "frase_inicial": 1029,
+    "frase_final": 1068,
+    "destaques": [
+     {
+      "inicio": 2630.2,
+      "fim": 2633.04,
+      "texto": "O Renan vai Cara, Sabatina não é declarar apoio.",
+      "motivo": "Esclarece a natureza dos convites e a postura da equipe em relação à participação.",
+      "frase": 1064
+     },
+     {
+      "inicio": 2634.88,
+      "fim": 2638.44,
+      "texto": "Sabatina ou entrevista ou me deêu uma aula de história.",
+      "motivo": "Reforça que a participação não é um endosso, mas uma oportunidade de diálogo.",
+      "frase": 1066
+     }
+    ],
+    "potencial": 71.5,
+    "pronto": false,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-16",
+    "titulo": "Renan Santos anuncia elenco principal da turnê e revela vídeo com Artur do Val",
+    "resumo": "Renan Santos anuncia o \"elenco principal\" que participará de toda a turnê, incluindo Renato Impera e Artur do Val, e menciona a tentativa de convencer Marcelo Brigadeiro. Ele também faz um teaser sobre um vídeo especial que será lançado com ele e Artur do Val, prometendo \"revelações\" e que o conteúdo \"não está no gibi\".",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Turnê",
+     "Elenco",
+     "Artur do Val",
+     "Vídeo Promocional",
+     "Campanha"
+    ],
+    "inicio": 2642.72,
+    "fim": 2755.2,
+    "duracao": 112.48,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 85,
+    "autonomia": 90,
+    "pergunta": "Quem são os participantes confirmados para a turnê e que anúncio especial está por vir?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan Santos é claramente o locutor principal, especialmente ao falar sobre o \"elenco principal\" e sua participação no vídeo. Outra voz interage no início para mencionar Renato Impera.",
+    "motivo_autonomia": "O bloco apresenta de forma clara quem são os participantes chave da turnê e detalha um anúncio importante de vídeo, sendo compreensível.",
+    "frase_inicial": 1069,
+    "frase_final": 1115,
+    "destaques": [
+     {
+      "inicio": 2655.84,
+      "fim": 2663.2,
+      "texto": "ele vai a turnê inteira porque vai ter o a turma assim que eu tô chamando de é o elenco principal, que é aquele elenco que vai estar em toda a aventura,",
+      "motivo": "Identifica os nomes que formarão o núcleo da equipe na turnê.",
+      "frase": 1077
+     },
+     {
+      "inicio": 2727.88,
+      "fim": 2730.68,
+      "texto": "Você você chegou a ver?",
+      "motivo": "Descreve o tom e a natureza do vídeo a ser lançado com Artur do Val.",
+      "frase": 1104
+     },
+     {
+      "inicio": 2750.92,
+      "fim": 2755.2,
+      "texto": "Tá que o que vem, gente, que vocês vão ver aí não tá no giibi, tá?",
+      "motivo": "Uma expressão que promete conteúdo surpreendente e impactante no vídeo.",
+      "frase": 1115
+     }
+    ],
+    "potencial": 81.2,
+    "pronto": true,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-17",
+    "titulo": "MBL convida veículos de mídia para acompanhar e cobrir a turnê \"Missão\"",
+    "resumo": "O orador faz um apelo direto para veículos de comunicação como Rádio Brado, Metrópoles e Antagonista enviarem representantes para cobrir a turnê. Ele sugere que podem fazer uma entrevista exclusiva ou acompanhar a comitiva.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Mídia",
+     "Cobertura Jornalística",
+     "Relações Públicas",
+     "Turnê"
+    ],
+    "inicio": 2798.08,
+    "fim": 2819.16,
+    "duracao": 21.08,
+    "renan_falando": false,
+    "precisa_contexto": false,
+    "cortes_possiveis": 1,
+    "forca": 80,
+    "autonomia": 95,
+    "pergunta": "Como a turnê \"Missão\" pretende se relacionar com a mídia?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Uma voz masculina, que parece ser o principal interlocutor, faz um convite direto à mídia. A transcrição indica \">>\" no início das frases, mas não identifica a voz como Renan.",
+    "motivo_autonomia": "O bloco é um convite explícito e direto à mídia, com os veículos nomeados e o propósito da cobertura bem definido.",
+    "frase_inicial": 1133,
+    "frase_final": 1140,
+    "destaques": [
+     {
+      "inicio": 2798.08,
+      "fim": 2802.08,
+      "texto": "Meu Deus, a pelo amor de Deus, Rádio Brado, mande alguém.",
+      "motivo": "Demonstra um apelo urgente e enfático para a participação da mídia.",
+      "frase": 1133
+     },
+     {
+      "inicio": 2807.96,
+      "fim": 2812.4,
+      "texto": "Outra coisa, eh, Metrópoles Antagonista, veículos como a Rádio Brado,",
+      "motivo": "Oferece duas modalidades de interação para a mídia: entrevista ou acompanhamento.",
+      "frase": 1136
+     }
+    ],
+    "potencial": 76.2,
+    "pronto": false,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-18",
+    "titulo": "Detalhes da estratégia de mobilização e eventos da turnê do MBL",
+    "resumo": "O orador descreve a estratégia da turnê, que envolve a chegada em comitivas de cerca de 60 pessoas, com um convite aberto para apoiadores seguirem em seus próprios veículos. Os eventos seriam montados em frente a faculdades, com discursos, barulho e mobilização para gerar apoio e votos para Renan.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Mobilização",
+     "Eventos de Campanha",
+     "Comícios",
+     "Estratégia Eleitoral"
+    ],
+    "inicio": 2989.44,
+    "fim": 3035.44,
+    "duracao": 46.0,
+    "renan_falando": false,
+    "precisa_contexto": false,
+    "cortes_possiveis": 3,
+    "forca": 90,
+    "autonomia": 90,
+    "pergunta": "Qual será a dinâmica dos eventos e da mobilização durante a turnê \"Missão\"?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Uma voz masculina descreve em detalhes a logística e a estratégia de mobilização dos eventos da turnê. Não há identificação explícita de Renan como essa voz.",
+    "motivo_autonomia": "O bloco detalha a metodologia de eventos da turnê de forma autônoma, descrevendo como será a interação com o público.",
+    "frase_inicial": 1215,
+    "frase_final": 1232,
+    "destaques": [
+     {
+      "inicio": 3000.2,
+      "fim": 3003.68,
+      "texto": "mas a galera que a gente vai abrir o formem,",
+      "motivo": "Mostra a intenção de incluir o público em uma \"comitiva\" maior, gerando engajamento.",
+      "frase": 1217
+     },
+     {
+      "inicio": 3017.16,
+      "fim": 3020.12,
+      "texto": "Vamos armar um evento na frente de uma faculdade.",
+      "motivo": "Revela o local estratégico para os eventos, visando um público jovem e engajado.",
+      "frase": 1224
+     },
+     {
+      "inicio": 3029.68,
+      "fim": 3031.44,
+      "texto": "Eu vou votar no Renan.",
+      "motivo": "Indica o objetivo final dos eventos: gerar apoio e votos para Renan.",
+      "frase": 1230
+     }
+    ],
+    "potencial": 87.8,
+    "pronto": false,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-19",
+    "titulo": "MBL discute e utiliza jingles e paródias musicais com crítica política",
+    "resumo": "A equipe discute o novo jingle da campanha e apresenta uma paródia de música que incorpora a frase \"rachadas não investigadas\", indicando o uso de elementos musicais para crítica política e engajamento.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Jingle",
+     "Paródia",
+     "Crítica Política",
+     "Estratégia de Comunicação"
+    ],
+    "inicio": 3035.44,
+    "fim": 3095.04,
+    "duracao": 59.6,
+    "renan_falando": false,
+    "precisa_contexto": false,
+    "cortes_possiveis": 1,
+    "forca": 75,
+    "autonomia": 80,
+    "pergunta": "Como a campanha do MBL pretende usar a música para comunicação e crítica política?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Duas vozes masculinas interagem, uma perguntando sobre o jingle e a outra respondendo e cantando a paródia. Não há identificação clara de Renan como voz dominante.",
+    "motivo_autonomia": "O bloco é autoexplicativo sobre o uso de jingles e paródias com conteúdo político, mesmo que a referência cultural da paródia não seja explicitada.",
+    "frase_inicial": 1233,
+    "frase_final": 1248,
+    "destaques": [
+     {
+      "inicio": 3040.88,
+      "fim": 3048.08,
+      "texto": "Se a juventude te encantar, vota na onça, meu amor.",
+      "motivo": "Trecho do jingle que visa ser cativante e político.",
+      "frase": 1236
+     },
+     {
+      "inicio": 3086.6,
+      "fim": 3094.2,
+      "texto": "Rachadas, não investigadas, tomam as suas cas.",
+      "motivo": "Paródia de música que incorpora uma crítica política direta e facilmente reconhecível no contexto brasileiro (\"rachadas não investigadas\").",
+      "frase": 1247
+     }
+    ],
+    "potencial": 69.0,
+    "pronto": false,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-20",
+    "titulo": "MBL busca diversificar convidados para a turnê e anuncia participação integral do vice-candidato Medina",
+    "resumo": "O orador sugere convidados como o piloto Lucas Di Grassi e Gabriel Silva, e depois aborda a necessidade de incluir mais mulheres na lista, citando nomes como Jess Peixoto e Maria Fernanda Schmit Bacelli para entrevistas. O bloco culmina com o anúncio de que Medina, o vice-candidato, estará presente na viagem inteira, sendo um dos principais participantes.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Convidados",
+     "Diversidade",
+     "Participação Feminina",
+     "Vice-Candidato",
+     "Turnê"
+    ],
+    "inicio": 3095.04,
+    "fim": 3298.88,
+    "duracao": 203.84,
+    "renan_falando": false,
+    "precisa_contexto": false,
+    "cortes_possiveis": 3,
+    "forca": 85,
+    "autonomia": 90,
+    "pergunta": "Como a equipe do MBL está diversificando a lista de convidados e qual é a participação do vice na turnê?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Várias vozes masculinas interagem, sugerindo nomes e fazendo um anúncio importante sobre a participação do vice.",
+    "motivo_autonomia": "O bloco consolida a discussão sobre quem participará da turnê e entrega um anúncio chave sobre a composição da comitiva, sendo compreensível.",
+    "frase_inicial": 1249,
+    "frase_final": 1322,
+    "destaques": [
+     {
+      "inicio": 3174.08,
+      "fim": 3178.4,
+      "texto": "Tá faltando mulheres aqui, ó. Citaram Jess Peixoto, vamos chamar.",
+      "motivo": "Indica a preocupação com a representatividade e a busca ativa por mais participantes femininas.",
+      "frase": 1281
+     },
+     {
+      "inicio": 3235.44,
+      "fim": 3236.92,
+      "texto": "Ela é bem inteligente, né?",
+      "motivo": "Sugere uma entrevista com uma personalidade relevante, Maria Fernanda Schmit.",
+      "frase": 1303
+     },
+     {
+      "inicio": 3294.92,
+      "fim": 3298.88,
+      "texto": "Vai, teremos Medina na viagem inteira.",
+      "motivo": "Anúncio de um fato importante para a campanha, a participação integral do vice-candidato.",
+      "frase": 1322
+     }
+    ],
+    "potencial": 85.0,
+    "pronto": false,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-21",
+    "titulo": "Renan Santos avalia entrevistas com jornalistas Malu Gaspar e Edilene",
+    "resumo": "Renan Santos comenta sobre a possibilidade de entrevistar a jornalista Malu Gaspar, sugerindo que ela pode ter se arrependido de alguma ação passada. Ele também se coloca à disposição para uma entrevista exclusiva com Edilene, da Rádio Itatiaia e CNN, elogiando sua educação e profissionalismo.",
+    "categoria": "Liberdade de Expressão",
+    "temas": [
+     "jornalismo",
+     "entrevistas",
+     "imprensa",
+     "MBL"
+    ],
+    "inicio": 3472.64,
+    "fim": 3499.12,
+    "duracao": 26.48,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 1,
+    "forca": 75,
+    "autonomia": 90,
+    "pergunta": "Renan Santos faria entrevistas com Malu Gaspar e Edilene?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "A voz dominante é de Renan Santos, que responde à pergunta de um co-apresentador e elabora seus comentários sobre as jornalistas.",
+    "motivo_autonomia": "O bloco aborda um tópico claro (entrevistas com jornalistas) e a opinião de Renan é compreensível sem contexto externo.",
+    "frase_inicial": 1394,
+    "frase_final": 1403,
+    "destaques": [
+     {
+      "inicio": 3482.72,
+      "fim": 3484.6,
+      "texto": "ela fazer uma exclusiva ali.",
+      "motivo": "Renan se coloca abertamente disponível para uma jornalista específica, demonstrando abertura e estratégia de comunicação.",
+      "frase": 1398
+     }
+    ],
+    "potencial": 72.0,
+    "pronto": true,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-22",
+    "titulo": "Renan Santos critica a elite brasileira por falta de apoio financeiro à campanha",
+    "resumo": "Renan Santos lamenta a falta de recursos financeiros para sua campanha presidencial, que considera 'ridícula' por ser pobre. Ele critica a elite brasileira, afirmando que realizou dezenas de reuniões com pessoas ricas que, segundo ele, não contribuíram financeiramente e demonstram falta de compromisso com o país.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "financiamento de campanha",
+     "elite brasileira",
+     "campanha presidencial",
+     "política",
+     "Renan Santos"
+    ],
+    "inicio": 3556.56,
+    "fim": 3598.84,
+    "duracao": 42.28,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 85,
+    "autonomia": 95,
+    "pergunta": "Por que a campanha de Renan Santos está sem dinheiro, e qual a crítica à elite?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan Santos expressa sua frustração e crítica sobre o financiamento da campanha.",
+    "motivo_autonomia": "O argumento sobre a falta de financiamento e a crítica à elite é autoexplicativo.",
+    "frase_inicial": 1434,
+    "frase_final": 1453,
+    "destaques": [
+     {
+      "inicio": 3566.68,
+      "fim": 3567.64,
+      "texto": "É ridículo, cara.",
+      "motivo": "A repetição de 'é ridículo' enfatiza a indignação e a situação precária da campanha.",
+      "frase": 1439
+     },
+     {
+      "inicio": 3580.8,
+      "fim": 3585.44,
+      "texto": "Agora na eleição, se o Brasil dependesse da sua elite, tava todo mundo",
+      "motivo": "Crítica contundente à elite brasileira, responsabilizando-a pela situação do país.",
+      "frase": 1447
+     }
+    ],
+    "potencial": 82.8,
+    "pronto": true,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-23",
+    "titulo": "Renan Santos minimiza processo de Thalis, comparando-o a disputas com ministros do Supremo",
+    "resumo": "Renan Santos reage à notícia de um processo movido por 'Thalis', afirmando que não se preocupa com isso. Ele compara o processo a conflitos passados com ministros do Supremo Tribunal Federal, indicando que a ação do 'coach' é insignificante em sua escala de preocupações.",
+    "categoria": "Liberdade de Expressão",
+    "temas": [
+     "processo judicial",
+     "liberdade de expressão",
+     "crítica política",
+     "MBL"
+    ],
+    "inicio": 3632.28,
+    "fim": 3666.84,
+    "duracao": 34.56,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 1,
+    "forca": 80,
+    "autonomia": 90,
+    "pergunta": "Qual a postura de Renan Santos sobre processos judiciais?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan Santos fala em resposta a um comentário do chat sobre um processo.",
+    "motivo_autonomia": "A explicação sobre o processo e a hierarquia de preocupações de Renan é clara.",
+    "frase_inicial": 1471,
+    "frase_final": 1483,
+    "destaques": [
+     {
+      "inicio": 3645.72,
+      "fim": 3648.2,
+      "texto": "Eu arrumei briga com o ministro supremo.",
+      "motivo": "Declaração forte que contextualiza a gravidade de suas preocupações jurídicas, desmerecendo o novo processo.",
+      "frase": 1475
+     },
+     {
+      "inicio": 3661.72,
+      "fim": 3663.88,
+      "texto": "Quem tá preocupado com essa história são eles,",
+      "motivo": "Reforça a ideia de que a preocupação com o processo deve ser do outro lado.",
+      "frase": 1481
+     }
+    ],
+    "potencial": 74.8,
+    "pronto": true,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-24",
+    "titulo": "Renan Santos critica a campanha de Lula e a polarização 'escota'",
+    "resumo": "Renan Santos afirma que a campanha de Lula está tensa e que a única estratégia restante é atacar Flávio Bolsonaro, utilizando o escândalo do Banco Master. Ele prevê que Lula seria 'devastado' no segundo turno por qualquer candidato que não seja da família Bolsonaro, criticando a 'polarização escrota' que aprisiona os eleitores.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "campanha eleitoral",
+     "Lula",
+     "polarização política",
+     "segundo turno",
+     "crítica política"
+    ],
+    "inicio": 3666.84,
+    "fim": 3703.76,
+    "duracao": 36.92,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 90,
+    "autonomia": 95,
+    "pergunta": "Qual a avaliação de Renan Santos sobre a campanha de Lula e a polarização?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan Santos faz uma análise sobre a campanha de Lula e o cenário político.",
+    "motivo_autonomia": "A análise política é compreensível e fundamentada nas opiniões de Renan Santos.",
+    "frase_inicial": 1484,
+    "frase_final": 1495,
+    "destaques": [
+     {
+      "inicio": 3691.6,
+      "fim": 3692.76,
+      "texto": "Que campanha ruim.",
+      "motivo": "Afirmação categórica sobre a fraqueza de Lula contra outros candidatos.",
+      "frase": 1490
+     },
+     {
+      "inicio": 3699.56,
+      "fim": 3702.16,
+      "texto": "faz com que as pessoas ficam presas no curto circuito.",
+      "motivo": "Expressão forte que resume a crítica à polarização política.",
+      "frase": 1493
+     }
+    ],
+    "potencial": 85.5,
+    "pronto": true,
+    "origem": "gemini"
+   },
+   {
+    "id": "local-25",
+    "titulo": "Renan Santos propõe transformar eleitores em multiplicadores para alcançar o segundo turno",
+    "resumo": "Renan Santos expressa otimismo após viagens, sentindo que os jovens estão influenciando seus pais. Ele propõe uma estratégia para chegar ao segundo turno: cada eleitor seu deve se tornar um 'multiplicador', convertendo pelo menos mais dois votos. Essa abordagem transformaria o eleitor em um agente ativo de campanha.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "estratégia de campanha",
+     "engajamento do eleitor",
+     "segundo turno",
+     "MBL"
+    ],
+    "inicio": 3703.76,
+    "fim": 3733.8,
+    "duracao": 30.04,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 90,
+    "autonomia": 95,
+    "pergunta": "Qual a estratégia de Renan Santos para chegar ao segundo turno?",
+    "riscos": [],
+    "avisos": [],
+    "nota_locutores": "Renan Santos elabora sobre sua estratégia para as eleições.",
+    "motivo_autonomia": "A tese do 'eleitor multiplicador' é explicada dentro do próprio bloco.",
+    "frase_inicial": 1496,
+    "frase_final": 1505,
+    "destaques": [
+     {
+      "inicio": 3716.28,
+      "fim": 3718.64,
+      "texto": "Cada um dos meus eleitores é um multiplicador.",
+      "motivo": "A ideia central e a meta explícita para o segundo turno.",
+      "frase": 1500
+     }
+    ],
+    "potencial": 85.5,
+    "pronto": true,
+    "origem": "gemini"
+   }
+  ],
+  "chub": [
+   {
+    "id": "f6fd1331-1b7f-4bdc-8756-191ca30f0f7a",
+    "titulo": "Caravana com dois ônibus é a aposta de Renan para chegar ao segundo turno",
+    "resumo": "Renan afirma que quer vencer as eleições e chegar ao segundo turno, apresentando a caravana nacional como a estratégia da reta final. Ele explica a escolha por dois ônibus, um mais confortável para convidados e outro para a equipe, além da participação de podcasts, candidatos e influenciadores. A viagem terá rota transmitida em tempo real, lives de 24 horas, produção de conteúdo e eventos com apoiadores nas cidades visitadas.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "segundo turno",
+     "caravana eleitoral",
+     "dois ônibus",
+     "transmissão ao vivo"
+    ],
+    "inicio": 72.52,
+    "fim": 598.56,
+    "duracao": 526.04,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 5,
+    "forca": 99,
+    "autonomia": 96,
+    "pergunta": "Como a caravana eleitoral foi estruturada para levar a candidatura ao segundo turno?",
+    "riscos": [],
+    "avisos": [],
+    "frase_inicial": 25,
+    "frase_final": 216,
+    "destaques": [
+     {
+      "inicio": 94.6,
+      "fim": 98.0,
+      "texto": "e temos agora mais três semanas para vencer as eleições.",
+      "motivo": "Apresenta a janela de três semanas e prepara a ambição explícita de vencer as eleições, não apenas obter uma vitória simbólica.",
+      "frase": 33
+     },
+     {
+      "inicio": 249.88,
+      "fim": 253.36,
+      "texto": "Nós precisamos rodar o Brasil com motor home.",
+      "motivo": "Expõe a decisão central da estratégia: percorrer o Brasil de motor home na reta final da campanha.",
+      "frase": 92
+     },
+     {
+      "inicio": 339.44,
+      "fim": 345.84,
+      "texto": "Estamos convidando eh membros dos maiores podcasts do Brasil, não apenas para nos entrevistar, mas para fazer",
+      "motivo": "Mostra o formato participativo da caravana, com podcasts convidados não só para entrevistar, mas para integrar a transmissão.",
+      "frase": 126
+     },
+     {
+      "inicio": 381.28,
+      "fim": 383.08,
+      "texto": "A rota vai ser transmitida em tempo real.",
+      "motivo": "Resume a logística de acompanhamento da viagem, com a rota divulgada e transmitida em tempo real.",
+      "frase": 140
+     },
+     {
+      "inicio": 535.6,
+      "fim": 540.12,
+      "texto": "A gente vai ter inclusive roteirista viajando, preparando as aventuras no caminho.",
+      "motivo": "Acrescenta a estrutura de produção da viagem, com roteirista a bordo e transmissão contínua das aventuras.",
+      "frase": 197
+     }
+    ],
+    "potencial": 98.2,
+    "pronto": false
+   },
+   {
+    "id": "95e5b674-1e0b-4350-9222-f0eb541079ab",
+    "titulo": "Caravana eleitoral percorre o Brasil com eventos e apoio popular",
+    "resumo": "O bloco detalha o funcionamento da caravana eleitoral, que sai de Vinhedo, passa por Londrina e percorre diversas cidades com eventos principais e pequenas paradas no caminho. A programação inclui encontros com apoiadores, festas, adesivagem de carros e motos, participação de personagens da campanha e transmissão contínua, com previsão de escolta e ônibus blindado. A iniciativa é apresentada como uma campanha financiada pela própria base, capaz de despertar o país e chegar ao segundo turno.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Caravana eleitoral",
+     "Rota pelo Brasil",
+     "Eventos com apoiadores",
+     "Campanha popular"
+    ],
+    "inicio": 598.56,
+    "fim": 1168.36,
+    "duracao": 569.8,
+    "renan_falando": false,
+    "precisa_contexto": false,
+    "cortes_possiveis": 3,
+    "forca": 79,
+    "autonomia": 71,
+    "pergunta": "Como vai funcionar a caravana eleitoral pelo Brasil?",
+    "riscos": [
+     "violencia"
+    ],
+    "avisos": [],
+    "frase_inicial": 217,
+    "frase_final": 441,
+    "destaques": [
+     {
+      "inicio": 793.96,
+      "fim": 799.68,
+      "texto": "A gente vai sair de lá lá do interior de São Paulo, de Vinhedo, e nós vamos até Londrina.",
+      "motivo": "Apresenta o início operacional da caravana, saindo de Vinhedo rumo a Londrina, e abre um corte sobre a rota da viagem.",
+      "frase": 319
+     },
+     {
+      "inicio": 1142.32,
+      "fim": 1143.8,
+      "texto": "Quem botou grana foi a nossa galera.",
+      "motivo": "Resume o financiamento popular da campanha ao afirmar que os recursos vieram da própria base de apoiadores.",
+      "frase": 434
+     },
+     {
+      "inicio": 1148.84,
+      "fim": 1154.76,
+      "texto": "E mais, é um modelo de campanha tão bonito e tão único que isso vai despertar o Brasil e nós vamos pro segundo turno.",
+      "motivo": "Expõe a tese de que o modelo de campanha, financiado pela própria galera, pode despertar o país e levar a candidatura ao segundo turno.",
+      "frase": 436
+     }
+    ],
+    "potencial": 76.0,
+    "pronto": false
+   },
+   {
+    "id": "5f15ed60-492a-45c7-b47c-ded9ad1f087c",
+    "titulo": "A estrutura cara da caravana e o convite à cobertura da viagem",
+    "resumo": "Renan detalha os custos da caravana, incluindo aluguel de ônibus, diesel, internet, motoristas e carros de apoio, afirmando que a operação consumirá uma fortuna por dia. Ele convoca podcasts e influenciadores para acompanhar a viagem e descreve possíveis momentos de convivência, como uma parada com churrasco e entrevistas em uma fazenda. O bloco também registra que a passagem por Poços de Caldas provavelmente foi retirada da rota.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Custos operacionais da caravana",
+     "Infraestrutura de campanha",
+     "Cobertura por podcasts e influenciadores",
+     "Rota por Poços de Caldas"
+    ],
+    "inicio": 1192.88,
+    "fim": 1309.08,
+    "duracao": 116.2,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 2,
+    "forca": 50,
+    "autonomia": 62,
+    "pergunta": "Quanto custa estruturar a caravana e quem pode acompanhar sua cobertura?",
+    "riscos": [],
+    "avisos": [],
+    "frase_inicial": 453,
+    "frase_final": 489,
+    "destaques": [
+     {
+      "inicio": 1226.24,
+      "fim": 1230.16,
+      "texto": "Nós vamos gastar uma fortuna todos os dias, tá?",
+      "motivo": "Resume o custo operacional diário da caravana, apresentado como uma despesa muito alta para manter a estrutura na estrada.",
+      "frase": 466
+     },
+     {
+      "inicio": 1247.52,
+      "fim": 1252.6,
+      "texto": "Podcasts, entrem em contato se vocês quiserem fazer cobertura da viagem, venham fazer cobertura da viagem.",
+      "motivo": "Faz um convite direto a podcasts para acompanhar e produzir cobertura da viagem, abrindo o ângulo da participação da mídia independente.",
+      "frase": 471
+     }
+    ],
+    "potencial": 53.6,
+    "pronto": false
+   },
+   {
+    "id": "55a8ab41-36b6-46c4-955b-3e449bb57a35",
+    "titulo": "Renan contesta pesquisas e aponta a caravana como prova de crescimento",
+    "resumo": "Renan afirma que não levará o Datafolha a sério e contrapõe às pesquisas a receptividade que diz encontrar em Joinville, onde relata reconhecimento e apoio no restaurante e nas ruas. Ele sustenta que a campanha está crescendo e descreve eventos com ônibus, som, imprensa, música e multidões como uma mobilização diferente das demais candidaturas.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Datafolha",
+     "pesquisas eleitorais",
+     "receptividade nas ruas",
+     "caravana eleitoral"
+    ],
+    "inicio": 1309.08,
+    "fim": 1457.36,
+    "duracao": 148.28,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 3,
+    "forca": 65,
+    "autonomia": 83,
+    "pergunta": "Como Renan contesta as pesquisas eleitorais e sustenta que sua campanha está crescendo?",
+    "riscos": [],
+    "avisos": [
+     "start_continuation"
+    ],
+    "frase_inicial": 490,
+    "frase_final": 532,
+    "destaques": [
+     {
+      "inicio": 1342.4,
+      "fim": 1344.0,
+      "texto": "Datafolha não se leva a sério.",
+      "motivo": "Tese central: Renan rejeita as pesquisas do Datafolha como referência para avaliar a disputa eleitoral.",
+      "frase": 500
+     },
+     {
+      "inicio": 1359.44,
+      "fim": 1361.12,
+      "texto": "Naturalmente a gente ficou mais conhecido.",
+      "motivo": "Sustenta o crescimento da campanha com base no aumento do reconhecimento de Renan nas ruas.",
+      "frase": 507
+     },
+     {
+      "inicio": 1402.64,
+      "fim": 1404.92,
+      "texto": "Nós vamos lotar as ruas das cidades, né?",
+      "motivo": "Apresenta a lotação das ruas durante os eventos da caravana como evidência esperada da força eleitoral da campanha.",
+      "frase": 518
+     }
+    ],
+    "potencial": 71.9,
+    "pronto": false
+   },
+   {
+    "id": "b0c4a6af-4f18-4867-894b-736bbff47b3d",
+    "titulo": "Participante confirma que vai participar da tour eleitoral",
+    "resumo": "Um participante demonstra empolgação com a tour eleitoral e com os acontecimentos previstos para a semana. Em seguida, afirma que poderá viajar na tour e confirma sua participação.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "tour eleitoral",
+     "participação na viagem",
+     "campanha eleitoral"
+    ],
+    "inicio": 1462.96,
+    "fim": 1478.72,
+    "duracao": 15.76,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 26,
+    "autonomia": 62,
+    "pergunta": "O participante confirma que vai participar da tour eleitoral?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 538,
+    "frase_final": 547,
+    "destaques": [
+     {
+      "inicio": 1472.44,
+      "fim": 1473.96,
+      "texto": "Eu vou poder ir na tour.",
+      "motivo": "Confirmação direta de que o participante poderá ir à tour eleitoral, funcionando como entrada autônoma para o trecho.",
+      "frase": 544
+     }
+    ],
+    "potencial": 36.6,
+    "pronto": false
+   },
+   {
+    "id": "9c7c2277-bdd5-4c7e-a50f-d6e6c221407e",
+    "titulo": "Busnelo tem chances e Guto Esquaveto pode surpreender na disputa",
+    "resumo": "Os participantes avaliam que Busnelo ainda tem chances eleitorais. Também afirmam que Guto Esquaveto pode ganhar relevância na disputa, embora parte da formulação sobre seu possível desempenho esteja pouco clara na transcrição.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Busnelo",
+     "Guto Esquaveto",
+     "chances eleitorais",
+     "disputa eleitoral"
+    ],
+    "inicio": 1483.6,
+    "fim": 1500.64,
+    "duracao": 17.04,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 5,
+    "autonomia": 7,
+    "pergunta": "Quais são as chances eleitorais de Busnelo e Guto Esquaveto?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "highlight_dropped(abre com conector)",
+     "too_few_highlights(1)",
+     "possible_cuts_capped(2->1)"
+    ],
+    "frase_inicial": 551,
+    "frase_final": 559,
+    "destaques": [
+     {
+      "inicio": 1487.4,
+      "fim": 1489.08,
+      "texto": "Busnelo tá com chances, viu?",
+      "motivo": "Avaliação direta de que Busnelo ainda tem chances na disputa eleitoral.",
+      "frase": 555
+     }
+    ],
+    "potencial": 8.6,
+    "pronto": false
+   },
+   {
+    "id": "27c23f71-8024-4334-a6f0-2470a07cd3fe",
+    "titulo": "Convite para seguir a caravana eleitoral de carro e produzir conteúdo",
+    "resumo": "O bloco convida pessoas de estados que não estão na rota a pegar um carro e acompanhar a caravana eleitoral. A participação é apresentada como uma aventura com audiência nacional, incluindo o convite para candidatos gravarem e fazerem parte da viagem.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "caravana eleitoral",
+     "participação de apoiadores",
+     "produção de conteúdo",
+     "audiência nacional"
+    ],
+    "inicio": 1508.4,
+    "fim": 1535.64,
+    "duracao": 27.24,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 0,
+    "forca": 26,
+    "autonomia": 21,
+    "pergunta": "Como pessoas de estados fora da rota podem participar da caravana eleitoral?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "highlight_dropped(abre com conector)",
+     "too_few_highlights(0)",
+     "possible_cuts_capped(1->0)"
+    ],
+    "frase_inicial": 567,
+    "frase_final": 577,
+    "destaques": [],
+    "potencial": 20.6,
+    "pronto": false
+   },
+   {
+    "id": "f4b3b998-7a50-4317-b4e4-0b0c6393eb98",
+    "titulo": "970 pagantes em Joinville desafiam os números das pesquisas",
+    "resumo": "O bloco usa os 970 pagantes de um evento em Joinville para questionar a estimativa de 3% e afirmar que a candidatura teria apoio maior, especialmente em Santa Catarina. Relatos de repórteres sobre a presença de público pagante reforçam o contraste com eventos de adversários que, segundo a fala, levariam pessoas mobilizadas por igrejas e funcionários públicos.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "970 pagantes em Joinville",
+     "pesquisas eleitorais",
+     "Santa Catarina",
+     "público mobilizado em eventos"
+    ],
+    "inicio": 1579.84,
+    "fim": 1623.76,
+    "duracao": 43.92,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 65,
+    "autonomia": 37,
+    "pergunta": "Os 970 pagantes em Joinville contradizem os percentuais das pesquisas?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "highlight_dropped(menos de 4 palavras)",
+     "too_few_highlights(1)",
+     "possible_cuts_capped(2->1)"
+    ],
+    "frase_inicial": 596,
+    "frase_final": 612,
+    "destaques": [
+     {
+      "inicio": 1579.84,
+      "fim": 1585.04,
+      "texto": "Nós tivemos ontem 970 pagantes em Joinville.",
+      "motivo": "Apresenta o dado concreto de 970 pagantes em Joinville como evidência de público real para contestar os percentuais das pesquisas.",
+      "frase": 596
+     }
+    ],
+    "potencial": 50.6,
+    "pronto": false
+   },
+   {
+    "id": "aac1ff04-37cd-480a-9b14-0b92c69830d5",
+    "titulo": "Renan diz que a disputa segue aberta e cobra explicações dos adversários",
+    "resumo": "O bloco afirma que a reta final ainda pode alterar a disputa e que os adversários tentam levar a eleição de volta ao primeiro turno. Também acusa os interlocutores de terem roubado enquanto outros pensavam no Brasil e diz que Pedro Sangue terá de explicar sua atuação.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "reta final eleitoral",
+     "estratégia dos adversários",
+     "Flávio",
+     "Pedro Sangue"
+    ],
+    "inicio": 1623.76,
+    "fim": 1658.72,
+    "duracao": 34.96,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 0,
+    "forca": 5,
+    "autonomia": 4,
+    "pergunta": "A disputa eleitoral ainda está aberta na reta final?",
+    "riscos": [
+     "juridico_sensivel"
+    ],
+    "avisos": [
+     "start_continuation",
+     "curto",
+     "too_few_highlights(0)"
+    ],
+    "frase_inicial": 613,
+    "frase_final": 629,
+    "destaques": [],
+    "potencial": 4.0,
+    "pronto": false
+   },
+   {
+    "id": "163dd621-8166-41d0-bd9b-de7496a33c2f",
+    "titulo": "Críticas a Thales Gomes e ao modelo de negócios de sua empresa",
+    "resumo": "O bloco critica Thales Gomes por suposto deslumbramento em uma reunião com J. Vance e em um podcast no qual se apresentaria como advisor. Também questiona o modelo da empresa, descrita como uma companhia que vende cursos e networking para outras empresas, além de contestar a alegação de geração de 16 milhões de empregos e a imagem de bilionário associada ao CEO.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Thales Gomes",
+     "Reunião com J. Vance",
+     "Venda de cursos para empresas",
+     "Geração de empregos"
+    ],
+    "inicio": 1658.72,
+    "fim": 1729.16,
+    "duracao": 70.44,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 21,
+    "autonomia": 15,
+    "pergunta": "Que críticas são feitas à atuação pública e à empresa de Thales Gomes?",
+    "riscos": [
+     "ataque_pessoal"
+    ],
+    "avisos": [
+     "end_unpunctuated_reviewed_boundary",
+     "start_continuation",
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 630,
+    "frase_final": 654,
+    "destaques": [
+     {
+      "inicio": 1685.0,
+      "fim": 1688.64,
+      "texto": "O o cara, o cara assim, o o Tales é muito burro, tá?",
+      "motivo": "Ataque pessoal direto a Thales Gomes, que concentra a crítica à sua atuação e prepara a discussão sobre a empresa.",
+      "frase": 639
+     }
+    ],
+    "potencial": 19.8,
+    "pronto": false
+   },
+   {
+    "id": "7e8b7e99-bd1c-4fbf-86a2-ffa19e2ad62c",
+    "titulo": "Crítica ao deslumbramento e às articulações políticas de Pedro Sangue",
+    "resumo": "O bloco critica o deslumbramento de Pedro Sangue com viagens, exposição pública e a apresentação de relações empresariais e internacionais. Também questiona sua atuação em favor da campanha de Flávio Bolsonaro, menciona a busca por um ministério e pede investigação sobre a empresa aberta durante sua representação da Rock Bridge no Brasil.",
+    "categoria": "Corrupção",
+    "temas": [
+     "Pedro Sangue",
+     "Flávio Bolsonaro",
+     "Rock Bridge",
+     "relações político-empresariais"
+    ],
+    "inicio": 1729.16,
+    "fim": 1860.88,
+    "duracao": 131.72,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 26,
+    "autonomia": 8,
+    "pergunta": "Que críticas são feitas ao deslumbramento e às articulações políticas e empresariais de Pedro Sangue?",
+    "riscos": [
+     "linguagem_ofensiva",
+     "ataque_pessoal",
+     "juridico_sensivel"
+    ],
+    "avisos": [
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 655,
+    "frase_final": 709,
+    "destaques": [
+     {
+      "inicio": 1802.16,
+      "fim": 1806.12,
+      "texto": "Você tá ajudando a campanha do Flávio Bolsonaro, você tá ajudando um aliado do crime organizado,",
+      "motivo": "Acusação direta de que Pedro Sangue estaria ajudando a campanha de Flávio Bolsonaro e um aliado do crime organizado, além de buscar um ministério.",
+      "frase": 687
+     }
+    ],
+    "potencial": 20.4,
+    "pronto": false
+   },
+   {
+    "id": "831295e6-5144-4bc1-8eca-ee14f2b1c934",
+    "titulo": "Mobilização para forçar Flávio a enfrentar o debate na reta final",
+    "resumo": "O bloco apresenta a reta final como uma batalha em que a militância deve aumentar a pressão para obrigar Flávio a participar do debate da Globo. A conversa sustenta que a campanha de Flávio foi marcada por uma estratégia evasiva e também comenta propostas copiadas, memes bolsonaristas sobre propina e uma página pró-corrupção atribuída ao PT em 2015.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Debate da Globo",
+     "Militância eleitoral",
+     "Estratégia evasiva de Flávio",
+     "Memes políticos e normalização da corrupção"
+    ],
+    "inicio": 1860.88,
+    "fim": 2035.44,
+    "duracao": 174.56,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 2,
+    "forca": 50,
+    "autonomia": 21,
+    "pergunta": "Como a mobilização pode forçar Flávio a participar do debate da Globo?",
+    "riscos": [
+     "juridico_sensivel"
+    ],
+    "avisos": [],
+    "frase_inicial": 710,
+    "frase_final": 788,
+    "destaques": [
+     {
+      "inicio": 1877.12,
+      "fim": 1878.76,
+      "texto": "A grande batalha final começa agora.",
+      "motivo": "Frase de efeito que abre a mobilização para a reta final da campanha e apresenta o momento como uma batalha decisiva.",
+      "frase": 719
+     },
+     {
+      "inicio": 1878.76,
+      "fim": 1885.0,
+      "texto": "Vocês precisam botar energia, até porque se a gente começa a botar energia e eles começam a ficar com medo, Flavinho vai ter que ir pro debate da Globo.",
+      "motivo": "Expõe a tese central: o aumento da militância e da pressão faria Flávio comparecer ao debate da Globo.",
+      "frase": 720
+     }
+    ],
+    "potencial": 41.3,
+    "pronto": false
+   },
+   {
+    "id": "f70979c4-7c1c-4f2b-832d-5e7eef09caf6",
+    "titulo": "Caravana quer transformar a reta final em campanha popular",
+    "resumo": "Na reta final, a caravana é apresentada como uma campanha de verdade, com propostas e participação do público. O bloco também descreve o tom festivo da turnê, com carro de som, sinalizadores e churrasqueira no ônibus, enquanto prevê o acirramento dos ataques entre adversários ligados a Flávio e Lula.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "reta final da campanha",
+     "campanha popular",
+     "carro de som e sinalizadores",
+     "propostas eleitorais"
+    ],
+    "inicio": 2035.44,
+    "fim": 2102.88,
+    "duracao": 67.44,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 0,
+    "forca": 11,
+    "autonomia": 6,
+    "pergunta": "Como a caravana pretende transformar a reta final em uma campanha de verdade?",
+    "riscos": [],
+    "avisos": [
+     "too_few_highlights(0)"
+    ],
+    "frase_inicial": 789,
+    "frase_final": 815,
+    "destaques": [],
+    "potencial": 7.9,
+    "pronto": false
+   },
+   {
+    "id": "3dd34842-183e-43c3-8497-1afef43d5ec6",
+    "titulo": "Prévia de vídeo é descrita como obra de arte, com humor, morte e tensão",
+    "resumo": "O vídeo é elogiado como maravilhoso e como uma obra de arte. A descrição prevê risadas durante a maior parte do tempo, mas também inclui elementos preocupantes, morte, piada, medo e tensão; os participantes sugerem anunciá-lo em um coletivo de imprensa.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "prévia de vídeo",
+     "humor",
+     "medo e tensão",
+     "coletivo de imprensa"
+    ],
+    "inicio": 2107.36,
+    "fim": 2159.28,
+    "duracao": 51.92,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 19,
+    "autonomia": 9,
+    "pergunta": "Como o vídeo é descrito por quem já o viu?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 817,
+    "frase_final": 843,
+    "destaques": [
+     {
+      "inicio": 2122.64,
+      "fim": 2124.6,
+      "texto": "O vídeo está maravilhoso.",
+      "motivo": "Descreve diretamente o vídeo como maravilhoso, funcionando como entrada para a reação positiva à prévia.",
+      "frase": 828
+     }
+    ],
+    "potencial": 16.9,
+    "pronto": false
+   },
+   {
+    "id": "b25eb805-2268-4f21-ab24-3791dfe1c165",
+    "titulo": "Vídeos de apoio a Renan Santos explodem no TikTok",
+    "resumo": "O bloco relata um movimento crescente no TikTok, atribuído à publicação de vídeos de apoio a Renan Santos por mulheres que passaram a destacar sua aparência. A conversa trata isso com humor, comparando a beleza de Renan a uma iguaria rara, e cita uma apoiadora que enviou meias suecas como comentário sobre seu visual na campanha.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "TikTok",
+     "vídeos de apoio",
+     "Renan Santos",
+     "apoio feminino"
+    ],
+    "inicio": 2193.68,
+    "fim": 2277.72,
+    "duracao": 84.04,
+    "renan_falando": false,
+    "precisa_contexto": false,
+    "cortes_possiveis": 1,
+    "forca": 42,
+    "autonomia": 51,
+    "pergunta": "O que explica o crescimento dos vídeos de apoio a Renan Santos no TikTok?",
+    "riscos": [],
+    "avisos": [
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 857,
+    "frase_final": 897,
+    "destaques": [
+     {
+      "inicio": 2256.28,
+      "fim": 2259.64,
+      "texto": "O número de garotas gravando vídeo de apoio ao Renan Santos estourou.",
+      "motivo": "Apresenta a evidência central de crescimento no TikTok: o aumento expressivo de garotas gravando vídeos de apoio a Renan Santos.",
+      "frase": 888
+     }
+    ],
+    "potencial": 42.1,
+    "pronto": false
+   },
+   {
+    "id": "9ca155e6-1101-489b-97a1-dadf55d95b3b",
+    "titulo": "Podcasters e convidados são chamados para acompanhar a Futuro Glorioso Tour",
+    "resumo": "O bloco confirma a participação do podcast Três Irmãos e de Junior Masters, além de convidar outros podcasters, jornalistas e personalidades para acompanhar a Futuro Glorioso Tour. Entre as propostas estão conversas sobre terras raras, geopolítica e saúde mental no SUS, com menções a Sacani, Rogério Vilela e à possível participação de Danilo Gentile. O grupo também cita nomes sugeridos pelo chat e pede que o público cobre a presença dos convidados.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Futuro Glorioso Tour",
+     "podcast Três Irmãos",
+     "terras raras",
+     "saúde mental no SUS",
+     "Rogério Vilela"
+    ],
+    "inicio": 2277.72,
+    "fim": 2508.52,
+    "duracao": 230.8,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 4,
+    "forca": 40,
+    "autonomia": 26,
+    "pergunta": "Quais convidados e podcasters são chamados para participar da Futuro Glorioso Tour?",
+    "riscos": [],
+    "avisos": [],
+    "frase_inicial": 898,
+    "frase_final": 1013,
+    "destaques": [
+     {
+      "inicio": 2302.28,
+      "fim": 2309.52,
+      "texto": "É no dia 24 o podcast Três Irmãos irá nos acompanhar aí.",
+      "motivo": "Confirma a participação do podcast Três Irmãos na turnê e informa quando eles acompanharão a viagem.",
+      "frase": 911
+     },
+     {
+      "inicio": 2358.28,
+      "fim": 2360.52,
+      "texto": "Sacane, venha, vai ser legal.",
+      "motivo": "Convite direto a Sacani para participar da viagem e abrir uma conversa sobre terras raras e geologia.",
+      "frase": 937
+     },
+     {
+      "inicio": 2428.24,
+      "fim": 2431.28,
+      "texto": "Tô chamando o podcaster Rogério Vilela também.",
+      "motivo": "Amplia a lista de convidados com o podcaster Rogério Vilela, associado a uma possível entrevista na estrada.",
+      "frase": 973
+     },
+     {
+      "inicio": 2503.96,
+      "fim": 2506.48,
+      "texto": "Será Danilo Gentile na reta final da caravana?",
+      "motivo": "Levanta a participação de Danilo Gentile na reta final da caravana, com confirmação imediata em seguida.",
+      "frase": 1012
+     }
+    ],
+    "potencial": 44.8,
+    "pronto": false
+   },
+   {
+    "id": "0a6feea2-d4ae-4602-872c-313e708fb620",
+    "titulo": "Caravana chega ao Rio e vira cortejo com feira itinerante",
+    "resumo": "A caravana será acompanhada por apoiadores de carro e chegará ao Rio de Janeiro nas vésperas do debate da Globo. O ônibus amarelo funcionará como uma estrutura móvel, com toldo, venda de produtos e adesivagem dos veículos, transformando a viagem em uma espécie de feira e festa pública.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Caravana eleitoral",
+     "Rio de Janeiro",
+     "Cortejo de carros",
+     "Feira itinerante"
+    ],
+    "inicio": 2508.52,
+    "fim": 2546.68,
+    "duracao": 38.16,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 2,
+    "forca": 65,
+    "autonomia": 51,
+    "pergunta": "Como a caravana será transformada em um cortejo público com feira itinerante?",
+    "riscos": [],
+    "avisos": [
+     "start_continuation",
+     "curto"
+    ],
+    "frase_inicial": 1014,
+    "frase_final": 1028,
+    "destaques": [
+     {
+      "inicio": 2509.88,
+      "fim": 2513.44,
+      "texto": "Caravana vai chegar no Rio de Janeiro, nas vésperas do debate da Globo.",
+      "motivo": "Anuncia a chegada da caravana ao Rio de Janeiro antes do debate da Globo, estabelecendo o momento estratégico da ação.",
+      "frase": 1015
+     },
+     {
+      "inicio": 2534.44,
+      "fim": 2543.92,
+      "texto": "Porque assim, o ônibus amarelo, Renato, quando separa ele, você abre um toldo, a gente vai criar uma feirinha ali, aí taca produto, compra produto, a gente adesiva o carro da galera.",
+      "motivo": "Detalha a transformação do ônibus em uma feira itinerante, com toldo, venda de produtos e adesivagem dos carros dos apoiadores.",
+      "frase": 1027
+     }
+    ],
+    "potencial": 58.5,
+    "pronto": false
+   },
+   {
+    "id": "fbeeb0d3-d512-415b-86fa-92a3e0ebd89b",
+    "titulo": "Convites e definição do elenco principal da turnê",
+    "resumo": "Os participantes levantam nomes de influenciadores e comentaristas para possíveis encontros, entrevistas e sessões durante as paradas da turnê, incluindo Rodrigo Pimentel no Rio e Thiago Braga em Petrópolis. Renato Impera é confirmado para acompanhar toda a viagem, enquanto Artur Moledo do Val, Marcelo Brigadeiro e Pedro Deiron são citados na formação do chamado elenco principal.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Elenco principal da turnê",
+     "Convites a influenciadores",
+     "Renato Impera",
+     "Rodrigo Pimentel",
+     "Thiago Braga"
+    ],
+    "inicio": 2546.68,
+    "fim": 2691.04,
+    "duracao": 144.36,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 16,
+    "autonomia": 8,
+    "pergunta": "Quem acompanhará a turnê inteira e quais influenciadores são convidados?",
+    "riscos": [],
+    "avisos": [
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 1029,
+    "frase_final": 1090,
+    "destaques": [
+     {
+      "inicio": 2603.84,
+      "fim": 2605.96,
+      "texto": "Rodrigo Pimentel no Rio, hein?",
+      "motivo": "Sugere Rodrigo Pimentel como convidado no Rio, exemplificando a busca por influenciadores para participar da turnê.",
+      "frase": 1053
+     }
+    ],
+    "potencial": 15.0,
+    "pronto": false
+   },
+   {
+    "id": "44cea0a6-65ba-4061-9a17-71d113e4d9f6",
+    "titulo": "Vídeo com Jennifer Galbiat e Artur do Val promete argumentos e revelações",
+    "resumo": "Os participantes confirmam a existência de um vídeo com Jennifer Galbiat e Artur do Val. A gravação é descrita como repleta de argumentos e revelações, mas o bloco não detalha quais serão esses conteúdos.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Jennifer Galbiat",
+     "Artur do Val",
+     "vídeo de campanha",
+     "argumentos e revelações"
+    ],
+    "inicio": 2691.04,
+    "fim": 2760.48,
+    "duracao": 69.44,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 0,
+    "forca": 11,
+    "autonomia": 8,
+    "pergunta": "O que o vídeo com Jennifer Galbiat e Artur do Val promete apresentar?",
+    "riscos": [],
+    "avisos": [
+     "too_few_highlights(0)"
+    ],
+    "frase_inicial": 1091,
+    "frase_final": 1117,
+    "destaques": [],
+    "potencial": 8.5,
+    "pronto": false
+   },
+   {
+    "id": "e7aae2ee-9919-4086-9f5c-a51ee1c8efbd",
+    "titulo": "Caravana terá convidados, cobertura, eventos públicos e apoio dos seguidores",
+    "resumo": "A caravana está sendo planejada com convites a jornalistas, influenciadores, candidatos, artistas e outros participantes, além de 300 pessoas confirmadas e carros de apoio para revezamento. Nas paradas, os apoiadores poderão acompanhar o grupo de carro ou moto e participar de eventos públicos, com discursos, jingle de campanha e outras atrações. O bloco também menciona a previsão de 40% de mulheres no elenco e a participação de Medina durante toda a viagem.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "convites a influenciadores e jornalistas",
+     "eventos públicos em faculdades",
+     "carros de apoio e participação de seguidores",
+     "jingle e atrações da campanha"
+    ],
+    "inicio": 2760.48,
+    "fim": 3317.68,
+    "duracao": 557.2,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 3,
+    "forca": 42,
+    "autonomia": 37,
+    "pergunta": "Como serão organizadas as participações e as atividades da caravana?",
+    "riscos": [
+     "linguagem_ofensiva"
+    ],
+    "avisos": [],
+    "frase_inicial": 1118,
+    "frase_final": 1330,
+    "destaques": [
+     {
+      "inicio": 3017.16,
+      "fim": 3020.12,
+      "texto": "Vamos armar um evento na frente de uma faculdade.",
+      "motivo": "Apresenta o formato dos eventos públicos da caravana, com uma atividade organizada diante de uma faculdade e participação dos apoiadores.",
+      "frase": 1224
+     },
+     {
+      "inicio": 3035.44,
+      "fim": 3037.48,
+      "texto": "a gente vai cantar o novo jingle, né?",
+      "motivo": "Introduz o uso de um novo jingle como atração da campanha durante as paradas da viagem.",
+      "frase": 1233
+     },
+     {
+      "inicio": 3201.36,
+      "fim": 3205.0,
+      "texto": "Acho que 40% do elenco é feminino.",
+      "motivo": "Traz um dado específico sobre a composição prevista do elenco da turnê: 40% de participação feminina.",
+      "frase": 1296
+     }
+    ],
+    "potencial": 45.5,
+    "pronto": false
+   },
+   {
+    "id": "baf6c32f-d615-483f-8ea1-94bd8a1e03c2",
+    "titulo": "Aplicativo permitirá acompanhar a turnê eleitoral em tempo real",
+    "resumo": "A campanha anuncia que o público poderá baixar seu aplicativo para acompanhar em tempo real onde a turnê está. O aplicativo concentrará as informações da viagem e permitirá ao público acompanhar seu percurso.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "aplicativo da campanha",
+     "turnê eleitoral",
+     "acompanhamento em tempo real",
+     "percurso da viagem"
+    ],
+    "inicio": 3317.68,
+    "fim": 3338.92,
+    "duracao": 21.24,
+    "renan_falando": false,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 21,
+    "autonomia": 92,
+    "pergunta": "Como acompanhar a turnê eleitoral em tempo real?",
+    "riscos": [],
+    "avisos": [
+     "curto"
+    ],
+    "frase_inicial": 1331,
+    "frase_final": 1338,
+    "destaques": [
+     {
+      "inicio": 3325.28,
+      "fim": 3331.84,
+      "texto": "Baixem o nosso aplicativo já e aguarde que você vai poder acompanhar em tempo real onde nós estamos pelo aplicativo.",
+      "motivo": "Convoca o público a baixar o aplicativo e promete acompanhar em tempo real a localização da turnê.",
+      "frase": 1334
+     },
+     {
+      "inicio": 3333.84,
+      "fim": 3336.72,
+      "texto": "Você vai controlar a nossa viagem por lá.",
+      "motivo": "Apresenta o aplicativo como ferramenta para acompanhar e controlar o percurso da viagem.",
+      "frase": 1337
+     }
+    ],
+    "potencial": 46.6,
+    "pronto": false
+   },
+   {
+    "id": "dc135a81-df88-4437-8a80-7cb0c9064665",
+    "titulo": "Novos convidados e encontro com candidato ao governo do Espírito Santo",
+    "resumo": "A lista de convidados inclui Daniel Macedo, Renata Vasconcelos, Andrea Sadi e Nateri, além da possibilidade de uma segunda sabatina. Vítor Anton Rio é citado para encontrar o grupo em Vitória. No mesmo contexto, é anunciado um encontro em Vitória com Breno Barcelos, apresentado como candidato ao governo do Espírito Santo e com pelo menos 7% nas pesquisas.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Daniel Macedo",
+     "Andrea Sadi",
+     "Vitória",
+     "Breno Barcelos",
+     "Candidato ao governo do Espírito Santo"
+    ],
+    "inicio": 3338.92,
+    "fim": 3393.4,
+    "duracao": 54.48,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 26,
+    "autonomia": 21,
+    "pergunta": "Quem são os novos convidados e onde será o encontro com o candidato ao governo do Espírito Santo?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 1339,
+    "frase_final": 1361,
+    "destaques": [
+     {
+      "inicio": 3338.92,
+      "fim": 3342.12,
+      "texto": "Ó, Daniel Macedo, convidado também.",
+      "motivo": "Abre a lista de novos convidados com a confirmação da participação de Daniel Macedo.",
+      "frase": 1339
+     }
+    ],
+    "potencial": 24.4,
+    "pronto": false
+   },
+   {
+    "id": "f25f2831-bd00-4229-b8f2-b1bb136dd4d6",
+    "titulo": "Aplicativo do partido acompanha a reta final e a virada da campanha",
+    "resumo": "Renan orienta o público a baixar o aplicativo do partido Missão, agora sem necessidade de código, para acompanhar a viagem e a campanha. Ele também anuncia o início da reta final e do viravoto, enquanto são citadas possíveis entrevistas com Jojô Todinho e Paulo Cruz.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "aplicativo do partido Missão",
+     "reta final da campanha",
+     "viravoto",
+     "entrevistas com Jojô Todinho e Paulo Cruz"
+    ],
+    "inicio": 3393.4,
+    "fim": 3430.16,
+    "duracao": 36.76,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 2,
+    "forca": 22,
+    "autonomia": 71,
+    "pergunta": "Como acompanhar a reta final da campanha e a viagem pelo aplicativo?",
+    "riscos": [],
+    "avisos": [
+     "curto"
+    ],
+    "frase_inicial": 1362,
+    "frase_final": 1376,
+    "destaques": [
+     {
+      "inicio": 3402.8,
+      "fim": 3407.68,
+      "texto": "Ó, pode baixar o aplicativo do partido Missão, que é o aplicativo em que você vai acompanhar tudo a nossa campanha.",
+      "motivo": "Apresenta o aplicativo do partido Missão como o canal para acompanhar toda a campanha.",
+      "frase": 1368
+     },
+     {
+      "inicio": 3412.16,
+      "fim": 3416.48,
+      "texto": "Reta final começou, o viravoto começou e esse viravolto vai tomar o Brasil.",
+      "motivo": "Marca o início da reta final e do viravoto, conectando o aplicativo à mobilização nacional da campanha.",
+      "frase": 1371
+     }
+    ],
+    "potencial": 40.9,
+    "pronto": false
+   },
+   {
+    "id": "7789edcb-54b8-4a36-bdf1-82e9e352aa35",
+    "titulo": "Renan convida Malu Gaspar e Edilene para entrevistas exclusivas",
+    "resumo": "Renan afirma que Malu Gaspar pode entrevistá-lo caso tenha se arrependido de uma atitude anterior e diz estar disponível para uma conversa exclusiva. Ele também convida Edilene, da Rádio Itatiaia e da CNN, elogiando sua educação e chamando-a de grande jornalista.",
+    "categoria": "Liberdade de Expressão",
+    "temas": [
+     "Malu Gaspar",
+     "Edilene",
+     "Entrevistas exclusivas",
+     "Rádio Itatiaia e CNN"
+    ],
+    "inicio": 3472.64,
+    "fim": 3499.12,
+    "duracao": 26.48,
+    "renan_falando": true,
+    "precisa_contexto": true,
+    "cortes_possiveis": 0,
+    "forca": 14,
+    "autonomia": 11,
+    "pergunta": "Renan convidaria Malu Gaspar e Edilene para entrevistas exclusivas?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "too_few_highlights(0)"
+    ],
+    "frase_inicial": 1394,
+    "frase_final": 1403,
+    "destaques": [],
+    "potencial": 11.0,
+    "pronto": false
+   },
+   {
+    "id": "b90fd268-5fbc-429c-90be-c43cdd6696ae",
+    "titulo": "Turnê eleitoral cogita Richard Rasmus e o Berranteiro viajando de mula",
+    "resumo": "Richard Rasmus é citado por ter percorrido o Brasil de mula, enquanto o Berranteiro é lembrado como possível participante da turnê. O grupo propõe chamá-lo, prevê uma passagem pela Paulistânia do Berranteiro e informa que Juiz de Fora está na lista oficial.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Richard Rasmus",
+     "Berranteiro",
+     "Turnê eleitoral",
+     "Paulistânia do Berranteiro",
+     "Juiz de Fora"
+    ],
+    "inicio": 3504.12,
+    "fim": 3535.76,
+    "duracao": 31.64,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 11,
+    "autonomia": 6,
+    "pergunta": "Como Richard Rasmus e o Berranteiro são relacionados à turnê eleitoral?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 1408,
+    "frase_final": 1418,
+    "destaques": [
+     {
+      "inicio": 3520.0,
+      "fim": 3522.6,
+      "texto": "A gente vai passar na Paulistânia do Berranteiro.",
+      "motivo": "Indica uma parada da turnê na região associada ao Berranteiro e sustenta o planejamento da participação dele.",
+      "frase": 1414
+     }
+    ],
+    "potencial": 11.6,
+    "pronto": false
+   },
+   {
+    "id": "b5dc1c41-adb0-45d9-a06e-9df293a5a131",
+    "titulo": "Falta de material e dinheiro atinge campanhas, incluindo Mateus Faustino",
+    "resumo": "Os participantes relatam que a campanha presidencial ficou sem material e precisa produzir dezenas de milhares de kits, enquanto é descrita como uma campanha feita com pouco dinheiro. Também mencionam o custo de cerca de 60 reuniões com pessoas ricas e afirmam que Mateus Faustino, no União Brasil, não recebeu recursos suficientes para sua campanha.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "financiamento eleitoral",
+     "material de campanha",
+     "reuniões com a elite",
+     "Mateus Faustino",
+     "União Brasil"
+    ],
+    "inicio": 3539.32,
+    "fim": 3614.6,
+    "duracao": 75.28,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 35,
+    "autonomia": 11,
+    "pergunta": "Por que essas campanhas estão sem material e dinheiro?",
+    "riscos": [
+     "linguagem_ofensiva"
+    ],
+    "avisos": [
+     "start_continuation",
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 1422,
+    "frase_final": 1461,
+    "destaques": [
+     {
+      "inicio": 3564.24,
+      "fim": 3566.68,
+      "texto": "Acabou o material da campanha presidencial.",
+      "motivo": "Expõe de forma direta a falta de material na campanha presidencial, funcionando como tese central do bloco.",
+      "frase": 1438
+     }
+    ],
+    "potencial": 26.3,
+    "pronto": false
+   },
+   {
+    "id": "2fc73ba1-2295-48ae-a306-74a4849cea6f",
+    "titulo": "Renan minimiza processo de Thalis e diz que não está preocupado",
+    "resumo": "Renan reage ao processo mencionado contra ele dizendo que já foi processado por muitas pessoas sérias e que até enfrentou um ministro do Supremo. Ele também afirma que a internet exagera o temor de ser processado e sugere que os verdadeiramente preocupados são os autores da ação.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "processo movido por Thalis",
+     "reação a processos judiciais",
+     "notícia-crime",
+     "ministro do Supremo"
+    ],
+    "inicio": 3632.28,
+    "fim": 3666.84,
+    "duracao": 34.56,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 1,
+    "forca": 22,
+    "autonomia": 51,
+    "pergunta": "Como Renan reage ao processo movido por Thalis?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 1471,
+    "frase_final": 1483,
+    "destaques": [
+     {
+      "inicio": 3641.04,
+      "fim": 3645.72,
+      "texto": "Meu amigo, eu já fui processado por tanta gente séria na vida.",
+      "motivo": "Renan minimiza o processo ao dizer que já foi processado por muitas pessoas sérias, apresentando sua experiência anterior como motivo para não se alarmar.",
+      "frase": 1474
+     }
+    ],
+    "potencial": 31.1,
+    "pronto": true
+   },
+   {
+    "id": "92c3cc40-d0c8-478e-8dd5-cf8890dc3d4b",
+    "titulo": "Renan: campanha de Lula só tem o ataque a Flávio e a polarização",
+    "resumo": "Renan afirma que a campanha de Lula estaria tensa e reduzida a atacar Flávio, inclusive com referências ao escândalo do Banco Master. Ele prevê que Lula seria derrotado por qualquer outro adversário no segundo turno e critica a polarização com a família Bolsonaro por prender as pessoas em um curto-circuito político.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Campanha de Lula",
+     "Flávio",
+     "Banco Master",
+     "Polarização Lula-Bolsonaro"
+    ],
+    "inicio": 3666.84,
+    "fim": 3703.76,
+    "duracao": 36.92,
+    "renan_falando": true,
+    "precisa_contexto": true,
+    "cortes_possiveis": 2,
+    "forca": 65,
+    "autonomia": 51,
+    "pergunta": "Como Renan avalia a campanha de Lula e sua polarização com a família Bolsonaro?",
+    "riscos": [],
+    "avisos": [
+     "curto"
+    ],
+    "frase_inicial": 1484,
+    "frase_final": 1495,
+    "destaques": [
+     {
+      "inicio": 3672.16,
+      "fim": 3680.28,
+      "texto": "A campanha do Lula, a única coisa que restou pra campanha do Lula é atacar o Flávio e tentar pegar elementos aí nesse escândalo do Banco Master para atacar o Flávio.",
+      "motivo": "Apresenta a tese central de que a campanha de Lula teria ficado restrita a atacar Flávio usando elementos do escândalo do Banco Master.",
+      "frase": 1485
+     },
+     {
+      "inicio": 3692.76,
+      "fim": 3694.44,
+      "texto": "O Lula tá detonado.",
+      "motivo": "Concentra a avaliação contundente de Renan sobre a fragilidade da campanha de Lula em uma frase curta e autossuficiente.",
+      "frase": 1491
+     }
+    ],
+    "potencial": 58.5,
+    "pronto": false
+   },
+   {
+    "id": "d228001b-abff-42c4-91e9-96d6fd2fca97",
+    "titulo": "Renan propõe transformar cada eleitor em multiplicador para chegar ao 2o turno",
+    "resumo": "Renan defende que cada eleitor da campanha conquiste pelo menos mais dois votos, transformando a base eleitoral em uma rede de mobilização. Ele usa a hipótese de ter 10% dos votos para afirmar que, se esses eleitores dobrarem seu alcance, a candidatura chegará ao segundo turno.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "estratégia eleitoral",
+     "mobilização de eleitores",
+     "multiplicadores de votos",
+     "segundo turno"
+    ],
+    "inicio": 3703.76,
+    "fim": 3734.64,
+    "duracao": 30.88,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 3,
+    "forca": 76,
+    "autonomia": 93,
+    "pergunta": "Como transformar cada eleitor em multiplicador para chegar ao segundo turno?",
+    "riscos": [],
+    "avisos": [
+     "start_continuation",
+     "curto"
+    ],
+    "frase_inicial": 1496,
+    "frase_final": 1506,
+    "destaques": [
+     {
+      "inicio": 3716.28,
+      "fim": 3718.64,
+      "texto": "Cada um dos meus eleitores é um multiplicador.",
+      "motivo": "Apresenta a tese central de que cada eleitor deve atuar como multiplicador da campanha.",
+      "frase": 1500
+     },
+     {
+      "inicio": 3723.32,
+      "fim": 3726.88,
+      "texto": "Se cada um dos nossos eleitores virar em dois votos, nós já estamos no segundo turno.",
+      "motivo": "Expõe de forma concreta a lógica eleitoral: dobrar os votos por meio da mobilização de cada eleitor.",
+      "frase": 1502
+     },
+     {
+      "inicio": 3726.88,
+      "fim": 3729.52,
+      "texto": "Porque o nosso eleitor não é um eleitor, ele é um multiplicador.",
+      "motivo": "Formula a diferenciação central entre um eleitor passivo e um eleitor que conquista novos votos.",
+      "frase": 1503
+     }
+    ],
+    "potencial": 81.0,
+    "pronto": true
+   },
+   {
+    "id": "0b22c731-9005-4cd9-bc9f-c6a6b8d01f1b",
+    "titulo": "Lei eleitoral impede shows de bandas na viagem da campanha",
+    "resumo": "A fala comenta que uma banda teria interesse em participar da viagem da campanha e fazer shows durante o trajeto, conforme mensagens no chat. Em seguida, afirma que a lei eleitoral proíbe esse tipo de apresentação e agradece o eventual apoio dos músicos.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "legislação eleitoral",
+     "shows de campanha",
+     "bandas",
+     "viagem eleitoral"
+    ],
+    "inicio": 3739.84,
+    "fim": 3762.52,
+    "duracao": 22.68,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 7,
+    "autonomia": 37,
+    "pergunta": "A lei eleitoral permite que bandas façam shows durante a viagem da campanha?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 1510,
+    "frase_final": 1514,
+    "destaques": [
+     {
+      "inicio": 3749.08,
+      "fim": 3761.64,
+      "texto": "Mas por mais que eles tenham aparentemente, não sei, tá, estão comentando aí no chat, não sei se é verdade, mas eles estejam afim, a lei eleitoral proíbe, não pode fazer com show mí, então não é legal, mas agradeço aí, se for verdade, agradeço aí o empenho deles.",
+      "motivo": "Explica que, mesmo com o possível interesse da banda em participar, a legislação eleitoral impede a realização de shows durante a viagem de campanha.",
+      "frase": 1513
+     }
+    ],
+    "potencial": 18.7,
+    "pronto": false
+   }
+  ]
+ },
+ {
+  "resumo": {
+   "youtube_id": "Eu8t2aEOLfo",
+   "titulo": "LIVE SURPRESA - RENAN SANTOS E KIM KATAGUIRI",
+   "erro": "nenhum modelo do Gemini respondeu. gemini-flash-latest: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on | gemini-flash-latest: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on | gemini-2.5-flash: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again  | gemini-2.5-flash: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again "
+  },
+  "nossos": [],
+  "chub": [
+   {
+    "id": "8233cbd6-f376-4be3-a617-28fb9efb1172",
+    "titulo": "Liderança exemplar deve transformar ordem em cultura no Brasil",
+    "resumo": "A fala atribui os problemas do Brasil à má liderança, que inspiraria comportamentos ruins na população, e defende a formação de uma elite capaz de dar o exemplo. Como referência, cita Singapura e sustenta que a transformação deve seguir a sequência de criar ordem, convertê-la em hábito e consolidá-la como cultura.",
+    "categoria": "Gestão Pública",
+    "temas": [
+     "liderança política",
+     "elite dirigente",
+     "Singapura",
+     "ordem e cultura"
+    ],
+    "inicio": 3.36,
+    "fim": 69.76,
+    "duracao": 66.4,
+    "renan_falando": false,
+    "precisa_contexto": false,
+    "cortes_possiveis": 3,
+    "forca": 95,
+    "autonomia": 83,
+    "pergunta": "Como uma liderança exemplar poderia transformar o Brasil?",
+    "riscos": [
+     "linguagem_ofensiva"
+    ],
+    "avisos": [],
+    "frase_inicial": 0,
+    "frase_final": 19,
+    "destaques": [
+     {
+      "inicio": 11.32,
+      "fim": 12.8,
+      "texto": "O problema do Brasil é um problema de liderança.",
+      "motivo": "Apresenta a tese central de que o principal problema do Brasil é a falta de liderança.",
+      "frase": 3
+     },
+     {
+      "inicio": 32.2,
+      "fim": 35.4,
+      "texto": "Se o topo tá participando do escândalo do Banco Master, eu não vou poder cobrar.",
+      "motivo": "Oferece um exemplo concreto do argumento: sem uma elite que dê o exemplo, não seria possível cobrar responsabilidade da população.",
+      "frase": 10
+     },
+     {
+      "inicio": 55.08,
+      "fim": 59.8,
+      "texto": "Primeiro você cria a ordem, depois a ordem vira hábito e depois o hábito vira a cultura.",
+      "motivo": "Resume a sequência defendida para transformar o país: criar ordem, convertê-la em hábito e depois em cultura.",
+      "frase": 16
+     }
+    ],
+    "potencial": 88.4,
+    "pronto": false
+   },
+   {
+    "id": "613f8bcc-2386-49f8-be74-2af83558d997",
+    "titulo": "Jogo apresenta personagens com habilidades e bônus de pontuação",
+    "resumo": "O bloco apresenta um jogo com personagens como Renan Santos, Aroldo Medina e Amanda, cada um com habilidades próprias. A fala cita bônus ligados a combo, eficiência, prisões e pontuação, incluindo mais pontos por prisões e aumento percentual na pontuação. A conversa também prepara a entrada dos participantes no jogo e comenta a escolha dos personagens na tela.",
+    "categoria": "Agropecuária e Tecnologia",
+    "temas": [
+     "jogo",
+     "personagens jogáveis",
+     "habilidades especiais",
+     "pontuação"
+    ],
+    "inicio": 78.56,
+    "fim": 178.68,
+    "duracao": 100.12,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 11,
+    "autonomia": 8,
+    "pergunta": "Quais personagens aparecem no jogo e quais habilidades e bônus de pontuação eles têm?",
+    "riscos": [
+     "ataque_pessoal"
+    ],
+    "avisos": [
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 25,
+    "frase_final": 74,
+    "destaques": [
+     {
+      "inicio": 143.32,
+      "fim": 144.64,
+      "texto": "E a Amanda tem um sangue frio.",
+      "motivo": "Apresenta Amanda como personagem jogável e introduz sua habilidade específica, o sangue-frio.",
+      "frase": 56
+     }
+    ],
+    "potencial": 12.2,
+    "pronto": false
+   },
+   {
+    "id": "175ee184-7fdc-422e-aea4-6116cfd23f3a",
+    "titulo": "Ação no STF pede abertura dos inquéritos das fake news e do INSS",
+    "resumo": "A fala apresenta uma ação no Supremo Tribunal Federal para levantar o sigilo do inquérito das fake news e do caso do INSS. Ao defender a abertura, cita pessoas investigadas, alegações envolvendo Lulinha e outros personagens e informações relacionadas a Alexandre de Moraes. O argumento é que os eleitores não deveriam tomar decisões na eleição sem acesso a dados que poderiam ser divulgados apenas depois do pleito.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "inquérito das fake news",
+     "inquérito do INSS",
+     "sigilo judicial",
+     "transparência eleitoral"
+    ],
+    "inicio": 178.68,
+    "fim": 402.68,
+    "duracao": 224.0,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 2,
+    "forca": 65,
+    "autonomia": 51,
+    "pergunta": "A ação busca abrir os inquéritos das fake news e do INSS antes da eleição para ampliar o acesso dos eleitores a informações?",
+    "riscos": [
+     "juridico_sensivel"
+    ],
+    "avisos": [],
+    "frase_inicial": 75,
+    "frase_final": 131,
+    "destaques": [
+     {
+      "inicio": 206.6,
+      "fim": 212.4,
+      "texto": "O inquérito das fake news começou por causa de uma notícia que falava sobre um escândalo envolvendo o Tofol.",
+      "motivo": "Explica a origem atribuída ao inquérito das fake news e abre o contexto da ação para revisar seus sigilos.",
+      "frase": 84
+     },
+     {
+      "inicio": 382.52,
+      "fim": 386.6,
+      "texto": "Por que fazer o eleitor tomar uma decisão com algumas informações",
+      "motivo": "Formula o argumento eleitoral central: o eleitor não deveria decidir sem acesso a informações que o Judiciário pode manter sob sigilo.",
+      "frase": 126
+     }
+    ],
+    "potencial": 58.5,
+    "pronto": false
+   },
+   {
+    "id": "23706f0e-d951-4d5d-b94b-30b7d55c5589",
+    "titulo": "Crise no STF expõe guerra de poder e fim da crença republicana",
+    "resumo": "O bloco descreve um suposto acordo entre grupos de ministros do STF para não expor materiais durante o período eleitoral, seguido por uma ruptura que teria transformado a disputa em guerra política. Também relaciona a crise a interesses do governo Lula, aos escândalos do INSS e do Banco Master e à liderança considerada fraca de Fachin. A conclusão é que os rituais institucionais e a crença republicana teriam perdido força, levando à ideia de que o pacto constitucional e a Constituição de 1988 estão mortos e de que uma discussão sobre constituinte se tornou urgente.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "STF",
+     "disputa de poder entre ministros",
+     "escândalo do Banco Master",
+     "crise institucional",
+     "Constituição de 1988"
+    ],
+    "inicio": 430.56,
+    "fim": 970.36,
+    "duracao": 539.8,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 2,
+    "forca": 95,
+    "autonomia": 28,
+    "pergunta": "A crise entre ministros do STF é uma disputa jurídica ou uma guerra política?",
+    "riscos": [
+     "juridico_sensivel"
+    ],
+    "avisos": [],
+    "frase_inicial": 150,
+    "frase_final": 314,
+    "destaques": [
+     {
+      "inicio": 726.36,
+      "fim": 730.96,
+      "texto": "Falei assim, cara, nem tem como dar opinião assim, mas esse é uma briga jurídica ou briga política?",
+      "motivo": "Define de forma direta a tese de que o conflito entre ministros do STF é político, e não uma disputa jurídica.",
+      "frase": 231
+     },
+     {
+      "inicio": 924.84,
+      "fim": 927.44,
+      "texto": "Eh, no fim do dia você tem que ter uma crença",
+      "motivo": "Apresenta a premissa de que a ordem constitucional depende de uma crença prévia capaz de validar suas próprias normas.",
+      "frase": 294
+     }
+    ],
+    "potencial": 68.2,
+    "pronto": false
+   },
+   {
+    "id": "3200052f-4d90-408f-bf96-cbfc3417d8a6",
+    "titulo": "Campanha aposta em caravana e sabatinas para furar a bolha eleitoral",
+    "resumo": "A conversa defende uma abordagem gradual para convencer eleitores que estão fora da bolha política, lembrando que muitos escolhem candidatos por sinais simples, como adesivos e santinhos. Para alcançar esse público, a campanha planeja percorrer as maiores cidades em ônibus e participar de todas as sabatinas, enquanto os debates eleitorais são cancelados ou ameaçados de cancelamento.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "bolha política",
+     "caravana eleitoral",
+     "sabatinas",
+     "cancelamento de debates"
+    ],
+    "inicio": 970.36,
+    "fim": 1237.92,
+    "duracao": 267.56,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 65,
+    "autonomia": 83,
+    "pergunta": "Como a campanha pretende alcançar eleitores fora da bolha política?",
+    "riscos": [],
+    "avisos": [
+     "start_continuation"
+    ],
+    "frase_inicial": 315,
+    "frase_final": 418,
+    "destaques": [
+     {
+      "inicio": 1202.0,
+      "fim": 1207.4,
+      "texto": "Nós temos que animar as pessoas e mostrar que existe um caminho que não é esse caminho da compra de voto, da malandragem,",
+      "motivo": "Apresenta a mobilização nas maiores cidades como forma de animar eleitores e mostrar uma alternativa à compra de votos e à malandragem.",
+      "frase": 396
+     },
+     {
+      "inicio": 1222.52,
+      "fim": 1223.88,
+      "texto": "A gente tá indo bem nas sabatinas.",
+      "motivo": "Resume o desempenho da campanha nas sabatinas como principal espaço de exposição diante do cancelamento dos debates.",
+      "frase": 407
+     }
+    ],
+    "potencial": 68.2,
+    "pronto": false
+   },
+   {
+    "id": "2c4126a5-19ba-4572-97ef-def01ea1fd76",
+    "titulo": "Como despertar eleitores para fazê-los mudar de candidato",
+    "resumo": "O bloco sustenta que eleitores dispostos a votar em candidatos considerados covardes ou ruins podem ser convencidos a mudar de escolha, desde que sejam despertados para os riscos políticos. A estratégia é descrita como um resgate ou um choque de realidade, ilustrado pelo relato de um empresário que fazia deboche e pela menção, de forma truncada, a um candidato supostamente ligado ao Comando Vermelho e a uma fala atribuída a Flávio.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "mudança de voto",
+     "persuasão eleitoral",
+     "riscos políticos",
+     "Comando Vermelho"
+    ],
+    "inicio": 1296.48,
+    "fim": 1344.44,
+    "duracao": 47.96,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 31,
+    "autonomia": 18,
+    "pergunta": "É possível convencer eleitores de candidatos ruins a mudar de escolha?",
+    "riscos": [
+     "linguagem_ofensiva",
+     "juridico_sensivel"
+    ],
+    "avisos": [
+     "start_continuation",
+     "curto",
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 447,
+    "frase_final": 463,
+    "destaques": [
+     {
+      "inicio": 1302.68,
+      "fim": 1306.4,
+      "texto": "a chance de você tirar ela do covarde é mais alta do que você imagina.",
+      "motivo": "Apresenta a tese de que é possível afastar eleitores de um candidato ruim com mais facilidade do que se imagina.",
+      "frase": 448
+     }
+    ],
+    "potencial": 26.2,
+    "pronto": false
+   },
+   {
+    "id": "9fe1e123-b4cc-4b98-8c89-6603032e9e0d",
+    "titulo": "Jogo diferencia alvos para prender, ameaças armadas e personagens intocáveis",
+    "resumo": "As regras do jogo determinam que personagens amarelos devem ser atropelados para serem presos, enquanto os vermelhos representam ameaças armadas e os verdes não podem ser tocados, incluindo policiais ou estudantes. A explicação também menciona três fugas no mesmo nível, chefões e a necessidade de ler as regras de cada batalha. Surge ainda a dúvida sobre o estudante da USP fazendo greg, mas a resposta se limita a considerar a questão um bom ponto.",
+    "categoria": "Outro",
+    "temas": [
+     "regras do jogo",
+     "alvos para prender",
+     "ameaças armadas",
+     "estudante da USP"
+    ],
+    "inicio": 1400.16,
+    "fim": 1422.4,
+    "duracao": 22.24,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 3,
+    "forca": 22,
+    "autonomia": 26,
+    "pergunta": "Como o jogo diferencia os alvos que devem ser presos das ameaças e dos personagens que não podem ser tocados?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "highlight_dropped(menos de 4 palavras)",
+     "possible_cuts_capped(4->3)"
+    ],
+    "frase_inicial": 493,
+    "frase_final": 503,
+    "destaques": [
+     {
+      "inicio": 1400.16,
+      "fim": 1403.08,
+      "texto": "Amarelo, passe por cima, alvo para prender.",
+      "motivo": "Apresenta a regra do alvo amarelo, que deve ser atropelado para ser preso.",
+      "frase": 493
+     },
+     {
+      "inicio": 1403.08,
+      "fim": 1406.24,
+      "texto": "Vermelho, passe por cima, ameaça armada.",
+      "motivo": "Define o alvo vermelho como uma ameaça armada que também deve ser atropelada.",
+      "frase": 494
+     },
+     {
+      "inicio": 1418.16,
+      "fim": 1420.52,
+      "texto": "Mas e se for o estudante da USP fazendo greg?",
+      "motivo": "Introduz a dúvida específica sobre como tratar o estudante da USP em uma situação particular do jogo.",
+      "frase": 502
+     }
+    ],
+    "potencial": 31.2,
+    "pronto": false
+   },
+   {
+    "id": "4534da71-90f2-4a01-b3fd-e609f51af225",
+    "titulo": "A dificuldade do jogo exige precisão para não confundir coach e policial",
+    "resumo": "O jogo é considerado difícil porque coach e policial são muito parecidos, aumentando o risco de o jogador cometer um erro e matar um policial por engano. A fala conclui que as operações precisam ser irretocáveis para evitar esse tipo de falha.",
+    "categoria": "Outro",
+    "temas": [
+     "Dificuldade do jogo",
+     "Coach e policial",
+     "Precisão nas operações",
+     "Erro de identificação"
+    ],
+    "inicio": 1620.08,
+    "fim": 1676.6,
+    "duracao": 56.52,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 2,
+    "forca": 26,
+    "autonomia": 21,
+    "pergunta": "Por que o jogo exige atenção para não confundir o coach com o policial?",
+    "riscos": [],
+    "avisos": [
+     "curto"
+    ],
+    "frase_inicial": 558,
+    "frase_final": 571,
+    "destaques": [
+     {
+      "inicio": 1630.32,
+      "fim": 1635.96,
+      "texto": "É, mas difícil cara porque assim, o coach é muito parecido com o policial.",
+      "motivo": "Apresenta a dificuldade central do jogo: a semelhança entre coach e policial exige atenção do jogador.",
+      "frase": 562
+     },
+     {
+      "inicio": 1669.48,
+      "fim": 1676.6,
+      "texto": "as operações tem que ser irretocáveis.",
+      "motivo": "Entrega a conclusão operacional de que as ações precisam ser executadas com precisão, sem erros.",
+      "frase": 571
+     }
+    ],
+    "potencial": 28.1,
+    "pronto": false
+   },
+   {
+    "id": "62132963-62cf-46ab-abd6-f9311e87bbef",
+    "titulo": "Jogo terá modo competitivo para desafiar amigos no WhatsApp",
+    "resumo": "A conversa confirma que o jogo terá um modo competitivo. A proposta é permitir que os jogadores desafiem seus amigos pelo WhatsApp.",
+    "categoria": "Agropecuária e Tecnologia",
+    "temas": [
+     "modo competitivo",
+     "jogo",
+     "WhatsApp",
+     "desafios entre amigos"
+    ],
+    "inicio": 2045.68,
+    "fim": 2073.44,
+    "duracao": 27.76,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 26,
+    "autonomia": 21,
+    "pergunta": "O jogo terá um modo competitivo para desafiar amigos pelo WhatsApp?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 679,
+    "frase_final": 680,
+    "destaques": [
+     {
+      "inicio": 2048.72,
+      "fim": 2073.44,
+      "texto": "Vai, você vai desafiar seus amigos no WhatsApp.",
+      "motivo": "Confirma a criação de um modo competitivo e explica que ele permitirá desafiar amigos pelo WhatsApp.",
+      "frase": 680
+     }
+    ],
+    "potencial": 24.4,
+    "pronto": false
+   },
+   {
+    "id": "c6cbbeb3-b982-4427-a014-30824225464b",
+    "titulo": "Novos jogos da campanha incluem modo de fuga e CDBs do Master",
+    "resumo": "O bloco sugere criar, até o fim da campanha, um jogo de fuga ambientado em um labirinto. Também propõe um aplicativo inspirado em CDBs do Master, no qual o jogador compraria itens para aumentar cada vez mais a velocidade.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "jogos de campanha",
+     "modo de fuga",
+     "labirinto",
+     "CDBs do Master"
+    ],
+    "inicio": 2445.76,
+    "fim": 2490.04,
+    "duracao": 44.28,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 0,
+    "forca": 2,
+    "autonomia": 1,
+    "pergunta": "Quais novos jogos poderiam ser criados para a campanha?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "too_few_highlights(0)"
+    ],
+    "frase_inicial": 801,
+    "frase_final": 819,
+    "destaques": [],
+    "potencial": 1.4,
+    "pronto": false
+   },
+   {
+    "id": "7dfdf3ed-2f9c-462f-b028-e813eb5e8616",
+    "titulo": "Jogo termina com todos presos, 1.049.000 pontos e site divulgado",
+    "resumo": "O jogo termina com todos os personagens presos e uma pontuação de 1.049.000 pontos. Em seguida, o site jogo.com.br é divulgado, e o público é convidado a publicar no Twitter prints de suas partidas.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "pontuação final do jogo",
+     "prisão dos personagens",
+     "jogo.com.br",
+     "compartilhamento no Twitter"
+    ],
+    "inicio": 2790.8,
+    "fim": 2826.04,
+    "duracao": 35.24,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 3,
+    "forca": 50,
+    "autonomia": 51,
+    "pergunta": "Qual foi a pontuação final do jogo e onde o público pode acessá-lo?",
+    "riscos": [],
+    "avisos": [
+     "curto"
+    ],
+    "frase_inicial": 940,
+    "frase_final": 956,
+    "destaques": [
+     {
+      "inicio": 2795.36,
+      "fim": 2799.0,
+      "texto": "Fizemos 1 milhão e 49.000 pontos.",
+      "motivo": "Revela a pontuação final alcançada no jogo, com um número específico e memorável.",
+      "frase": 944
+     },
+     {
+      "inicio": 2815.04,
+      "fim": 2817.68,
+      "texto": "É jogo.com.br.",
+      "motivo": "Divulga diretamente o endereço do site onde o público pode acessar o jogo.",
+      "frase": 953
+     },
+     {
+      "inicio": 2821.96,
+      "fim": 2826.04,
+      "texto": "Tirem prints de vocês jogando e e coloquem no no Twitter.",
+      "motivo": "Faz um convite concreto para os jogadores compartilharem seus resultados no Twitter.",
+      "frase": 956
+     }
+    ],
+    "potencial": 54.1,
+    "pronto": false
+   }
+  ]
+ },
+ {
+  "resumo": {
+   "youtube_id": "M4RmnqK4vQY",
+   "titulo": "BRASILEIRO AMA BANDIDO | ANÁLISES PRESIDENCIAIS com Renan Santos 10/09/26",
+   "erro": "nenhum modelo do Gemini respondeu. gemini-flash-latest: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on | gemini-flash-latest: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on | gemini-2.5-flash: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again  | gemini-2.5-flash: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'The service is currently unavailable.', 'status': 'UNAVAILABLE'}}"
+  },
+  "nossos": [],
+  "chub": [
+   {
+    "id": "636b57a5-54dc-4567-83f8-2373565cfb74",
+    "titulo": "Escândalos fortalecem os dois polos enquanto a terceira via desaparece",
+    "resumo": "Renan afirma que o acúmulo de escândalos de corrupção não enfraquece o petismo e o bolsonarismo, mas reforça a escolha entre os dois polos e empurra a terceira via para baixo, como teria ocorrido com Augusto Curi. Ele descreve uma eleição sem debate político, marcada por torpor nas ruas, enquanto apresenta seu partido como uma terceira força mobilizada e cita 11% em uma pesquisa. Ao final, defende manter o discurso de denúncia e critica o eleitorado por decidir o futuro entre os dois grupos que chama de ladrões.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Polarização entre lulismo e bolsonarismo",
+     "Terceira via",
+     "Escândalos de corrupção",
+     "Apatia eleitoral",
+     "Augusto Curi"
+    ],
+    "inicio": 92.08,
+    "fim": 412.84,
+    "duracao": 320.76,
+    "renan_falando": true,
+    "precisa_contexto": true,
+    "cortes_possiveis": 4,
+    "forca": 86,
+    "autonomia": 37,
+    "pergunta": "Por que os escândalos de corrupção fortalecem os dois polos e esvaziam a terceira via?",
+    "riscos": [
+     "juridico_sensivel"
+    ],
+    "avisos": [
+     "start_continuation"
+    ],
+    "frase_inicial": 30,
+    "frase_final": 121,
+    "destaques": [
+     {
+      "inicio": 334.24,
+      "fim": 335.6,
+      "texto": "É a eleição mais vazia.",
+      "motivo": "Formula a tese de que a eleição está vazia de debate político e de disputa programática.",
+      "frase": 92
+     },
+     {
+      "inicio": 335.6,
+      "fim": 339.04,
+      "texto": "Os únicos que trouxeram um discurso político para as eleições fomos nós.",
+      "motivo": "Apresenta o partido do falante como a única força do bloco a levar um discurso político para a eleição.",
+      "frase": 93
+     },
+     {
+      "inicio": 376.08,
+      "fim": 379.92,
+      "texto": "O que eu digo para vocês é, nós não vamos desviar uma vírgula do nosso plano.",
+      "motivo": "Expõe a decisão de manter a estratégia e denunciar os escândalos, apesar do torpor eleitoral.",
+      "frase": 105
+     },
+     {
+      "inicio": 391.28,
+      "fim": 397.76,
+      "texto": "O elitor tá pelado no meio da rua rifando o nosso futuro, decidindo voto por ladrões.",
+      "motivo": "Concentra a crítica ao eleitorado que, segundo o falante, decide o futuro apoiando os dois polos associados a ladrões.",
+      "frase": 113
+     }
+    ],
+    "potencial": 73.4,
+    "pronto": false
+   },
+   {
+    "id": "546e61ef-60eb-418c-950a-463dacc6e767",
+    "titulo": "A apatia eleitoral trava o país, mas jovens começam um despertar político",
+    "resumo": "O bloco contrapõe a apatia e o torpor do eleitorado brasileiro a um despertar político entre os mais jovens. O orador apresenta esse movimento como um novo projeto geracional, compara-o ao papel que o PT teve para a geração dos chamados Boomers e afirma que seu partido lidera a preferência dos jovens em pesquisas. A falta de reação a crises econômicas, segurança pública e corrupção teria frustrado a expectativa de renovação eleitoral, enquanto as eleições de 2024 foram, na maior parte dos municípios, mornas e pouco mobilizadas.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "apatia eleitoral",
+     "juventude e política",
+     "projetos geracionais",
+     "PT",
+     "eleições municipais de 2024"
+    ],
+    "inicio": 429.28,
+    "fim": 823.08,
+    "duracao": 393.8,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 2,
+    "forca": 65,
+    "autonomia": 51,
+    "pergunta": "Por que o despertar político dos jovens contrasta com a apatia eleitoral brasileira?",
+    "riscos": [
+     "juridico_sensivel",
+     "ataque_pessoal",
+     "linguagem_ofensiva"
+    ],
+    "avisos": [],
+    "frase_inicial": 129,
+    "frase_final": 255,
+    "destaques": [
+     {
+      "inicio": 480.16,
+      "fim": 483.84,
+      "texto": "Os mais jovens estão tendo um despertar que nós não estamos vendo há muito tempo.",
+      "motivo": "Apresenta de forma completa a tese de que os jovens vivem um despertar político raro, abrindo um corte sobre mudança geracional.",
+      "frase": 148
+     },
+     {
+      "inicio": 588.2,
+      "fim": 589.6,
+      "texto": "A população brasileira não liga.",
+      "motivo": "Sintetiza a crítica central à apatia eleitoral: a população não reage aos acontecimentos políticos.",
+      "frase": 183
+     }
+    ],
+    "potencial": 58.5,
+    "pronto": false
+   },
+   {
+    "id": "c5116495-010e-444a-9f81-9de73e9a44c3",
+    "titulo": "Sem debates, a campanha cria agenda própria e percorre o Brasil",
+    "resumo": "Renan anuncia uma grande turnê por dezenas de cidades, com eventos e registros em vídeo, para manter a campanha ativa e estimular o engajamento na reta final. Ele afirma que, sem debates, as campanhas perdem espaço e que a candidatura precisa criar sua própria pauta. Como exemplo da apatia do eleitorado, compara o interesse por conteúdos da campanha com notícias sobre disputas institucionais e diz que a população não reage mais a denúncias de corrupção ou à crise do STF.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "campanha eleitoral",
+     "turnê nacional",
+     "debates eleitorais",
+     "indiferença à corrupção"
+    ],
+    "inicio": 823.08,
+    "fim": 1206.04,
+    "duracao": 382.96,
+    "renan_falando": true,
+    "precisa_contexto": true,
+    "cortes_possiveis": 2,
+    "forca": 76,
+    "autonomia": 62,
+    "pergunta": "Como a campanha pretende se manter relevante sem depender dos debates e do noticiário?",
+    "riscos": [],
+    "avisos": [
+     "start_continuation"
+    ],
+    "frase_inicial": 256,
+    "frase_final": 386,
+    "destaques": [
+     {
+      "inicio": 1068.64,
+      "fim": 1072.68,
+      "texto": "se você não cria a sua própria pauta, você morre",
+      "motivo": "Formula a tese central de que uma candidatura precisa criar sua própria pauta para não desaparecer quando não há debates ou fatos políticos mobilizadores.",
+      "frase": 337
+     },
+     {
+      "inicio": 1162.8,
+      "fim": 1164.88,
+      "texto": "Está bem claro que o eleitor não liga pra corrupção.",
+      "motivo": "Expõe o diagnóstico sobre a indiferença do eleitor à corrupção, que sustenta a decisão de não depender do noticiário.",
+      "frase": 372
+     }
+    ],
+    "potencial": 67.9,
+    "pronto": false
+   },
+   {
+    "id": "773dec36-8de4-4e44-896f-596d3ca6bcf1",
+    "titulo": "Escândalos de corrupção já não mudam o voto do eleitor brasileiro",
+    "resumo": "O bloco sustenta que o Brasil acumula escândalos de corrupção maiores que os de períodos anteriores, mas a indignação perdeu força e os eleitores continuam apoiando seus grupos políticos. A fala atribui esse comportamento a uma espécie de brutalização e descolamento do interesse público, com preocupações reduzidas ao preço das coisas e pouca atenção à segurança pública. No fim, a comparação com eleições de 2014, 2018 e 2022 reforça que os pleitos atuais ainda não despertaram o mesmo debate político.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "apatia eleitoral",
+     "escândalos de corrupção",
+     "interesse público",
+     "segurança pública"
+    ],
+    "inicio": 1206.04,
+    "fim": 1584.08,
+    "duracao": 378.04,
+    "renan_falando": false,
+    "precisa_contexto": false,
+    "cortes_possiveis": 4,
+    "forca": 86,
+    "autonomia": 51,
+    "pergunta": "Por que os escândalos de corrupção já não alteram o voto do eleitor brasileiro?",
+    "riscos": [
+     "juridico_sensivel",
+     "tema_sexual"
+    ],
+    "avisos": [
+     "start_continuation"
+    ],
+    "frase_inicial": 387,
+    "frase_final": 511,
+    "destaques": [
+     {
+      "inicio": 1220.32,
+      "fim": 1223.84,
+      "texto": "que é um acúmulo de escândalos de corrupção maiores do que do petrolão.",
+      "motivo": "Apresenta a tese de que o acúmulo atual de escândalos de corrupção supera casos históricos que antes derrubavam ministros e presidentes.",
+      "frase": 391
+     },
+     {
+      "inicio": 1371.64,
+      "fim": 1375.92,
+      "texto": "o Flávio recebeu propina do cara e as pessoas continuam votando.",
+      "motivo": "Resume o contraste central: apesar de acusações de recebimento de propina envolvendo figuras ligadas aos dois polos, as pessoas continuam votando neles.",
+      "frase": 427
+     },
+     {
+      "inicio": 1494.2,
+      "fim": 1499.12,
+      "texto": "Eh, o brasileiro se descolou da ideia de interesse público",
+      "motivo": "Formula a conclusão sobre a apatia eleitoral: o brasileiro teria se afastado da ideia de interesse público e passado a priorizar questões menores.",
+      "frase": 471
+     },
+     {
+      "inicio": 1518.56,
+      "fim": 1522.8,
+      "texto": "mas assim, o eleitor de fato não está preocupado com segurança pública, como vocês imaginam.",
+      "motivo": "Traz o recorte específico da segurança pública, afirmando que o eleitor não está tão preocupado com o tema quanto se imaginava.",
+      "frase": 480
+     }
+    ],
+    "potencial": 77.6,
+    "pronto": false
+   },
+   {
+    "id": "470d21d5-35ee-4a1a-9038-ebe9fcda6bc2",
+    "titulo": "O torpor político enfrenta um possível despertar entre os jovens",
+    "resumo": "Renan sustenta que a maioria dos brasileiros não quer despertar politicamente, preferindo a identificação com blocos e o entretenimento à mobilização contra corrupção e decisões do STF. Ele contrapõe esse cinismo ao surgimento de jovens esperançosos e indignados, compara a mobilização necessária à resistência de Dom Pelágio e afirma que um despertar geracional pode estar avançando sem aparecer nas pesquisas. O bloco também defende uma campanha baseada em energia e esperança para convencer uma minoria e romper a apatia nacional.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "apatia eleitoral",
+     "despertar geracional",
+     "mobilização política",
+     "Dom Pelágio"
+    ],
+    "inicio": 1584.08,
+    "fim": 2007.08,
+    "duracao": 423.0,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 3,
+    "forca": 86,
+    "autonomia": 37,
+    "pergunta": "O eleitorado brasileiro está anestesiado, mas um despertar entre os jovens pode mudar esse cenário?",
+    "riscos": [
+     "ataque_pessoal"
+    ],
+    "avisos": [
+     "highlight_dropped(menos de 4 palavras)",
+     "possible_cuts_capped(4->3)"
+    ],
+    "frase_inicial": 512,
+    "frase_final": 653,
+    "destaques": [
+     {
+      "inicio": 1766.48,
+      "fim": 1770.52,
+      "texto": "A única coisa que importa no Brasil de hoje são os mais jovens.",
+      "motivo": "Apresenta os jovens como a principal esperança política diante do cinismo do restante da sociedade.",
+      "frase": 589
+     },
+     {
+      "inicio": 1962.04,
+      "fim": 1966.16,
+      "texto": "Há um estranho despertar que eu comentei geracional,",
+      "motivo": "Introduz a percepção de um despertar geracional, especialmente entre pessoas mais jovens.",
+      "frase": 641
+     },
+     {
+      "inicio": 1979.8,
+      "fim": 1983.88,
+      "texto": "Vem acontecendo algo que eu não acho que as pesquisas estejam captando.",
+      "motivo": "Afirma que uma mudança relevante pode estar ocorrendo sem ser captada pelas pesquisas eleitorais.",
+      "frase": 649
+     }
+    ],
+    "potencial": 69.7,
+    "pronto": false
+   },
+   {
+    "id": "2e6b67f4-a01d-444b-8187-ffa4fb63942f",
+    "titulo": "Como a corrupção virou sinal de relevância na política brasileira",
+    "resumo": "Renan contrasta o pico de esperança e mobilização da Lava-Jato com o atual vale de energia cívica, em que ser corrupto pode ser tratado como validação de relevância. Ele afirma que, especialmente em cidades pequenas e periferias, a dependência de favores do Estado condiciona o voto e afasta políticos honestos, criando uma pressão para que as lideranças sejam mais corruptas. O bloco também aborda como a empatia por Lula ou pela família Bolsonaro leva eleitores a rejeitar quem expõe o contraste entre honestidade e a falta de virtude de seus líderes.",
+    "categoria": "Corrupção",
+    "temas": [
+     "Lava-Jato",
+     "corrupção como relevância política",
+     "dependência de favores do Estado",
+     "Lula e família Bolsonaro"
+    ],
+    "inicio": 2032.84,
+    "fim": 2374.92,
+    "duracao": 342.08,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 3,
+    "forca": 86,
+    "autonomia": 37,
+    "pergunta": "Como a corrupção passou a ser tratada como critério de relevância e escolha política?",
+    "riscos": [],
+    "avisos": [
+     "start_continuation"
+    ],
+    "frase_inicial": 671,
+    "frase_final": 779,
+    "destaques": [
+     {
+      "inicio": 2086.08,
+      "fim": 2088.68,
+      "texto": "Você é premiado se você for corrupto.",
+      "motivo": "Apresenta a tese de que, no atual ciclo político, a corrupção passou a funcionar como vantagem eleitoral e sinal de relevância.",
+      "frase": 686
+     },
+     {
+      "inicio": 2208.88,
+      "fim": 2212.76,
+      "texto": "Boa parte dos corruptos se tornam corruptos porque o eleitor quer que eles sejam corruptos.",
+      "motivo": "Abre o argumento de que a pressão por favores e benefícios faz parte do eleitorado e contribui para a corrupção de políticos.",
+      "frase": 729
+     },
+     {
+      "inicio": 2287.44,
+      "fim": 2289.44,
+      "texto": "Esta é a lógica política brasileira.",
+      "motivo": "Resume a conclusão estrutural de que a política brasileira condiciona lideranças a serem cada vez mais corruptas.",
+      "frase": 756
+     }
+    ],
+    "potencial": 69.7,
+    "pronto": false
+   },
+   {
+    "id": "3689da75-ad7c-4e1b-b1c4-13c822ec175d",
+    "titulo": "População anestesiada pode reagir na última semana da eleição",
+    "resumo": "A população brasileira estaria apática no momento, mas poderia voltar a se mobilizar na última semana da eleição. A militância mais engajada é apontada como possível força de reação, com comparação ao caso de Artur em 2020, quando os números teriam passado de 2 para 10 em dez dias; as projeções de crescimento de 6 para 30 ou de 11 para perto de 20 são apresentadas com incerteza.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "apatia eleitoral",
+     "militância política",
+     "reação de última hora",
+     "Artur em 2020"
+    ],
+    "inicio": 2374.92,
+    "fim": 2415.84,
+    "duracao": 40.92,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 26,
+    "autonomia": 26,
+    "pergunta": "A militância pode provocar uma reação eleitoral de última hora?",
+    "riscos": [],
+    "avisos": [
+     "curto",
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 780,
+    "frase_final": 797,
+    "destaques": [
+     {
+      "inicio": 2374.92,
+      "fim": 2381.52,
+      "texto": "A população brasileira, ela está numa tá catatônica.",
+      "motivo": "Apresenta de forma direta a tese de que a população está anestesiada, ponto de partida para a possibilidade de uma reação de última hora.",
+      "frase": 780
+     }
+    ],
+    "potencial": 25.9,
+    "pronto": false
+   },
+   {
+    "id": "b847c5b1-92f8-4e5a-b300-7b67940cadab",
+    "titulo": "Discurso direto ou estratégia de marqueteiro: a consulta ao público",
+    "resumo": "A fala contrapõe seguir as recomendações dos marqueteiros, como evitar reformas, suavizar o discurso sobre crime organizado e concentrar ataques em Lula, à manutenção de uma comunicação direta. Depois de mencionar uma enquete com mais de mil votos e ampla maioria pela estratégia atual, o bloco critica a defesa de um discurso político vazio e questiona se aparições em sabatinas geram votos.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "estratégia de campanha",
+     "marqueteiros políticos",
+     "crime organizado",
+     "reforma fiscal e reforma do Estado"
+    ],
+    "inicio": 2415.84,
+    "fim": 2573.56,
+    "duracao": 157.72,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 3,
+    "forca": 65,
+    "autonomia": 28,
+    "pergunta": "Vale seguir as recomendações dos marqueteiros ou manter o discurso atual?",
+    "riscos": [],
+    "avisos": [],
+    "frase_inicial": 798,
+    "frase_final": 834,
+    "destaques": [
+     {
+      "inicio": 2422.36,
+      "fim": 2430.4,
+      "texto": "Eu posso fazer o seguinte, eu posso adotar o caminho que todos os marqueteiros recomendam.",
+      "motivo": "Apresenta de forma completa a escolha entre adotar a estratégia recomendada pelos marqueteiros e manter o discurso próprio.",
+      "frase": 801
+     },
+     {
+      "inicio": 2480.04,
+      "fim": 2488.96,
+      "texto": "Sigo este novo caminho ou mantenho como estou?",
+      "motivo": "Formula a consulta central à audiência sobre seguir o novo caminho ou manter a estratégia atual.",
+      "frase": 817
+     },
+     {
+      "inicio": 2531.04,
+      "fim": 2535.16,
+      "texto": "Os marqueteiros sempre falam: \"Ah, você tem que ter um discurso meio vazio e tal\".",
+      "motivo": "Explicita a crítica aos marqueteiros que defendem um discurso político vazio.",
+      "frase": 825
+     }
+    ],
+    "potencial": 55.4,
+    "pronto": false
+   },
+   {
+    "id": "f2afeb49-7860-411b-9113-b6116390bba2",
+    "titulo": "Mais apoio e reconhecimento, mas menos intenção de voto nas pesquisas",
+    "resumo": "Renan afirma que está muito mais conhecido e apoiado, com pessoas declarando voto nele em intensidade dez vezes maior do que em março ou abril. Apesar disso, diz que sua intenção de voto está abaixo da registrada em maio, classificando o resultado como paradoxal e sem conseguir explicar a divergência.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "pesquisas eleitorais",
+     "intenção de voto",
+     "reconhecimento político",
+     "apoio eleitoral"
+    ],
+    "inicio": 2573.56,
+    "fim": 2647.4,
+    "duracao": 73.84,
+    "renan_falando": true,
+    "precisa_contexto": false,
+    "cortes_possiveis": 2,
+    "forca": 65,
+    "autonomia": 62,
+    "pergunta": "Por que o maior reconhecimento e apoio não se refletem em maior intenção de voto?",
+    "riscos": [],
+    "avisos": [
+     "start_continuation"
+    ],
+    "frase_inicial": 835,
+    "frase_final": 852,
+    "destaques": [
+     {
+      "inicio": 2580.12,
+      "fim": 2589.88,
+      "texto": "Eu eu eu sinto eu sinto que de um lado eu estou muito mais conhecido e apoiado do que eu jamais fui.",
+      "motivo": "Afirma que está mais conhecido e apoiado do que nunca, estabelecendo o crescimento de sua visibilidade e apoio.",
+      "frase": 838
+     },
+     {
+      "inicio": 2614.36,
+      "fim": 2616.88,
+      "texto": "a minha intenção de volta é menor do que eu tinha em maio.",
+      "motivo": "Expõe diretamente o paradoxo central: apesar do crescimento do reconhecimento, dos eventos e da participação, sua intenção de voto caiu em relação a maio.",
+      "frase": 848
+     }
+    ],
+    "potencial": 61.8,
+    "pronto": true
+   },
+   {
+    "id": "a5bb7514-bed2-423c-bc55-ff455bf87dd9",
+    "titulo": "Enquete aponta 84% pela estratégia Renan Raiz",
+    "resumo": "A enquete exibida no bloco indica que 84% preferem manter a estratégia Renan Raiz. Outros 16% optam pelo caminho dos marqueteiros, e o resultado é colocado no ar.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "enquete",
+     "estratégia Renan Raiz",
+     "marqueteiros",
+     "estratégia de campanha"
+    ],
+    "inicio": 2660.84,
+    "fim": 2678.24,
+    "duracao": 17.4,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 1,
+    "forca": 11,
+    "autonomia": 15,
+    "pergunta": "Qual estratégia a enquete apoia?",
+    "riscos": [],
+    "avisos": [
+     "start_continuation",
+     "curto",
+     "too_few_highlights(1)"
+    ],
+    "frase_inicial": 858,
+    "frase_final": 863,
+    "destaques": [
+     {
+      "inicio": 2663.0,
+      "fim": 2666.24,
+      "texto": "84% segue como está Renan Raiz.",
+      "motivo": "Apresenta o resultado principal da enquete: 84% preferem manter a estratégia Renan Raiz.",
+      "frase": 859
+     }
+    ],
+    "potencial": 14.3,
+    "pronto": false
+   },
+   {
+    "id": "40a5f166-e4a7-44c4-afe5-b12a6dab03f6",
+    "titulo": "Sátira de marqueteiro: sem propostas e até com roubo para ganhar eleição",
+    "resumo": "A encenação mostra um marqueteiro recomendando retirar todas as propostas de governo para aumentar o desempenho eleitoral. O diálogo também explora a manipulação de contatos, a busca de atenção na internet e a orientação absurda para roubar, além de abandonar pautas raciais conforme a conveniência da campanha.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "marqueteiro político",
+     "propostas de governo",
+     "estratégia eleitoral",
+     "pautas raciais"
+    ],
+    "inicio": 2955.8,
+    "fim": 3088.56,
+    "duracao": 132.76,
+    "renan_falando": false,
+    "precisa_contexto": false,
+    "cortes_possiveis": 3,
+    "forca": 86,
+    "autonomia": 71,
+    "pergunta": "Como a sátira mostra que um marqueteiro pode recomendar abandonar propostas e até roubar para ganhar a eleição?",
+    "riscos": [
+     "linguagem_ofensiva"
+    ],
+    "avisos": [
+     "start_continuation"
+    ],
+    "frase_inicial": 1000,
+    "frase_final": 1100,
+    "destaques": [
+     {
+      "inicio": 2974.12,
+      "fim": 2975.6,
+      "texto": "Mas não é para ter proposta nenhuma.",
+      "motivo": "Apresenta a tese satírica de que o candidato deve eliminar completamente as propostas de governo para crescer nas pesquisas.",
+      "frase": 1013
+     },
+     {
+      "inicio": 3023.52,
+      "fim": 3025.68,
+      "texto": "Você vai chegar lá e você vai roubar.",
+      "motivo": "Concretiza a recomendação absurda do marqueteiro: praticar um roubo como estratégia para conquistar apoio eleitoral.",
+      "frase": 1048
+     },
+     {
+      "inicio": 3065.36,
+      "fim": 3066.56,
+      "texto": "Vida negra não importa.",
+      "motivo": "Expõe, em tom provocativo, o abandono de pautas raciais conforme a conveniência eleitoral do momento.",
+      "frase": 1085
+     }
+    ],
+    "potencial": 79.9,
+    "pronto": false
+   },
+   {
+    "id": "a08a34ed-2738-4e12-b37e-e23361e47635",
+    "titulo": "Apoio a Renan destaca inteligência e independência política",
+    "resumo": "Um apoiador elogia Renan Santos como um candidato jovem, inteligente e capaz de abordar os temas certos. O depoimento também valoriza alguém sem vínculos com grupos tradicionais no Senado e contrasta sua postura com ataques envolvendo outros políticos, o caso Banco Master e críticas ao robô que ele teria criado.",
+    "categoria": "Eleições e Política",
+    "temas": [
+     "Renan Santos",
+     "apoio eleitoral",
+     "independência política",
+     "caso Banco Master"
+    ],
+    "inicio": 3194.2,
+    "fim": 3248.48,
+    "duracao": 54.28,
+    "renan_falando": false,
+    "precisa_contexto": true,
+    "cortes_possiveis": 2,
+    "forca": 26,
+    "autonomia": 15,
+    "pergunta": "Por que esse eleitor apoia Renan Santos para a Presidência?",
+    "riscos": [],
+    "avisos": [
+     "end_unpunctuated_reviewed_boundary",
+     "curto"
+    ],
+    "frase_inicial": 1138,
+    "frase_final": 1157,
+    "destaques": [
+     {
+      "inicio": 3209.08,
+      "fim": 3211.4,
+      "texto": "Porque o Renato Santos é um menino bom.",
+      "motivo": "Apresenta a justificativa central do apoio: Renan é visto como uma pessoa boa e confiável.",
+      "frase": 1144
+     },
+     {
+      "inicio": 3217.52,
+      "fim": 3219.16,
+      "texto": "Ele bate na teca certa.",
+      "motivo": "Resume a percepção de que Renan aborda os temas considerados corretos pelo apoiador.",
+      "frase": 1147
+     }
+    ],
+    "potencial": 26.3,
+    "pronto": false
+   }
+  ]
+ }
+]

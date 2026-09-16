@@ -1,0 +1,93 @@
+"""Processa links de fora do Chub: legenda do YouTube (ou transcrição local), frases e blocos pelo Gemini."""
+
+import queue
+import threading
+import time
+import traceback
+
+from . import acervo_local, blocador, legendas, transcricao_local
+
+
+class FilaDeLinks:
+    def __init__(self):
+        self._fila = queue.Queue()
+        self._ativos = set()
+        self._trava = threading.Lock()
+        threading.Thread(target=self._trabalhar, name="fila-links", daemon=True).start()
+
+    def ativos(self):
+        with self._trava:
+            return set(self._ativos)
+
+    def adicionar(self, youtube_id, refazer=False):
+        """Coloca o vídeo na fila. Devolve False se ele já está sendo processado."""
+        with self._trava:
+            if youtube_id in self._ativos:
+                return False
+            self._ativos.add(youtube_id)
+        if not acervo_local.ler(youtube_id, "info.json"):
+            acervo_local.salvar(youtube_id, "info.json", {"youtube_id": youtube_id, "titulo": f"Vídeo {youtube_id}"})
+        acervo_local.salvar_estado(youtube_id, "na_fila", "Aguardando a vez", 0.0)
+        self._fila.put((youtube_id, refazer))
+        return True
+
+    def _trabalhar(self):
+        while True:
+            youtube_id, refazer = self._fila.get()
+            try:
+                self._processar(youtube_id, refazer)
+            except Exception as erro:
+                try:
+                    acervo_local.salvar_estado(youtube_id, "falhou", str(erro)[:400], None, detalhe=traceback.format_exc()[-2000:])
+                except Exception:
+                    # Nem o estado de falha gravou: registra no console e mantém a fila viva para os próximos links.
+                    traceback.print_exc()
+            finally:
+                with self._trava:
+                    self._ativos.discard(youtube_id)
+                self._fila.task_done()
+
+    def _processar(self, youtube_id, refazer):
+        pasta = acervo_local.pasta_do_video(youtube_id)
+
+        def estado(etapa, mensagem, progresso):
+            acervo_local.salvar_estado(youtube_id, etapa, mensagem, round(progresso, 3))
+
+        frases = None if refazer else acervo_local.ler(youtube_id, "frases.json")
+        if frases is None:
+            estado("legenda", "Buscando a legenda automática do YouTube", 0.02)
+            info, caminho = legendas.baixar_legenda(youtube_id, pasta)
+            acervo_local.salvar(youtube_id, "info.json", info)
+            if caminho:
+                palavras = legendas.palavras_do_json3(caminho)
+                origem = "legenda automática do YouTube"
+            else:
+                estado("transcrevendo", "O YouTube ainda não tem legenda: baixando o áudio", 0.04)
+                audio = transcricao_local.baixar_audio(youtube_id, pasta)
+                palavras = transcricao_local.transcrever(
+                    audio,
+                    ao_progredir=lambda p: estado("transcrevendo", f"Transcrevendo no computador… {p:.0%}", 0.05 + 0.45 * p),
+                )
+                origem = "transcrição local (Whisper)"
+            lista = legendas.frases_das_palavras(palavras)
+            if not lista:
+                raise RuntimeError("a transcrição veio vazia")
+            acervo_local.salvar(youtube_id, "palavras.json", palavras)
+            frases = {"origem": origem, "frases": lista}
+            acervo_local.salvar(youtube_id, "frases.json", frases)
+
+        info = acervo_local.ler(youtube_id, "info.json", {})
+        contexto = (
+            f"VÍDEO: {info.get('titulo', '')}\nCANAL: {info.get('canal', '')}\n"
+            f"PUBLICADO: {info.get('publicado_em', '')}\nDESCRIÇÃO: {(info.get('descricao') or '')[:600]}"
+        )
+        estado("blocos", "Dividindo em blocos com o Gemini", 0.5)
+        blocos, ignorados, modelos = blocador.dividir(
+            frases["frases"], contexto,
+            ao_progredir=lambda p: estado("blocos", f"Dividindo em blocos com o Gemini… {p:.0%}", 0.5 + 0.5 * p),
+        )
+        acervo_local.salvar(youtube_id, "blocos.json", {
+            "blocos": blocos, "ignorados": ignorados, "modelos": modelos, "gerado_em": time.time(),
+            "origem_frases": frases["origem"],
+        })
+        estado("pronto", f"{len(blocos)} blocos · {frases['origem']} · {', '.join(modelos)}", 1.0)

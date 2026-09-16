@@ -1,0 +1,49 @@
+Exception in thread fila-links:
+    0s | na_fila | Aguardando a vez
+Traceback (most recent call last):
+  File "C:\Users\nandi\indomavel\indomavel\processador.py", line 38, in _trabalhar
+    self._processar(youtube_id, refazer)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nandi\indomavel\indomavel\processador.py", line 54, in _processar
+    estado("legenda", "Buscando a legenda automática do YouTube", 0.02)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nandi\indomavel\indomavel\processador.py", line 50, in estado
+    acervo_local.salvar_estado(youtube_id, etapa, mensagem, round(progresso, 3))
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nandi\indomavel\indomavel\acervo_local.py", line 39, in salvar_estado
+    salvar(youtube_id, "estado.json", {
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "estado": estado, "mensagem": mensagem, "progresso": progresso, "atualizado_em": time.time(), **extras,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    })
+    ^^
+  File "C:\Users\nandi\indomavel\indomavel\acervo_local.py", line 27, in salvar
+    os.replace(temporario, destino)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] Acesso negado: 'C:\\Users\\nandi\\indomavel\\dados\\videos\\xLHFC_YejIE\\estado.json.tmp' -> 'C:\\Users\\nandi\\indomavel\\dados\\videos\\xLHFC_YejIE\\estado.json'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\nandi\AppData\Local\Programs\Python\Python313\Lib\threading.py", line 1043, in _bootstrap_inner
+    self.run()
+    ~~~~~~~~^^
+  File "C:\Users\nandi\AppData\Local\Programs\Python\Python313\Lib\threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nandi\indomavel\indomavel\processador.py", line 40, in _trabalhar
+    acervo_local.salvar_estado(youtube_id, "falhou", str(erro)[:400], None, detalhe=traceback.format_exc()[-2000:])
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\nandi\indomavel\indomavel\acervo_local.py", line 39, in salvar_estado
+    salvar(youtube_id, "estado.json", {
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        "estado": estado, "mensagem": mensagem, "progresso": progresso, "atualizado_em": time.time(), **extras,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    })
+    ^^
+  File "C:\Users\nandi\indomavel\indomavel\acervo_local.py", line 27, in salvar
+    os.replace(temporario, destino)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 5] Acesso negado: 'C:\\Users\\nandi\\indomavel\\dados\\videos\\xLHFC_YejIE\\estado.json.tmp' -> 'C:\\Users\\nandi\\indomavel\\dados\\videos\\xLHFC_YejIE\\estado.json'
+FINAL: {"estado": "na_fila", "mensagem": "Aguardando a vez", "progresso": 0.0, "atualizado_em": 1789483575.783533}
+codigo de saida: 0
