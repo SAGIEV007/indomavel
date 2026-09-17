@@ -1,0 +1,16 @@
+ANÚNCIO ESPECIAL com Renan Santos: 1523 frases, 30 blocos no Chub
+   17%
+   37%
+   56%
+   68%
+   87%
+   100%
+   {"blocos_chub": 30, "blocos_nossos": 26, "precisao_inicios": 0.423, "revocacao_inicios": 0.367, "f1_inicios": 0.393, "blocos_do_chub_com_par": 13, "concordancia_renan_falando": 0.462, "concordancia_precisa_contexto": 0.308, "duracao_mediana_chub_s": 53.2, "duracao_mediana_nossa_s": 81.9, "prontos_chub": 2, "prontos_nossos": 13, "youtube_id": "DxN0m8JN94w", "titulo": "ANÚNCIO ESPECIAL com Renan Santos", "frases": 1523, "segundos": 1039, "modelos": ["gemini-2.5-flash"]}
+LIVE SURPRESA - RENAN SANTOS E KIM KATAGUIRI: 1024 frases, 11 blocos no Chub
+   15%
+   44%
+   FALHOU: nenhum modelo do Gemini respondeu. gemini-flash-latest: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on | gemini-flash-latest: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on | gemini-2.5-flash: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again  | gemini-2.5-flash: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again 
+BRASILEIRO AMA BANDIDO | ANÁLISES PRESIDENCIAIS com Renan Santos 10/09/26: 1178 frases, 12 blocos no Chub
+   FALHOU: nenhum modelo do Gemini respondeu. gemini-flash-latest: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on | gemini-flash-latest: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on | gemini-2.5-flash: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again  | gemini-2.5-flash: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'The service is currently unavailable.', 'status': 'UNAVAILABLE'}}
+Relatório: C:\Users\nandi\indomavel\relatorios\regua_blocos_2026-09-15_1200.md
+codigo de saida: 1

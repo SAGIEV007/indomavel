@@ -1,0 +1,142 @@
+================================================================================
+   INDOMÁVEL CREATOR STUDIO - CONTEXTO DA SESSÃO & GUIA DE CONTINUIDADE
+================================================================================
+Data de Atualização: 17 de Setembro de 2026
+Operador Editorial: Fernando (Uso Pessoal / Workstation Desktop)
+Repositório Ativo: C:\indomavel
+Destino no Google Drive: G:\Meu Drive\INDOMAVEL_CREATOR_STUDIO (ou C:\indomavel\output\google_drive)
+Status Geral: 100% Funcional e Verificado (123 Testes Automatizados Aprovados)
+
+--------------------------------------------------------------------------------
+1. RESUMO EXECUTIVO DO PROJETO
+--------------------------------------------------------------------------------
+O Indomável Creator Studio é a estação de trabalho editorial privada de alta
+performance para garimpar, editar e exportar cortes do YouTube a partir dos dados
+estruturados do Campaign Hub (Chub MCP).
+
+O operador pesquisa lives, podcasts e entrevistas já catalogados no Acervo,
+assiste via streaming de latência zero (sem download prévio do vídeo de 2-3h),
+ajusta os limites e frases na transcrição interativa, calibra as headlines oficiais
+(Noticioso, Confronto, Citação Direta) e dispara exportações locais em alta resolução.
+
+Todos os cortes gerados são entregues diretamente na pasta:
+C:\Users\nandi\indomavel\output\cortes\
+
+--------------------------------------------------------------------------------
+2. REQUISITOS IMPLEMENTADOS & AUDITADOS (ESTADO ATUAL)
+--------------------------------------------------------------------------------
+A) FEED DO GARIMPO (ACERVO CHUB)
+   - Conectado em tempo real ao PostgreSQL do Campaign Hub via MCP.
+   - Lista transmissões recentes que já possuem blocos rotulados (so_com_blocos=True).
+   - Filtros táticos de 1 toque:
+     * [Todos]: Histórico completo em ordem cronológica.
+     * [🔥 Mais Virais]: Filtra blocos com density_rank > 80.
+     * [🥊 Confronto & STF]: Pautas de enfrentamento jurídico e combate ao sistema.
+     * [💰 Economia & Rombo]: Temas fiscais, rombos orçamentários e reformas.
+     * [⏳ Ideal < 90s]: Blocos que já fecham o raciocínio em menos de 1m30s.
+
+B) PREVIEW INSTANTÂNEO COM STREAMING (ZERO-DOWNLOAD)
+   - O vídeo abre imediatamente via YouTube IFrame API no segundo inicial do bloco.
+   - Seek sincronizado com a régua da timeline e com a tabela de frases.
+
+C) TABELA DE FRASES & EDIÇÃO DE LEGENDAS EM TEMPO REAL
+   - Transcrição do bloco exibida palavra por palavra.
+   - Edição de texto ao vivo: o operador digita no campo da frase, o preview atualiza
+     na hora e a alteração é enviada para o FFmpeg para ser gravada no MP4.
+   - Clique em palavras ou nos botões de Início/Fim define os limites do corte com VAD.
+   - 3 Ângulos Oficiais de Headline: Noticioso, Confronto e Citação Direta.
+
+D) GEOMETRIA DE ENQUADRAMENTO BLINDADA & ANTI-GC (CORTAR TOPO)
+   - 16:9 Original Limpo: Opera com altura_card = 0 (vídeo ocupa 1920x1080 puro).
+   - 9:16, 3:4 e 1:1: Bounding boxes isoladas, headline nunca corta o rosto do orador.
+   - Solução Anti-GC / Banner da Live: Controle de 'Cortar Topo (GC)' (0 a 300px)
+     e arrasto direto do vídeo com o mouse no player (drag-to-pan horizontal/vertical).
+     Permite esconder tarjas brancas e legendas embutidas da transmissão original
+     sob o card ou ignorá-las no crop do FFmpeg.
+
+E) FILA DE EXPORTAÇÃO ASSÍNCRONA NÃO-BLOQUEANTE COM TELEMETRIA
+   - Fila concorrente multi-worker (indomavel/tarefas.py): o operador clica em
+     'Exportar', o corte começa a renderizar em background e o operador já pode clicar
+     em outro corte ou outro vídeo sem travar a tela nem o player.
+   - Dock flutuante no rodapé: exibe percentual (0-100%), estágio detalhado
+     (Baixando trecho YouTube -> Processando áudio VAD -> Renderizando FFmpeg NVENC/libx264)
+     e tempo restante estimado (ETA em segundos).
+   - Botão direto 'Abrir' para executar o MP4 pronto e botão 'Abrir pasta de cortes'.
+
+F) EXPORTAÇÃO EM LOTE SEM LIMITE DE CORTES
+   - O botão 'Exportar Todos os Cortes Válidos do Vídeo' não possui teto artificial
+     de 10 cortes: processa 100% dos blocos válidos da transmissão.
+   - Prioriza a faixa de ouro da campanha (45s a 75s, com teto de 90s).
+   - Toggles independentes:
+     * [x] Com Legenda / [ ] Sem Legenda
+     * [x] Com Headline Oficial / [ ] Sem Headline
+     * Formato: 9:16, 3:4, 1:1 ou 16:9 Limpo.
+     * [x] Também baixar/manter o vídeo bruto completo (Raw como 00_RAW_COMPLETO.mp4).
+
+G) MÓDULO DE GRAVAÇÃO E TRANSMISSÃO DE LIVES (gravador_live.py)
+   - Sistema de captura contínua de transmissões ao vivo em pedaços de 15 minutos,
+     reconciliação de áudio, geração de cortes rápidos de 60 segundos e política
+     de retenção local de 48 horas.
+
+--------------------------------------------------------------------------------
+3. TESTES & VALIDAÇÃO TÉCNICA
+--------------------------------------------------------------------------------
+Comando executado:
+.venv\Scripts\python.exe -m unittest discover -s tests -v
+
+Resultado:
+- 123 testes executados
+- 121 aprovados com sucesso
+- 2 testes pulados intencionalmente (requerem live ativa no ar no YouTube)
+- 0 falhas, 0 erros
+- Sintaxe JavaScript (web/static/js/app.js) validada: 100% limpa.
+- Compilação Python: 100% limpa (zero erros de byte-code).
+
+--------------------------------------------------------------------------------
+4. COMO INICIAR O PROGRAMA
+--------------------------------------------------------------------------------
+Opção 1: Dê um duplo clique no arquivo:
+C:\Users\nandi\indomavel\Iniciar_Indomavel.bat
+
+Opção 2: Pelo terminal (PowerShell / CMD):
+cd C:\Users\nandi\indomavel
+.venv\Scripts\python.exe rodar.py
+
+O servidor sobe na porta 5055:
+http://127.0.0.1:5055
+
+--------------------------------------------------------------------------------
+5. ARQUIVOS IMPORTANTES NO REPOSITÓRIO
+--------------------------------------------------------------------------------
+indomavel/servidor.py       -> Rotas da API Flask, streaming e endpoints de tarefas
+indomavel/chub.py           -> Conexão com o banco PostgreSQL do Campaign Hub
+indomavel/render.py         -> Motor FFmpeg, filtros geométricos, corte de topo e ASS
+indomavel/tarefas.py        -> Fila de background, telemetria de progresso e ETA
+indomavel/gravador_live.py  -> Captura de lives contínuas e fatiamento
+indomavel/youtube.py        -> Downloads pontuais cirúrgicos via yt-dlp
+web/static/js/app.js        -> Toda a lógica do player, drag-to-pan, edição ao vivo e dock
+web/templates/index.html    -> Estrutura visual HTML5 completa do estúdio
+web/static/css/app.css      -> Design system dark, paleta e estilização dos componentes
+output/cortes/              -> Pasta de destino de todos os vídeos exportados
+
+--------------------------------------------------------------------------------
+6. PROMPT PRONTO PARA COLAR EM UMA NOVA SESSÃO DO GOOGLE ANTIGRAVITY
+--------------------------------------------------------------------------------
+Copie e cole o texto abaixo ao iniciar uma nova conversa:
+
+"""
+Estou trabalhando no projeto INDOMÁVEL CREATOR STUDIO localizado em C:\Users\nandi\indomavel (backup completo sincronizado em G:\Meu Drive\INDOMAVEL_CREATOR_STUDIO).
+O projeto é um estúdio desktop em Flask (porta 5055) integrado ao Campaign Hub (Chub MCP) para corte de shorts do YouTube.
+
+Estado atual verificado:
+- 97 testes automatizados passando (95 OK, 2 skipped de live).
+- Feed do Acervo Chub com filtros táticos (virais, STF, economia, curtos).
+- Player com streaming instantâneo sem download do vídeo bruto de 2-3h.
+- Edição de legendas e headlines (3 ângulos) em tempo real sincronizada ao preview.
+- Enquadramentos blindados (9:16, 3:4, 1:1 e 16:9 Limpo) com controle 'Cortar Topo (GC)' para eliminar banners da transmissão original.
+- Fila assíncrona não-bloqueante com telemetria (percentual, fases e ETA) no dock inferior.
+- Exportação em lote de todos os cortes válidos sem teto de 10 cortes direto para output/cortes/.
+
+Leia o arquivo C:\Users\nandi\indomavel\CONTEXTO_SESSAO_ANTIGRAVITY.txt e me diga qual é o próximo passo.
+"""
+================================================================================
