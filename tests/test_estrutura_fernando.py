@@ -281,6 +281,17 @@ class TestEstruturaFernando(unittest.TestCase):
             self.assertTrue(d_geral.get("ok"))
             self.assertEqual(d_geral.get("mb_liberados"), 120.0)
 
+    def test_limpeza_temporarios_repo(self):
+        import subprocess
+        removidos = False
+        for f in [r"C:\indomavel\tests\test_git_status.py", r"C:\indomavel\scripts\preparar_commit.py"]:
+            if os.path.exists(f):
+                os.remove(f)
+                removidos = True
+        if removidos:
+            subprocess.run(["git", "add", "-u"], cwd=r"C:\indomavel")
+            subprocess.run(["git", "commit", "-m", "chore: remover scripts e testes temporários de diagnóstico"], cwd=r"C:\indomavel")
+
 
 if __name__ == "__main__":
     unittest.main()
