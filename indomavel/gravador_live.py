@@ -192,10 +192,43 @@ def extrair_id(url_ou_id: str) -> str:
 
 
 def normalize_youtube_url(url: str) -> str:
-    m = re.search(r"youtube\.com/live/([a-zA-Z0-9_-]{11})", url)
-    if m:
-        return f"https://www.youtube.com/watch?v={m.group(1)}"
-    return url
+    """Normaliza URLs ou canais do YouTube para formato utilizável pelo Gravador/Streamlink/yt-dlp.
+    - Se for ID puro de 11 caracteres -> https://www.youtube.com/watch?v=ID
+    - Se for /live/ID -> https://www.youtube.com/watch?v=ID
+    - Se for canal (@nome, channel/ID, c/nome, user/nome) sem /live -> acrescenta /live
+    - Garante https:// se for @nome ou youtube.com sem protocolo
+    """
+    if not url:
+        return ""
+    texto = url.strip()
+
+    # ID de 11 caracteres isolado
+    if re.match(r"^[A-Za-z0-9_-]{11}$", texto):
+        return f"https://www.youtube.com/watch?v={texto}"
+
+    # Handle puro iniciado por @: ex "@PartidoMissao" ou "@PartidoMissao/live"
+    if texto.startswith("@"):
+        texto = f"https://www.youtube.com/{texto}"
+    elif not texto.startswith(("http://", "https://")) and ("youtube.com" in texto or "youtu.be" in texto):
+        texto = f"https://{texto}"
+
+    # URL de live com ID direto: youtube.com/live/11chars -> youtube.com/watch?v=11chars
+    m_live_id = re.search(r"youtube\.com/live/([a-zA-Z0-9_-]{11})(?:[?&].*)?$", texto)
+    if m_live_id:
+        return f"https://www.youtube.com/watch?v={m_live_id.group(1)}"
+
+    # Canal com @handle, /channel/, /c/, /user/: se não tiver /live no final, acrescenta /live
+    padrao_canal = r"^(https?://(?:www\.)?youtube\.com/(?:@[a-zA-Z0-9_.-]+|channel/[a-zA-Z0-9_-]+|c/[a-zA-Z0-9_.-]+|user/[a-zA-Z0-9_.-]+))"
+    m_canal = re.match(padrao_canal, texto)
+    if m_canal:
+        base_canal = m_canal.group(1)
+        return f"{base_canal}/live"
+
+    m_ytbe = re.search(r"youtu\.be/([a-zA-Z0-9_-]{11})", texto)
+    if m_ytbe:
+        return f"https://www.youtube.com/watch?v={m_ytbe.group(1)}"
+
+    return texto
 
 
 def resolve_youtube_stream_info(url_ou_id: str, cookies_path: Optional[str] = None, timeout: int = 15) -> Tuple[bool, Optional[str], Optional[str], Optional[str]]:
@@ -203,10 +236,13 @@ def resolve_youtube_stream_info(url_ou_id: str, cookies_path: Optional[str] = No
     Resolve URL ou ID do YouTube utilizando yt-dlp android player client ou web parser.
     Retorna (is_live, video_id, title, hls_url).
     """
-    youtube_id = extrair_id(url_ou_id)
-    clean_url = f"https://www.youtube.com/watch?v={youtube_id}" if len(youtube_id) == 11 else (url_ou_id or "").strip()
+    clean_url = normalize_youtube_url(url_ou_id)
     if not clean_url:
         return False, None, "Live Stream", None
+
+    youtube_id = extrair_id(clean_url)
+    if len(youtube_id) == 11 and not clean_url.startswith("https://www.youtube.com/watch"):
+        clean_url = f"https://www.youtube.com/watch?v={youtube_id}"
 
     cookies = cookies_path or getattr(config, "COOKIES_TXT", None)
 
@@ -234,13 +270,18 @@ def resolve_youtube_stream_info(url_ou_id: str, cookies_path: Optional[str] = No
         )
         if res.returncode == 0 and res.stdout:
             lines = [l.strip() for l in res.stdout.strip().splitlines() if l.strip()]
-            if len(lines) >= 3:
-                vid_id = lines[0]
-                title = lines[1]
-                hls_url = lines[2]
-                return True, vid_id, title, hls_url
-            elif len(lines) == 1 and lines[0].startswith("http"):
-                return True, youtube_id, "Live Stream", lines[0]
+            hls_candidates = [l for l in lines if l.startswith(("http://", "https://"))]
+            non_hls = [l for l in lines if not l.startswith(("http://", "https://"))]
+            hls_url = hls_candidates[0] if hls_candidates else None
+            vid_id = None
+            title = None
+            for l in non_hls:
+                if re.match(r"^[A-Za-z0-9_-]{11}$", l) and not vid_id:
+                    vid_id = l
+                elif not title:
+                    title = l
+            if hls_url or vid_id:
+                return True, vid_id or (youtube_id if len(youtube_id) == 11 else None), title or "Live Stream", hls_url
     except Exception as e:
         log.debug("Aviso yt-dlp android resolver: %s", e)
 
@@ -277,7 +318,7 @@ def resolve_youtube_stream_info(url_ou_id: str, cookies_path: Optional[str] = No
             if not is_live and "liveStreamability" in playability:
                 is_live = True
             is_online = (status == "OK") and (is_live or bool(hls_url))
-            return is_online, video_id, title or "Live Stream", hls_url
+            return is_online, video_id or (youtube_id if len(youtube_id) == 11 else None), title or "Live Stream", hls_url
     except Exception as e:
         log.debug("Aviso urllib resolver: %s", e)
 
@@ -286,8 +327,9 @@ def resolve_youtube_stream_info(url_ou_id: str, cookies_path: Optional[str] = No
 
 def check_streamlink_online(stream_url: str, streamlink_path: Optional[str] = None, quality: str = "best", timeout_seconds: int = 15) -> bool:
     """Verifica se a live stream está online usando yt-dlp ou Streamlink."""
-    if any(domain in stream_url for domain in ("youtube.com", "youtu.be", "@")):
-        is_live, _, _, _ = resolve_youtube_stream_info(stream_url)
+    stream_url_norm = normalize_youtube_url(stream_url)
+    if any(domain in stream_url_norm for domain in ("youtube.com", "youtu.be", "@")):
+        is_live, _, _, _ = resolve_youtube_stream_info(stream_url_norm, timeout=timeout_seconds)
         if is_live:
             return True
 
@@ -299,7 +341,7 @@ def check_streamlink_online(stream_url: str, streamlink_path: Optional[str] = No
     cookies = getattr(config, "COOKIES_TXT", None)
     if cookies and os.path.exists(cookies):
         cmd.extend(["--http-cookies-file", str(cookies)])
-    cmd.extend(["--stream-url", stream_url, quality])
+    cmd.extend(["--stream-url", stream_url_norm, quality])
     try:
         result = subprocess.run(
             cmd,
@@ -320,11 +362,12 @@ def check_streamlink_online(stream_url: str, streamlink_path: Optional[str] = No
 
 def obter_informacoes_live(url_ou_id: str) -> Dict[str, Any]:
     """Extrai metadados e URLs HLS da transmissão ao vivo."""
-    is_live, vid_id, title, hls_url = resolve_youtube_stream_info(url_ou_id)
+    url_norm = normalize_youtube_url(url_ou_id)
+    is_live, vid_id, title, hls_url = resolve_youtube_stream_info(url_norm)
     if hls_url:
         return {
-            "youtube_id": vid_id or extrair_id(url_ou_id),
-            "url_origem": url_ou_id,
+            "youtube_id": vid_id or extrair_id(url_norm),
+            "url_origem": url_norm,
             "titulo": title or "Live Stream",
             "is_live": is_live,
             "url_video": hls_url,
@@ -332,13 +375,18 @@ def obter_informacoes_live(url_ou_id: str) -> Dict[str, Any]:
             "altura": 1080,
         }
 
-    youtube_id = extrair_id(url_ou_id)
-    url = f"https://www.youtube.com/watch?v={youtube_id}" if len(youtube_id) == 11 else url_ou_id
+    youtube_id = vid_id or extrair_id(url_norm)
+    url = f"https://www.youtube.com/watch?v={youtube_id}" if len(youtube_id) == 11 else url_norm
 
     ydl_opts = {
         "quiet": True,
         "no_warnings": True,
+        "force_ipv4": True,
     }
+    cookies = getattr(config, "COOKIES_TXT", None)
+    if cookies and os.path.exists(cookies):
+        ydl_opts["cookiefile"] = str(cookies)
+    ydl_opts["extractor_args"] = {"youtube": {"player_client": ["android"]}}
     if config.NODE:
         ydl_opts["js_runtimes"] = {"node": {"path": config.NODE}}
     if config.FFMPEG:
@@ -450,7 +498,9 @@ class GerenciadorGravacaoLive:
                       auto_cortar: Optional[bool] = None, monitor_ativo: Optional[bool] = None):
         with self._trava:
             if url is not None:
-                self._url_monitorada = url.strip()
+                url_limpa = url.strip()
+                if url_limpa:
+                    self._url_monitorada = normalize_youtube_url(url_limpa)
             if duracao_chunk_s is not None:
                 self._duracao_chunk_s = duracao_chunk_s
             if qualidade is not None:
@@ -560,7 +610,7 @@ class GerenciadorGravacaoLive:
             if self._processo_ffmpeg and self._processo_ffmpeg.poll() is None:
                 raise RuntimeError("Já existe uma gravação de live em andamento.")
 
-            url_alvo = (url_ou_id or self._url_monitorada).strip()
+            url_alvo = normalize_youtube_url((url_ou_id or self._url_monitorada).strip())
             if not url_alvo:
                 raise RuntimeError("Informe a URL ou canal da transmissão ao vivo.")
 

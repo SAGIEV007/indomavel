@@ -87,6 +87,10 @@ input[type=search]:focus, input[type=text]:focus, select:focus, textarea:focus {
 /* Coluna de vídeos */
 .coluna-videos { background: var(--card); border: 1px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra); display: flex; flex-direction: column; overflow: hidden; }
 .coluna-videos .cabeca { padding: 12px; border-bottom: 1px solid var(--borda); display: grid; gap: 8px; }
+.coluna-videos .abas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; width: 100%; }
+.coluna-videos .abas .aba { width: 100%; padding: 7px 6px; font-size: 11.5px; font-weight: 700; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-flex; align-items: center; justify-content: center; gap: 4px; border-radius: 8px; box-sizing: border-box; transition: all 0.15s ease; }
+.coluna-videos .abas .aba:hover { background: var(--borda); color: #fff; }
+.coluna-videos .abas .aba.ativa { background: var(--escuro); color: #fff; border-color: var(--amarelo-borda); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3); }
 .form-link { display: flex; gap: 6px; }
 .form-link input { min-width: 0; }
 .filtros { display: grid; gap: 8px; }
@@ -956,6 +960,11 @@ input[type=search]:focus, input[type=text]:focus, select:focus, textarea:focus {
     gap: 10px;
     padding: 10px;
   }
+  .coluna-videos .abas .aba {
+    padding: 6px 4px;
+    font-size: 11px;
+    gap: 3px;
+  }
 }
 
 @media (max-width: 1180px) {
@@ -963,6 +972,11 @@ input[type=search]:focus, input[type=text]:focus, select:focus, textarea:focus {
     grid-template-columns: 240px minmax(0, 1fr) 350px;
     gap: 8px;
     padding: 8px;
+  }
+  .coluna-videos .abas .aba {
+    padding: 5px 3px;
+    font-size: 10px;
+    gap: 2px;
   }
 }
 

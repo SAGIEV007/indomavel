@@ -129,8 +129,12 @@ function limparPalavra(palavra) {
 
 async function api(caminho, opcoes) {
   let resposta;
+  const opts = Object.assign({}, opcoes);
+  if (opts.body && typeof opts.body === "string" && (!opts.headers || !opts.headers["Content-Type"])) {
+    opts.headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
+  }
   try {
-    resposta = await fetch(caminho, opcoes);
+    resposta = await fetch(caminho, opts);
   } catch (erro) {
     estado.semConexao = true;
     verificarServidor();
@@ -256,9 +260,74 @@ function trocarOrigem(origem) {
     carregarVideos(true);
   } else if (origem === "playlist") {
     carregarPlaylist();
+  } else if (origem === "lives") {
+    carregarOrigemLives();
   } else {
     carregarLocais();
   }
+}
+
+async function carregarOrigemLives() {
+  clearTimeout(carregarOrigemLives.espera);
+  try {
+    const dados = await api("/api/live/todas-partes?limite=50");
+    const partes = dados.partes || [];
+    if ($("contador-lives-origem")) {
+      $("contador-lives-origem").textContent = partes.length ? `(${partes.length})` : "";
+    }
+    if (estado.origemLista === "lives") {
+      desenharOrigemLives(partes);
+    }
+  } catch (err) {
+    if (estado.origemLista === "lives") {
+      const lista = $("lista-videos");
+      if (lista) {
+        lista.innerHTML = `<li class="erro-lista">Erro ao carregar transmissões: ${escaparHtml(err.message)}</li>`;
+      }
+    }
+  }
+}
+
+function desenharOrigemLives(partes) {
+  const lista = $("lista-videos");
+  if (!lista) return;
+  lista.innerHTML = "";
+  if (!partes.length) {
+    lista.innerHTML = '<li class="vazio-lista">Nenhuma gravação de live registrada ainda. Inicie a gravação no painel Live 24/7.</li>';
+    return;
+  }
+  partes.forEach((parte) => {
+    const li = el("li", "video");
+    li.dataset.id = parte.youtube_id || "";
+
+    const miniatura = el("div", "miniatura");
+    const img = el("img");
+    img.src = parte.youtube_id && parte.youtube_id.length === 11 ? `https://i.ytimg.com/vi/${parte.youtube_id}/mqdefault.jpg` : "/static/img/icone-live.png";
+    img.alt = parte.nome_arquivo || "Live";
+    img.loading = "lazy";
+    miniatura.appendChild(img);
+
+    const durTag = el("span", "duracao", formatarMinutos(parte.duracao_s || 0));
+    miniatura.appendChild(durTag);
+    li.appendChild(miniatura);
+
+    const corpo = el("div", "video-corpo");
+    const titulo = el("h3", "video-titulo", `${parte.sessao_titulo || "Live"} · Bloco ${parte.numero_parte}`);
+    corpo.appendChild(titulo);
+
+    const meta = el("div", "video-meta", `${formatarTempoS(parte.duracao_s || 0)} · ${((parte.tamanho_bytes || 0) / (1024 * 1024)).toFixed(1)} MB · ${formatarEstadoLive(parte.estado)}`);
+    corpo.appendChild(meta);
+
+    li.appendChild(corpo);
+    li.addEventListener("click", () => {
+      if (parte.youtube_id && parte.youtube_id.length === 11) {
+        abrirVideo(parte.youtube_id);
+      } else {
+        trocarAbaPainel("live");
+      }
+    });
+    lista.appendChild(li);
+  });
 }
 
 function fmtTempoRelativo(timestampSegundos) {
@@ -2430,8 +2499,11 @@ function renderizarLogsTerminal(logs) {
   }
 }
 
+let ultimoStatusLive = null;
+
 function atualizarUiLive(dados) {
   if (!dados) return;
+  ultimoStatusLive = dados;
   const gravando = Boolean(dados.gravando);
   const monitorAtivo = Boolean(dados.monitor_ativo);
   const online = Boolean(dados.online);
@@ -2645,6 +2717,9 @@ function atualizarUiLive(dados) {
   const listaPartes = $("live-lista-partes");
   const contadorPartes = $("live-contador-partes");
   if (contadorPartes) contadorPartes.textContent = partes.length;
+  if ($("contador-lives-origem")) {
+    $("contador-lives-origem").textContent = partes.length ? `(${partes.length})` : "";
+  }
 
   if (listaPartes) {
     if (!partes.length) {
@@ -3397,10 +3472,7 @@ function vincular() {
       try {
         const status = await api("/api/live/status");
         const novoEstado = !status.monitor_ativo;
-        await api("/api/live/config", {
-          method: "POST",
-          body: JSON.stringify({ monitor_ativo: novoEstado }),
-        });
+        await postar("/api/live/config", { monitor_ativo: novoEstado });
         avisar(novoEstado ? "Monitoramento 24/7 ATIVADO." : "Monitoramento 24/7 PAUSADO (Standby).", "ok");
         carregarLiveStatus();
       } catch (err) {
@@ -3421,23 +3493,23 @@ function vincular() {
   const btnIniciarLive = $("btn-iniciar-live");
   if (btnIniciarLive) {
     btnIniciarLive.addEventListener("click", async () => {
-      const url = ($("live-url").value || "").trim();
+      let url = ($("live-url") ? $("live-url").value : "").trim();
+      if (!url && typeof ultimoStatusLive !== "undefined" && ultimoStatusLive && ultimoStatusLive.url) {
+        url = (ultimoStatusLive.url || "").trim();
+      }
       if (!url) {
         avisar("Informe o link ou canal da transmissão ao vivo.", "atencao");
         return;
       }
       const playlist_id = ($("live-playlist") ? $("live-playlist").value : "").trim();
       const dvr = $("live-dvr") ? $("live-dvr").checked : true;
-      const duracao_chunk_s = parseInt($("live-duracao").value, 10) || 1800;
+      const duracao_chunk_s = parseInt($("live-duracao") ? $("live-duracao").value : "1800", 10) || 1800;
       const qualidade = $("live-qualidade") ? $("live-qualidade").value : "best";
       const auto_cortar = $("live-auto-cortar") ? $("live-auto-cortar").checked : true;
 
       btnIniciarLive.disabled = true;
       try {
-        await api("/api/live/iniciar", {
-          method: "POST",
-          body: JSON.stringify({ url, playlist_id, dvr, duracao_chunk_s, qualidade, auto_cortar }),
-        });
+        await postar("/api/live/iniciar", { url, playlist_id, dvr, duracao_chunk_s, qualidade, auto_cortar });
         avisar("Gravação iniciada com sucesso! Pipeline ativo.");
         carregarLiveStatus();
       } catch (err) {
@@ -3485,8 +3557,8 @@ function vincular() {
     btnSalvarConfigLive.addEventListener("click", async () => {
       btnSalvarConfigLive.disabled = true;
       try {
-        const url = ($("live-url").value || "").trim();
-        const duracao_chunk_s = parseInt($("live-duracao").value, 10) || 1800;
+        const url = ($("live-url") ? $("live-url").value : "").trim();
+        const duracao_chunk_s = parseInt($("live-duracao") ? $("live-duracao").value : "1800", 10) || 1800;
         const qualidade = $("live-qualidade") ? $("live-qualidade").value : "best";
         const auto_cortar = $("live-auto-cortar") ? $("live-auto-cortar").checked : true;
         const dvr = $("live-dvr") ? $("live-dvr").checked : true;
@@ -3496,10 +3568,7 @@ function vincular() {
           payload.monitor_ativo = $("live-monitor-auto").checked;
         }
 
-        const res = await api("/api/live/config", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
+        const res = await postar("/api/live/config", payload);
         avisar("Configurações do Gravador 24/7 salvas com sucesso!", "ok");
         if (res && res.status) atualizarUiLive(res.status);
       } catch (err) {

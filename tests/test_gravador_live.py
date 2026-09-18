@@ -123,6 +123,47 @@ class TestGravadorLive(unittest.TestCase):
             self.assertEqual(row["estado"], "gravado")
             self.assertEqual(row["erro_mensagem"], "")
 
+    def test_normalize_youtube_url_diversos_formatos(self):
+        # Canal handle sem /live
+        self.assertEqual(
+            gravador_live.normalize_youtube_url("https://www.youtube.com/@PartidoMissao"),
+            "https://www.youtube.com/@PartidoMissao/live"
+        )
+        self.assertEqual(
+            gravador_live.normalize_youtube_url("https://www.youtube.com/@PartidoMissao/"),
+            "https://www.youtube.com/@PartidoMissao/live"
+        )
+        self.assertEqual(
+            gravador_live.normalize_youtube_url("@PartidoMissao"),
+            "https://www.youtube.com/@PartidoMissao/live"
+        )
+        # Canal já com /live
+        self.assertEqual(
+            gravador_live.normalize_youtube_url("https://www.youtube.com/@PartidoMissao/live"),
+            "https://www.youtube.com/@PartidoMissao/live"
+        )
+        # URL watch direta
+        self.assertEqual(
+            gravador_live.normalize_youtube_url("https://www.youtube.com/watch?v=9XJfP7qObF8"),
+            "https://www.youtube.com/watch?v=9XJfP7qObF8"
+        )
+        # URL live direta
+        self.assertEqual(
+            gravador_live.normalize_youtube_url("https://www.youtube.com/live/9XJfP7qObF8"),
+            "https://www.youtube.com/watch?v=9XJfP7qObF8"
+        )
+        # ID isolado
+        self.assertEqual(
+            gravador_live.normalize_youtube_url("9XJfP7qObF8"),
+            "https://www.youtube.com/watch?v=9XJfP7qObF8"
+        )
+        # youtu.be
+        self.assertEqual(
+            gravador_live.normalize_youtube_url("https://youtu.be/9XJfP7qObF8"),
+            "https://www.youtube.com/watch?v=9XJfP7qObF8"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
+

@@ -33,11 +33,11 @@
         <input id="link" type="text" placeholder="Colar link do YouTube">
         <button class="botao-pri pequeno" type="submit">Abrir</button>
       </form>
-      <div class="abas">
-        <button class="aba ativa" data-origem="chub" type="button">Acervo Chub</button>
-        <button class="aba" data-origem="playlist" type="button">🔴 Indomável <span id="contador-playlist"></span></button>
-        <button class="aba" data-origem="local" type="button">Meus links <span id="contador-locais"></span></button>
-        <button class="aba" data-origem="lives" type="button" id="aba-origem-lives">📡 Lives Zema <span id="contador-lives-origem"></span></button>
+      <div class="abas abas-origem" role="tablist" aria-label="Origem dos vídeos">
+        <button class="aba ativa" data-origem="chub" type="button" title="Acervo Chub">Acervo Chub</button>
+        <button class="aba" data-origem="playlist" type="button" title="Playlist Indomável no Google Drive">🔴 Indomável <span id="contador-playlist"></span></button>
+        <button class="aba" data-origem="local" type="button" title="Meus links adicionados">Meus links <span id="contador-locais"></span></button>
+        <button class="aba" data-origem="lives" type="button" id="aba-origem-lives" title="Transmissões e gravações de lives Zema">📡 Lives Zema <span id="contador-lives-origem"></span></button>
       </div>
       <div id="barra-playlist" class="barra-playlist" hidden>
         <div class="playlist-info">

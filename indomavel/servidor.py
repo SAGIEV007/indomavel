@@ -943,7 +943,7 @@ def live_todas_partes():
 
 @app.post("/api/live/iniciar")
 def live_iniciar():
-    dados = request.get_json(silent=True) or {}
+    dados = request.get_json(force=True, silent=True) or {}
     url = str(dados.get("url", "")).strip()
     if not url:
         return _erro("informe a URL ou ID da transmissão ao vivo", 400)
@@ -970,7 +970,7 @@ def live_iniciar():
 
 @app.post("/api/live/parar")
 def live_parar():
-    dados = request.get_json(silent=True) or {}
+    dados = request.get_json(force=True, silent=True) or {}
     sessao_id = dados.get("sessao_id")
     res = gravador_live.gravador.parar_gravacao(sessao_id)
     return jsonify({"ok": True, "resultado": res})
@@ -985,7 +985,7 @@ def live_cortar_agora():
 
 @app.post("/api/live/config")
 def live_config():
-    dados = request.get_json(silent=True) or {}
+    dados = request.get_json(force=True, silent=True) or {}
     gravador_live.gravador.salvar_config(
         url=dados.get("url"),
         duracao_chunk_s=int(dados["duracao_chunk_s"]) if "duracao_chunk_s" in dados and dados["duracao_chunk_s"] is not None else None,
