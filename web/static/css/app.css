@@ -384,4 +384,220 @@ textarea { resize: vertical; }
 .live-detalhes-bloco summary { cursor: pointer; font-weight: 700; color: var(--amarelo); margin-bottom: 4px; }
 .live-detalhes-bloco pre { white-space: pre-wrap; font-family: inherit; font-size: 11px; margin: 4px 0 0 0; color: #CCC; }
 
+/* Modal de Preferências de Cortes Automáticos & Google Drive */
+.modal-dialog {
+  border: 1px solid #4A463B;
+  border-radius: 14px;
+  background: #181714;
+  color: #EDE8DF;
+  max-width: 640px;
+  width: 92%;
+  padding: 0;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+}
+.modal-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+}
+.modal-conteudo {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.modal-cabeca {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333028;
+  padding-bottom: 14px;
+}
+.modal-cabeca h2 {
+  font-size: 16px;
+  font-weight: 800;
+  margin: 0;
+  color: #FFF;
+}
+.botao-fechar {
+  background: transparent;
+  border: 0;
+  color: #AAA;
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+}
+.botao-fechar:hover {
+  color: #FFF;
+}
+.form-config-cortes {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.secao-config {
+  background: #22201B;
+  border: 1px solid #363228;
+  border-radius: 10px;
+  padding: 14px;
+}
+.config-titulo {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--amarelo);
+  display: block;
+  margin-bottom: 4px;
+}
+.config-dica {
+  font-size: 11px;
+  color: #A9A293;
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+.opcoes-radio-grupo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+.opcao-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #2C2922;
+  border: 1px solid #3F3B30;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.opcao-radio:hover {
+  border-color: var(--amarelo);
+}
+.opcao-radio input:checked + span {
+  font-weight: 800;
+  color: var(--amarelo);
+}
+.opcoes-checkbox-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.opcao-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #28251E;
+  border: 1px solid #3A362B;
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+.opcao-checkbox input[type="checkbox"] {
+  margin-top: 3px;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--amarelo);
+}
+.opcao-checkbox-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.opcao-checkbox-info strong {
+  font-size: 12px;
+  color: #FFF;
+}
+.opcao-checkbox-info small {
+  font-size: 11px;
+  color: #B5AD9C;
+}
+.opcao-checkbox-info code {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-size: 10px;
+  color: #7FD5FF;
+}
+.grade-config-visual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.campo-config {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #28251E;
+  border: 1px solid #3A362B;
+  border-radius: 8px;
+  padding: 10px;
+}
+.campo-config label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #DDD;
+}
+.campo-config small {
+  font-size: 10px;
+  color: #999;
+}
+.drive-status-painel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.drive-status-linha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+.campo-texto {
+  flex: 1;
+  background: #141310;
+  border: 1px solid #444;
+  color: #FFF;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: monospace;
+}
+.drive-status-badge-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.badge-drive {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #333;
+  color: #EEE;
+}
+.badge-drive.nuvem {
+  background: #183C25;
+  color: #62E78F;
+}
+.badge-drive.local {
+  background: #3B2E15;
+  color: #FFD25F;
+}
+.drive-status-detalhe {
+  font-size: 11px;
+  color: #B0A999;
+  margin: 0;
+  line-height: 1.4;
+}
+.modal-rodape {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+  border-top: 1px solid #333028;
+  padding-top: 14px;
+}
+
 

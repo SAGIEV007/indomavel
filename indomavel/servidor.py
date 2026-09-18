@@ -8,7 +8,7 @@ import subprocess
 
 from flask import Flask, jsonify, request, send_file, send_from_directory
 
-from . import acervo_local, config, cortador_automatico, gravador_live, headlines, legenda, legendas, palavras, render, versao
+from . import acervo_local, config, cortador_automatico, google_drive, gravador_live, headlines, legenda, legendas, palavras, render, versao
 from .automacao import Automacao
 from .chub import Chub, ChubErro
 from .gemini import GeminiErro
@@ -64,6 +64,13 @@ def ao_concluir_blocagem(youtube_id, info, blocos, frases):
     if not cortador_automatico.obter_modo_automatico():
         logging.getLogger(__name__).info(
             "Modo de cortes automáticos está DESLIGADO. Vídeo %s aguardando disparo manual ou ativação do modo automático.",
+            youtube_id,
+        )
+        return
+
+    if not cortador_automatico.video_eh_elegivel_por_ponto_partida(youtube_id):
+        logging.getLogger(__name__).info(
+            "Vídeo %s ignorado pelo ponto de partida configurado pelo operador.",
             youtube_id,
         )
         return
@@ -400,6 +407,7 @@ def feedback_headline():
     return jsonify({"ok": True, "registro": registro})
 
 
+@app.get("/api/cortes/<youtube_id>")
 @app.get("/api/cortes_automaticos/<youtube_id>")
 def status_cortes_automaticos(youtube_id):
     if not ID_YOUTUBE.match(youtube_id):
@@ -430,16 +438,141 @@ def toggle_modo_cortes_automaticos():
     })
 
 
+@app.get("/api/automacao/config-cortes")
+def obter_config_cortes():
+    return jsonify({"ok": True, "config": cortador_automatico.carregar_config_cortes()})
+
+
+@app.post("/api/automacao/config-cortes")
+def atualizar_config_cortes():
+    dados = request.get_json(silent=True) or {}
+    salvo = cortador_automatico.salvar_config_cortes(dados)
+    return jsonify({"ok": True, "config": salvo, "mensagem": "Preferências de cortes salvas com sucesso!"})
+
+
+@app.get("/api/drive/status")
+def status_google_drive():
+    return jsonify(google_drive.status_conexao())
+
+
+@app.post("/api/drive/configurar")
+def configurar_google_drive():
+    dados = request.get_json(silent=True) or {}
+    pasta_id = dados.get("pasta_id")
+    if pasta_id:
+        cortador_automatico.salvar_config_cortes({"drive": {"pasta_id": pasta_id}})
+    credenciais = dados.get("credenciais")
+    if credenciais:
+        google_drive.salvar_credenciais(credenciais)
+    return jsonify({"ok": True, "status": google_drive.status_conexao()})
+
+
+@app.post("/api/drive/testar")
+def testar_conexao_drive():
+    return jsonify(google_drive.status_conexao())
+
+
+@app.post("/api/drive/abrir-pasta-local")
+def abrir_pasta_drive_local():
+    os.makedirs(config.PASTA_GOOGLE_DRIVE, exist_ok=True)
+    try:
+        os.startfile(config.PASTA_GOOGLE_DRIVE)
+        return jsonify({"ok": True, "caminho": config.PASTA_GOOGLE_DRIVE})
+    except Exception as e:
+        return _erro(f"Erro ao abrir pasta: {e}", 500)
+
+
+@app.get("/api/drive/auth-url")
+def obter_auth_url_drive():
+    url, erro = google_drive.gerar_url_autorizacao()
+    if not url:
+        return _erro(erro or "Não foi possível gerar URL de autorização", 400)
+    return jsonify({"ok": True, "url": url})
+
+
+@app.get("/oauth2callback")
+def oauth2callback():
+    code = request.args.get("code")
+    erro = request.args.get("error")
+    if erro:
+        return f"""
+        <html><body style="font-family:system-ui,sans-serif;background:#0d1117;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
+          <div style="background:#161b22;padding:32px;border-radius:12px;max-width:500px;text-align:center;border:1px solid #30363d;">
+            <h2 style="color:#ff4757;margin-top:0;">❌ Autorização Cancelada</h2>
+            <p style="color:#8b949e;">O Google retornou: <code>{erro}</code></p>
+            <p style="margin-top:24px;"><a href="/" style="background:#238636;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Voltar ao Indomável</a></p>
+          </div>
+        </body></html>
+        """, 400
+
+    if not code:
+        return "Código de autorização não recebido", 400
+
+    ok, msg = google_drive.trocar_codigo_por_token(code)
+    if ok:
+        return """
+        <html><body style="font-family:system-ui,sans-serif;background:#0d1117;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
+          <div style="background:#161b22;padding:32px;border-radius:12px;max-width:500px;text-align:center;border:1px solid #30363d;">
+            <h1 style="color:#2ed573;margin-top:0;">✅ Conectado com Sucesso!</h1>
+            <p style="color:#c9d1d9;font-size:15px;line-height:1.5;">Sua conta do Google Drive foi autorizada. Os cortes automáticos agora serão enviados diretamente para a pasta na nuvem.</p>
+            <p style="margin-top:24px;"><a href="/" style="background:#2ea043;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Voltar ao Indomável Studio</a></p>
+            <script>
+              try { if (window.opener) { window.opener.location.reload(); } } catch(e){}
+              setTimeout(() => { window.close(); }, 4000);
+            </script>
+          </div>
+        </body></html>
+        """
+    else:
+        return f"""
+        <html><body style="font-family:system-ui,sans-serif;background:#0d1117;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
+          <div style="background:#161b22;padding:32px;border-radius:12px;max-width:500px;text-align:center;border:1px solid #30363d;">
+            <h2 style="color:#ff4757;margin-top:0;">⚠️ Falha ao Conectar Token</h2>
+            <p style="color:#8b949e;">{msg}</p>
+            <p style="margin-top:24px;"><a href="/" style="background:#30363d;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;">Voltar ao Indomável</a></p>
+          </div>
+        </body></html>
+        """, 500
+
+
+@app.post("/api/drive/conectar-codigo")
+def conectar_codigo_manual():
+    dados = request.get_json(silent=True) or {}
+    code = dados.get("codigo") or dados.get("code")
+    if not code:
+        return _erro("Código não fornecido", 400)
+    if "code=" in code:
+        match = re.search(r"[?&]code=([^&]+)", code)
+        if match:
+            code = urllib.parse.unquote(match.group(1))
+    ok, msg = google_drive.trocar_codigo_por_token(code)
+    if not ok:
+        return _erro(msg, 400)
+    return jsonify({"ok": True, "mensagem": msg, "status": google_drive.status_conexao()})
+
+
+@app.get("/api/drive/subir-locais")
+@app.post("/api/drive/subir-locais")
+def subir_cortes_locais():
+    cfg = cortador_automatico.carregar_config_cortes()
+    pasta_id = request.args.get("pasta_id") or (cfg.get("drive") or {}).get("pasta_id")
+    res = google_drive.subir_cortes_locais_pendentes(pasta_id_raiz=pasta_id)
+    return jsonify(res)
+
+
 @app.post("/api/cortes/<youtube_id>/disparar")
 @app.post("/api/cortes_automaticos/<youtube_id>/disparar")
 def disparar_cortes_manuais(youtube_id):
     if not ID_YOUTUBE.match(youtube_id):
         return _erro("id de vídeo inválido", 400)
-    info = acervo_local.ler(youtube_id, "info.json") or {}
+    info = acervo_local.ler(youtube_id, "info.json") or video_resumido(youtube_id)
     blocos = blocos_do_video(youtube_id)
     if not blocos:
         return _erro("Este vídeo ainda não possui blocos gerados", 400)
-    frases = frases_do_video(youtube_id)
+    try:
+        frases = frases_do_video(youtube_id)
+    except Exception:
+        frases = None
     resultado = cortador_automatico.processar_blocos_automaticamente(
         fila=fila,
         youtube_id=youtube_id,
@@ -457,11 +590,14 @@ def disparar_cortes_manuais(youtube_id):
 def refazer_cortes_video(youtube_id):
     if not ID_YOUTUBE.match(youtube_id):
         return _erro("id de vídeo inválido", 400)
-    info = acervo_local.ler(youtube_id, "info.json") or {}
+    info = acervo_local.ler(youtube_id, "info.json") or video_resumido(youtube_id)
     blocos = blocos_do_video(youtube_id)
     if not blocos:
         return _erro("Este vídeo ainda não possui blocos gerados", 400)
-    frases = frases_do_video(youtube_id)
+    try:
+        frases = frases_do_video(youtube_id)
+    except Exception:
+        frases = None
     resultado = cortador_automatico.processar_blocos_automaticamente(
         fila=fila,
         youtube_id=youtube_id,

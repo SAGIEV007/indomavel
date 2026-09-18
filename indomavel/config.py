@@ -62,7 +62,10 @@ LIMPEZA_AUTOMATICA_CACHE = RETENCAO_LIMPA
 # nesse caso o programa tenta o próximo da lista.
 GEMINI_MODELOS = [
     nome.strip()
-    for nome in valor("GEMINI_MODELOS", "gemini-3.8-flash,gemini-3.7-flash,gemini-3.6-flash,gemini-flash-latest,gemini-2.5-flash").split(",")
+    for nome in valor(
+        "GEMINI_MODELOS",
+        "gemini-2.5-flash,gemini-2.5-flash-lite,gemini-2.0-flash,gemini-2.0-flash-lite,gemini-1.5-flash,gemini-1.5-flash-8b,gemini-flash-latest,gemini-3.8-flash,gemini-3.7-flash"
+    ).split(",")
     if nome.strip()
 ]
 WHISPER_MODELO = valor("WHISPER_MODELO", "small")

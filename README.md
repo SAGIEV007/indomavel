@@ -60,13 +60,19 @@ Desde o início do projeto, o Indomável Creator Studio foi desenhado e expandid
 - 3 Ângulos Oficiais: **Noticioso**, **Confronto** e **Citação Direta**.
 - **Locutor Inteligente**: Detecção rigorosa de quem está falando. NÃO assume cegamente que é o Renan Santos — só atribui ao Renan quando confirmado pela transcrição ou metadados; caso contrário, foca no debate ou no orador convidado.
 
-### 7. Pacotes Quádruplos de Cortes `FernandoXX` para Google Drive (`indomavel/cortador_automatico.py`)
-- Criação sequencial de subpastas numeradas sem colisão (`Fernando01/`, `Fernando02/`, etc.) em `PASTA_GOOGLE_DRIVE` (padrão `output/google_drive/` ou pasta sincronizada do Drive como `G:\Meu Drive\...`).
-- Cada pacote contém o quarteto completo de entrega:
-  1. `FernandoXX_com_legenda.mp4` (9:16 vertical, card superior com headline, legendas animadas ASS bebas, sem marca)
-  2. `FernandoXX_sem_legenda.mp4` (9:16 vertical, card superior com headline, sem legendas, sem marca)
-  3. `FernandoXX_cru.mp4` + `FernandoXX_cru.srt` (corte sem perda de qualidade / stream copy original com legendas externas)
-  4. `FernandoXX_headlines.txt` (sugestões completas de headline com metadados e tags)
+### 7. Pacotes de Cortes `FernandoXX` e Google Drive (`indomavel/cortador_automatico.py`, `indomavel/google_drive.py`)
+- Criação sequencial de subpastas numeradas sem colisão (`Fernando01/`, `Fernando02/`, etc.) em `PASTA_GOOGLE_DRIVE` (`output/google_drive/` ou pasta do Drive).
+- **Proporção Padrão 1:1 (Quadrado)** configurada como inicial, com total flexibilidade para 9:16, 4:5, 3:4 ou 16:9 via modal `[⚙️ Configurar]`.
+- **Organização Modular por Categoria**:
+  * `Com headline e legenda/` -> `FernandoXX_com_legenda.mp4` (card superior com headline viral, legendas animadas ASS Bebas)
+  * `Com headline e sem legenda/` -> `FernandoXX_sem_legenda.mp4` (opcional via checkbox)
+  * `Só legenda/` -> `FernandoXX_so_legenda.mp4` (vídeo limpo com legenda animada)
+  * `Cortes crus/` -> `FernandoXX_cru.mp4` + `FernandoXX_cru.srt` (lossless stream copy original)
+  * `Headlines/` -> `FernandoXX_headlines.txt` (3 a 8 sugestões avaliadas com notas de CTR e arquétipos)
+- **Integração Google Drive Nuvem**:
+  * Upload direto para a pasta compartilhada `1wBxCAat68t-jLBl3RJxCBJmZNvPAjz-G` via Service Account ou OAuth.
+  * **Fallback Local Garantido**: na ausência de chave de nuvem, salva tudo organizado localmente em `output/google_drive/`.
+  * Botão de 1 clique no frontend **`[📂 Abrir Cortes]`** para abrir imediatamente os arquivos no Windows Explorer.
 
 ### 8. Fila de Execução Sequencial Estrita
 - Garante a conclusão de 100% dos cortes de um vídeo antes de iniciar o próximo vídeo da fila, evitando sobrecarga de CPU/GPU e fragmentação de arquivos.
@@ -79,23 +85,23 @@ Desde o início do projeto, o Indomável Creator Studio foi desenhado e expandid
   * `[🔄 Recortar do zero]`: Limpa cortes anteriores e regera os pacotes do zero.
 
 ### 10. Validação Rigorosa e Política de Exclusão Automática de Cache
-- **Verificação de Integridade**: Antes de qualquer exclusão, o sistema valida se todos os arquivos obrigatórios do pacote `FernandoXX` foram gerados com tamanho > 0 bytes na pasta do Google Drive.
-- **Limpeza Automática de Disco**: Assim que a integridade for confirmada, o vídeo bruto grande local (`PASTA_VIDEOS/<id>.mp4`, muitas vezes com 5 a 10 GB em lives) e arquivos intermediários em downloads são liberados automaticamente (`RETENCAO_LIMPA = True`).
+- **Verificação de Integridade**: Antes de qualquer exclusão, o sistema valida se todos os arquivos obrigatórios do pacote `FernandoXX` foram gerados com tamanho > 0 bytes.
+- **Limpeza Automática de Disco**: Assim que a integridade for confirmada, o vídeo bruto grande local (`PASTA_VIDEOS/<id>.mp4`) e arquivos intermediários em downloads são liberados automaticamente (`RETENCAO_LIMPA = True`).
 - **Limpeza de Inicialização**: Purga arquivos `.tmp`, `.part`, `.partial` e pastas vazias geradas por interrupções ou desligamento da máquina.
 
 ---
 
 ## 🧪 Testes Automatizados
 
-O projeto conta com uma suíte abrangente de **123 testes unitários e de integração** cobrindo todas as camadas:
+O projeto conta com uma suíte abrangente de **125 testes unitários e de integração** cobrindo todas as camadas:
 
 ```powershell
 .venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
 **Resultado:**
-- 123 testes executados
-- 121 aprovados com 100% de sucesso
+- 125 testes executados
+- 123 aprovados com 100% de sucesso
 - 2 testes de live externa pulados intencionalmente (requerem stream ativo no YouTube)
 - 0 falhas, 0 erros.
 
@@ -105,9 +111,23 @@ O projeto conta com uma suíte abrangente de **123 testes unitários e de integr
 
 - `GET /api/vivo`: Status da aplicação e versão.
 - `GET /api/videos`: Listagem de vídeos do Acervo Chub com filtros táticos.
+- `GET /api/cortes/<id>` ou `GET /api/cortes_automaticos/<id>`: Status dos cortes e pacotes FernandoXX de um vídeo.
 - `GET /api/automacao/cortes/status`: Status do modo automático e executor sequencial.
 - `POST /api/automacao/cortes/toggle`: Liga ou desliga o modo de cortes automáticos.
 - `POST /api/cortes/<id>/disparar`: Dispara geração de cortes FernandoXX para um vídeo.
 - `POST /api/cortes/<id>/refazer`: Apaga cortes anteriores e refaz do zero.
 - `POST /api/cortes/<id>/limpar-cache`: Libera manualmente arquivos de cache bruto de um vídeo.
 - `POST /api/cortes/limpar-cache-geral`: Varre todos os vídeos já concluídos e libera cache residual.
+
+---
+
+## 🌐 Publicação no GitHub
+
+Para vincular e subir o repositório no seu perfil do GitHub (https://github.com/SAGIEV007):
+
+```powershell
+cd C:\indomavel
+git remote add origin https://github.com/SAGIEV007/indomavel.git
+git branch -M main
+git push -u origin main
+```

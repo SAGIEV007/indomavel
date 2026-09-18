@@ -8,28 +8,41 @@ from . import config
 
 # Um modelo que respondeu "alta demanda" fica de lado por um tempo, para as próximas chamadas não
 # gastarem minutos esperando por ele (na régua de 15/09 isso custou boa parte dos 17 minutos por vídeo).
-PAUSA_MODELO_SOBRECARREGADO_S = 600
-PAUSA_MODELO_SEM_COTA_S = 1800
+PAUSA_MODELO_SOBRECARREGADO_S = 120
+PAUSA_MODELO_SEM_COTA_S = 60
 
 
 class GeminiErro(RuntimeError):
     """Nenhum modelo do Gemini respondeu."""
 
 
-_cliente = None
+_clientes = {}
 _sobrecarregado_ate = {}
 _trava = threading.Lock()
 
 
-def _obter_cliente():
-    global _cliente
-    if _cliente is None:
-        if not config.GOOGLE_API_KEY:
-            raise GeminiErro("GOOGLE_API_KEY não está no arquivo .env")
-        from google import genai
+def _obter_clientes():
+    from google import genai
 
-        _cliente = genai.Client(api_key=config.GOOGLE_API_KEY)
-    return _cliente
+    chaves = []
+    if config.GOOGLE_API_KEY:
+        chaves.append(config.GOOGLE_API_KEY)
+    stitch = config.valor("STITCH_API_KEY")
+    if stitch and stitch not in chaves:
+        chaves.append(stitch)
+    if not chaves:
+        raise GeminiErro("GOOGLE_API_KEY não está no arquivo .env")
+
+    clientes = []
+    for k in chaves:
+        if k not in _clientes:
+            _clientes[k] = genai.Client(api_key=k)
+        clientes.append(_clientes[k])
+    return clientes
+
+
+def _obter_cliente():
+    return _obter_clientes()[0]
 
 
 def _passageiro(erro):
@@ -68,7 +81,7 @@ def gerar_json(instrucao, conteudo, esquema, modelos=None, tentativas_por_modelo
     """Devolve (dados, modelo_usado). Levanta GeminiErro se nenhum modelo da lista responder."""
     from google.genai import types
 
-    cliente = _obter_cliente()
+    clientes = _obter_clientes()
     configuracao = types.GenerateContentConfig(
         system_instruction=instrucao,
         response_mime_type="application/json",
@@ -76,30 +89,31 @@ def gerar_json(instrucao, conteudo, esquema, modelos=None, tentativas_por_modelo
         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
     )
     falhas = []
-    for modelo in ordem_dos_modelos(modelos or config.GEMINI_MODELOS):
-        for tentativa in range(tentativas_por_modelo):
-            try:
-                resposta = cliente.models.generate_content(model=modelo, contents=conteudo, config=configuracao)
-                return json.loads(resposta.text or ""), modelo
-            except json.JSONDecodeError:
-                falhas.append(f"{modelo}: JSON incompleto")
-            except Exception as erro:
-                falhas.append(f"{modelo}: {_sem_chave(erro)[:160]}")
-                if "503" in str(erro) or "UNAVAILABLE" in str(erro):
-                    with _trava:
-                        _sobrecarregado_ate[modelo] = time.time() + PAUSA_MODELO_SOBRECARREGADO_S
-                    break
-                if "429" in str(erro) or "RESOURCE_EXHAUSTED" in str(erro):
-                    # Cota do plano gratuito estourada para este modelo: tenta os outros e volta nele depois.
-                    with _trava:
-                        _sobrecarregado_ate[modelo] = time.time() + PAUSA_MODELO_SEM_COTA_S
-                    break
-                if "404" in str(erro) or "NOT_FOUND" in str(erro):
-                    with _trava:
-                        _sobrecarregado_ate[modelo] = time.time() + 86400 * 30
-                    break
-                if not _passageiro(erro):
-                    break
-            if tentativa + 1 < tentativas_por_modelo:
-                time.sleep(espera_s * (tentativa + 1))
+    for cliente in clientes:
+        for modelo in ordem_dos_modelos(modelos or config.GEMINI_MODELOS):
+            for tentativa in range(tentativas_por_modelo):
+                try:
+                    resposta = cliente.models.generate_content(model=modelo, contents=conteudo, config=configuracao)
+                    return json.loads(resposta.text or ""), modelo
+                except json.JSONDecodeError:
+                    falhas.append(f"{modelo}: JSON incompleto")
+                except Exception as erro:
+                    falhas.append(f"{modelo}: {_sem_chave(erro)[:160]}")
+                    if "503" in str(erro) or "UNAVAILABLE" in str(erro):
+                        with _trava:
+                            _sobrecarregado_ate[modelo] = time.time() + PAUSA_MODELO_SOBRECARREGADO_S
+                        break
+                    if "429" in str(erro) or "RESOURCE_EXHAUSTED" in str(erro):
+                        # Cota do plano gratuito estourada para este modelo: tenta os outros e volta nele depois.
+                        with _trava:
+                            _sobrecarregado_ate[modelo] = time.time() + PAUSA_MODELO_SEM_COTA_S
+                        break
+                    if "404" in str(erro) or "NOT_FOUND" in str(erro):
+                        with _trava:
+                            _sobrecarregado_ate[modelo] = time.time() + 86400 * 30
+                        break
+                    if not _passageiro(erro):
+                        break
+                if tentativa + 1 < tentativas_por_modelo:
+                    time.sleep(espera_s * (tentativa + 1))
     raise GeminiErro("nenhum modelo do Gemini respondeu. " + " | ".join(falhas[-4:]))

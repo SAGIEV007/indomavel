@@ -68,6 +68,7 @@ def listar():
             continue
         estado = ler(youtube_id, "estado.json", {})
         blocos = ler(youtube_id, "blocos.json")
+        cortes = ler(youtube_id, "cortes_automaticos.json")
         videos.append({
             "youtube_id": youtube_id,
             "titulo": info.get("titulo") or youtube_id,
@@ -76,6 +77,7 @@ def listar():
             "fontes": info.get("canal") or "",
             "tem_transcricao": os.path.exists(os.path.join(pasta_do_video(youtube_id), "frases.json")),
             "blocos": len(blocos["blocos"]) if blocos else 0,
+            "cortes": cortes,
             "origem": "local",
             "estado": estado.get("estado"),
             "mensagem": estado.get("mensagem"),

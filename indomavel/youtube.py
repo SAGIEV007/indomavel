@@ -135,21 +135,44 @@ def video_em_cache(youtube_id):
 
 
 def remover_video_cache(youtube_id):
-    """Remove o vídeo bruto baixado de PASTA_VIDEOS/<id>.mp4 e sua ficha para liberar espaço em disco."""
-    caminho = caminho_do_video(youtube_id)
-    ficha = _caminho_ficha(youtube_id)
+    """Remove o vídeo bruto baixado de PASTA_VIDEOS/<id>.mp4, sua ficha e fragmentos residuais para liberar espaço em disco."""
+    import gc
     bytes_liberados = 0
     with _trava_geral:
         trava = _travas_de_video.setdefault(youtube_id, threading.Lock())
     with trava:
-        for arq in (caminho, ficha):
-            if os.path.exists(arq):
+        caminho = caminho_do_video(youtube_id)
+        ficha = _caminho_ficha(youtube_id)
+        alvos = [caminho, ficha]
+
+        # Varrer PASTA_VIDEOS para capturar quaisquer variantes (.webm, .mkv, .part) do mesmo youtube_id
+        if os.path.isdir(config.PASTA_VIDEOS):
+            try:
+                for nome in os.listdir(config.PASTA_VIDEOS):
+                    if nome.startswith(youtube_id):
+                        arq_cand = os.path.join(config.PASTA_VIDEOS, nome)
+                        if arq_cand not in alvos and os.path.isfile(arq_cand):
+                            alvos.append(arq_cand)
+            except Exception as e:
+                log.warning("Aviso ao listar PASTA_VIDEOS para remover cache de %s: %s", youtube_id, e)
+
+        for arq in alvos:
+            if not os.path.exists(arq):
+                continue
+            removido = False
+            for tentativa in range(3):
                 try:
-                    bytes_liberados += os.path.getsize(arq)
+                    sz = os.path.getsize(arq)
                     os.remove(arq)
+                    bytes_liberados += sz
                     log.info("Arquivo de cache removido: %s", arq)
-                except Exception as e:
-                    log.warning("Falha ao remover arquivo de cache %s: %s", arq, e)
+                    removido = True
+                    break
+                except OSError as e:
+                    gc.collect()
+                    time.sleep(0.3)
+            if not removido and os.path.exists(arq):
+                log.warning("Falha ao remover arquivo de cache %s após retentativas.", arq)
     return bytes_liberados
 
 

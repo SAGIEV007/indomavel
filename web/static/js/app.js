@@ -411,6 +411,21 @@ function criarPainelCortes(video, callbackRecarregar) {
       }
     });
     painelCortes.appendChild(btnCortes);
+
+    const btnPonto = el("button", "botao-sec pequeno", "🚩 Iniciar cortes daqui");
+    btnPonto.type = "button";
+    btnPonto.title = "Define este vídeo como o ponto de partida para os cortes automáticos";
+    btnPonto.addEventListener("click", async (evento) => {
+      evento.stopPropagation();
+      try {
+        await postar("/api/automacao/config-cortes", { video_inicial_id: video.youtube_id });
+        if (estado.configCortes) estado.configCortes.video_inicial_id = video.youtube_id;
+        avisar(`🚩 Ponto de partida definido: ${video.titulo || video.youtube_id}`, "ok");
+      } catch (e) {
+        avisar("Erro ao definir ponto de partida: " + e.message, "erro");
+      }
+    });
+    painelCortes.appendChild(btnPonto);
   }
   return painelCortes;
 }
@@ -2490,6 +2505,173 @@ async function carregarModoCortes() {
   }
 }
 
+async function carregarConfigCortes() {
+  try {
+    const res = await api("/api/automacao/config-cortes");
+    if (res && res.config) {
+      estado.configCortes = res.config;
+    }
+  } catch (e) {
+    // silencioso
+  }
+}
+
+async function atualizarStatusDriveModal() {
+  const badge = $("drive-status-badge");
+  const msg = $("drive-status-msg");
+  const btnAuth = $("btn-conectar-oauth-drive");
+  const boxManual = $("box-codigo-manual");
+  if (!badge) return;
+  badge.textContent = "Verificando...";
+  badge.className = "badge-drive";
+  try {
+    const res = await api("/api/drive/status");
+    if (res.conectado) {
+      badge.textContent = "☁️ Nuvem Ativa";
+      badge.className = "badge-drive nuvem";
+      if (msg) msg.textContent = `Conectado à nuvem na pasta ${res.pasta_id}. Uploads automáticos ativos.`;
+      if (btnAuth) {
+        btnAuth.textContent = "✅ Conta Google Conectada";
+        btnAuth.style.background = "#2ed573";
+        btnAuth.style.borderColor = "#2ed573";
+        btnAuth.disabled = true;
+      }
+      if (boxManual) boxManual.style.display = "none";
+    } else {
+      badge.textContent = "📁 Fallback Local";
+      badge.className = "badge-drive local";
+      if (msg) msg.textContent = res.mensagem || `Salva localmente em ${res.pasta_local}.`;
+      if (btnAuth) {
+        btnAuth.textContent = "🔑 Conectar Conta Google";
+        btnAuth.style.background = "#4285F4";
+        btnAuth.style.borderColor = "#4285F4";
+        btnAuth.disabled = false;
+        if (res.url_autorizacao) {
+          btnAuth.dataset.url = res.url_autorizacao;
+        }
+      }
+      if (boxManual) boxManual.style.display = res.oauth_configurado ? "block" : "none";
+    }
+  } catch (e) {
+    badge.textContent = "⚠️ Erro Conexão";
+    badge.className = "badge-drive";
+    if (msg) msg.textContent = "Não foi possível verificar status da nuvem: " + e.message;
+  }
+}
+
+function abrirModalConfigCortes() {
+  const modal = $("modal-config-cortes");
+  if (!modal) return;
+  const cfg = estado.configCortes || {
+    proporcao: "1:1",
+    video_inicial_id: "",
+    variacoes: { com_legenda: false, sem_legenda: true, so_legenda: false, cru: true, headlines: true },
+    visual: { marca_dagua: false, cortar_topo: 140, tamanho_headline: 44 },
+    drive: { pasta_id: "1wBxCAat68t-jLBl3RJxCBJmZNvPAjz-G" }
+  };
+
+  // Ponto de Partida dos Cortes
+  const selVideo = $("cfg-video-inicial");
+  if (selVideo) {
+    const selecionadoAtual = cfg.video_inicial_id || "";
+    selVideo.innerHTML = `
+      <option value="">▶️ Todos os vídeos elegíveis da playlist</option>
+      <option value="__apenas_novos__">🆕 Apenas novos vídeos adicionados a partir de agora</option>
+    `;
+    if (Array.isArray(estado.videosPlaylist)) {
+      estado.videosPlaylist.forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v.youtube_id;
+        opt.textContent = `A partir de: ${v.titulo || v.youtube_id}`;
+        selVideo.appendChild(opt);
+      });
+    }
+    selVideo.value = selecionadoAtual;
+  }
+
+  // Proporção
+  const radio = document.querySelector(`input[name="proporcao"][value="${cfg.proporcao || '1:1'}"]`);
+  if (radio) radio.checked = true;
+
+  // Variações
+  const vars = cfg.variacoes || {};
+  if ($("chk-var-sem-legenda")) $("chk-var-sem-legenda").checked = vars.sem_legenda !== false;
+  if ($("chk-var-com-legenda")) $("chk-var-com-legenda").checked = Boolean(vars.com_legenda);
+  if ($("chk-var-so-legenda")) $("chk-var-so-legenda").checked = Boolean(vars.so_legenda);
+  if ($("chk-var-cru")) $("chk-var-cru").checked = vars.cru !== false;
+  if ($("chk-var-headlines")) $("chk-var-headlines").checked = vars.headlines !== false;
+
+  // Visual
+  const vis = cfg.visual || {};
+  if ($("chk-vis-marca")) $("chk-vis-marca").checked = Boolean(vis.marca_dagua);
+  if ($("cfg-cortar-topo")) {
+    $("cfg-cortar-topo").value = vis.cortar_topo != null ? vis.cortar_topo : 140;
+    if ($("cfg-cortar-topo-val")) $("cfg-cortar-topo-val").textContent = $("cfg-cortar-topo").value;
+  }
+  if ($("cfg-tamanho-hl")) {
+    $("cfg-tamanho-hl").value = vis.tamanho_headline != null ? vis.tamanho_headline : 44;
+    if ($("cfg-tamanho-hl-val")) $("cfg-tamanho-hl-val").textContent = $("cfg-tamanho-hl").value;
+  }
+
+  // Drive
+  const drv = cfg.drive || {};
+  if ($("cfg-drive-pasta-id")) $("cfg-drive-pasta-id").value = drv.pasta_id || "1wBxCAat68t-jLBl3RJxCBJmZNvPAjz-G";
+
+  atualizarStatusDriveModal();
+  if (typeof modal.showModal === "function") {
+    modal.showModal();
+  } else {
+    modal.hidden = false;
+  }
+}
+
+function fecharModalConfigCortes() {
+  const modal = $("modal-config-cortes");
+  if (!modal) return;
+  if (typeof modal.close === "function") {
+    modal.close();
+  } else {
+    modal.hidden = true;
+  }
+}
+
+async function salvarConfigCortes(evento) {
+  if (evento) evento.preventDefault();
+  const radioProp = document.querySelector('input[name="proporcao"]:checked');
+  const proporcao = radioProp ? radioProp.value : "1:1";
+  const videoInicial = $("cfg-video-inicial") ? $("cfg-video-inicial").value : "";
+
+  const dados = {
+    proporcao: proporcao,
+    video_inicial_id: videoInicial,
+    variacoes: {
+      sem_legenda: $("chk-var-sem-legenda") ? $("chk-var-sem-legenda").checked : true,
+      com_legenda: $("chk-var-com-legenda") ? $("chk-var-com-legenda").checked : false,
+      so_legenda: $("chk-var-so-legenda") ? $("chk-var-so-legenda").checked : false,
+      cru: $("chk-var-cru") ? $("chk-var-cru").checked : true,
+      headlines: $("chk-var-headlines") ? $("chk-var-headlines").checked : true,
+    },
+    visual: {
+      marca_dagua: $("chk-vis-marca") ? $("chk-vis-marca").checked : false,
+      cortar_topo: $("cfg-cortar-topo") ? Number($("cfg-cortar-topo").value) : 140,
+      tamanho_headline: $("cfg-tamanho-hl") ? Number($("cfg-tamanho-hl").value) : 44,
+    },
+    drive: {
+      pasta_id: $("cfg-drive-pasta-id") ? $("cfg-drive-pasta-id").value.trim() : "1wBxCAat68t-jLBl3RJxCBJmZNvPAjz-G",
+      upload_ativo: true,
+    }
+  };
+
+  try {
+    const res = await postar("/api/automacao/config-cortes", dados);
+    estado.configCortes = res.config;
+    fecharModalConfigCortes();
+    avisar("Preferências de cortes salvas com sucesso!", "ok");
+  } catch (err) {
+    avisar("Erro ao salvar preferências: " + err.message, "erro");
+  }
+}
+
 function atualizarBotaoModoCortes() {
   const btn = $("btn-toggle-auto-cortes");
   if (!btn) return;
@@ -2522,12 +2704,127 @@ function vincular() {
         const dados = await postar("/api/automacao/cortes/toggle", { ativo: !estado.modoAutoCortes });
         estado.modoAutoCortes = Boolean(dados.modo_automatico);
         atualizarBotaoModoCortes();
-        avisar(dados.mensagem || "Modo de cortes alterado", "ok");
+        if (estado.modoAutoCortes) {
+          const prop = (estado.configCortes && estado.configCortes.proporcao) || "1:1";
+          avisar(`⚡ Cortes automáticos ATIVADOS em formato ${prop} para Google Drive.`, "ok");
+        } else {
+          avisar(dados.mensagem || "Modo de cortes alterado", "ok");
+        }
       } catch (e) {
         avisar("Erro ao alterar modo: " + e.message, "erro");
       } finally {
         btn.disabled = false;
       }
+    });
+  }
+  if ($("btn-config-auto-cortes")) {
+    $("btn-config-auto-cortes").addEventListener("click", () => abrirModalConfigCortes());
+  }
+  if ($("btn-fechar-modal-cortes")) {
+    $("btn-fechar-modal-cortes").addEventListener("click", () => fecharModalConfigCortes());
+  }
+  if ($("btn-cancelar-config-cortes")) {
+    $("btn-cancelar-config-cortes").addEventListener("click", () => fecharModalConfigCortes());
+  }
+  if ($("form-config-cortes")) {
+    $("form-config-cortes").addEventListener("submit", salvarConfigCortes);
+  }
+  if ($("btn-testar-drive")) {
+    $("btn-testar-drive").addEventListener("click", async () => {
+      avisar("Testando conexão com o Google Drive...", "ok");
+      await atualizarStatusDriveModal();
+    });
+  }
+  if ($("btn-abrir-pasta-drive")) {
+    $("btn-abrir-pasta-drive").addEventListener("click", async () => {
+      try {
+        await postar("/api/drive/abrir-pasta-local", {});
+        avisar("Abrindo pasta dos cortes no Windows Explorer...", "ok");
+      } catch (e) {
+        avisar("Erro ao abrir pasta: " + e.message, "erro");
+      }
+    });
+  }
+  if ($("btn-abrir-pasta-cortes-topo")) {
+    $("btn-abrir-pasta-cortes-topo").addEventListener("click", async () => {
+      try {
+        await postar("/api/drive/abrir-pasta-local", {});
+        avisar("Abrindo pasta dos cortes no Windows Explorer...", "ok");
+      } catch (e) {
+        avisar("Erro ao abrir pasta: " + e.message, "erro");
+      }
+    });
+  }
+  if ($("btn-enviar-credenciais")) {
+    $("btn-enviar-credenciais").addEventListener("click", async () => {
+      const fileInput = $("input-arquivo-credenciais");
+      if (!fileInput || !fileInput.files.length) {
+        avisar("Selecione um arquivo .json de credenciais primeiro!", "erro");
+        return;
+      }
+      const arquivo = fileInput.files[0];
+      const leitor = new FileReader();
+      leitor.onload = async (evt) => {
+        try {
+          const conteudo = evt.target.result;
+          JSON.parse(conteudo);
+          await postar("/api/drive/configurar", { credenciais: conteudo });
+          avisar("Credenciais do Google Drive salvas com sucesso!", "ok");
+          await atualizarStatusDriveModal();
+        } catch (err) {
+          avisar("Erro no arquivo de credenciais: " + err.message, "erro");
+        }
+      };
+      leitor.readAsText(arquivo, "UTF-8");
+    });
+  }
+  if ($("btn-conectar-oauth-drive")) {
+    $("btn-conectar-oauth-drive").addEventListener("click", async () => {
+      try {
+        const res = await api("/api/drive/auth-url");
+        if (res && res.url) {
+          window.open(res.url, "_blank", "width=600,height=700");
+          avisar("Janela de login do Google aberta! Conceda permissão para a pasta do Drive.", "ok");
+          const intv = setInterval(async () => {
+            const st = await api("/api/drive/status");
+            if (st && st.conectado) {
+              clearInterval(intv);
+              avisar("Google Drive conectado com sucesso na nuvem!", "ok");
+              atualizarStatusDriveModal();
+            }
+          }, 3000);
+          setTimeout(() => clearInterval(intv), 120000);
+        }
+      } catch (err) {
+        avisar("Erro ao iniciar login Google: " + err.message, "erro");
+      }
+    });
+  }
+  if ($("btn-salvar-codigo-oauth")) {
+    $("btn-salvar-codigo-oauth").addEventListener("click", async () => {
+      const cod = $("input-codigo-oauth") ? $("input-codigo-oauth").value.trim() : "";
+      if (!cod) {
+        avisar("Cole o código ou URL de autorização primeiro!", "erro");
+        return;
+      }
+      try {
+        await postar("/api/drive/conectar-codigo", { codigo: cod });
+        avisar("Google Drive conectado com sucesso na nuvem!", "ok");
+        if ($("input-codigo-oauth")) $("input-codigo-oauth").value = "";
+        await atualizarStatusDriveModal();
+      } catch (err) {
+        avisar("Falha ao validar código: " + err.message, "erro");
+      }
+    });
+  }
+  if ($("cfg-cortar-topo")) {
+    $("cfg-cortar-topo").addEventListener("input", (e) => {
+      if ($("cfg-cortar-topo-val")) $("cfg-cortar-topo-val").textContent = e.target.value;
+    });
+  }
+  if ($("cfg-tamanho-hl")) {
+    $("cfg-tamanho-hl").addEventListener("input", (e) => {
+      if ($("cfg-tamanho-hl-val")) $("cfg-tamanho-hl-val").textContent = e.target.value;
     });
   }
   if ($("btn-sync-playlist")) {
@@ -2898,6 +3195,7 @@ async function iniciar() {
   atualizarTarefas();
   carregarAutomacao();
   carregarModoCortes();
+  carregarConfigCortes();
   carregarMassa();
   carregarLiveStatus();
   setInterval(carregarLiveStatus, 3000);

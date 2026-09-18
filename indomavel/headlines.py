@@ -7,7 +7,7 @@ fortes que o Chub marcou, além do texto do corte.
 import hashlib
 import json
 import os
-
+import re
 import threading
 import time
 
@@ -108,18 +108,28 @@ def montar_instrucao(categoria="", temas=(), texto="", renan_falando=None, locut
     return f"""{intro}
 
 O card tem duas partes:
-- etiqueta: 1 a 3 palavras em CAIXA ALTA terminando com exclamação (ex.: EM ALTA!, VIRALIZOU!!, MANDOU A REAL!!, VERGONHOSO!, URGENTE!, DEBATE AO VIVO!).
+- etiqueta: 1 a 3 palavras em CAIXA ALTA terminando com exclamação (ex.: EM ALTA!, VIRALIZOU!!, MANDOU A REAL!!, VERGONHOSO!, URGENTE!, DEBATE AO VIVO!, DETONOU!!).
 - headline: uma frase de até 110 caracteres, em terceira pessoa, magnética e fiel ao conteúdo.
 
 Regra de Locutor:
 {regra_locutor}
+
+Arquétipos Virais de Alto Desempenho (Use para maximizar retenção e CTR):
+1. Confronto Direto: Embate claro, enfrentamento a autoridades/narrativas (verbos de ação: detona, desmascara, confronta, rebate, expõe, desafia).
+2. Curiosidade Irresistível / Gap de Informação: Lacuna psicológica que impele o clique sem sensacionalismo vazio (ex.: "O detalhe na fala que ninguém percebeu...", "A verdade que tentaram esconder sobre...").
+3. Alerta / Urgência: Impacto direto e imediato na vida do cidadão (Tags: URGENTE!, ALERTA MÁXIMO!, ATENÇÃO!).
+4. Frase de Efeito com Verbo Ativo e Contexto Dramático: Citação contundente combinada ao momento de tensão do debate.
+
+Auto-Avaliação e Ranking de CTR:
+Para cada headline gerada, auto-avalie o potencial de retenção dos primeiros 3 segundos atribuindo uma nota 'score_ctr' de 1 a 10 e informe brevemente o 'gatilho' psicológico utilizado (ex.: "gap de curiosidade", "embate direto", "urgência").
+Ordene as opções da maior nota para a menor, para que a primeira opção seja sempre a mais irresistível para o corte.
 
 Regras Editoriais:
 - Construa a headline em torno do tema principal do bloco: use a categoria, os temas e os momentos fortes informados.
 - Fiel ao trecho: não invente fatos, números, nomes ou citações que não estejam na transcrição.
 - Citação entre aspas só com palavras que aparecem na transcrição.
 - Sem hashtags e sem emojis.
-- Devolva entre 3 e 8 opções cobrindo ângulos variados: "noticioso", "confronto", "citacao", "bastidores", "alerta", "ironia".
+- Devolva entre 3 e 8 opções cobrindo ângulos variados: "confronto", "curiosidade", "alerta", "noticioso", "citacao", "impacto".
 
 Exemplos reais selecionados para este tema:
 {exemplos_txt}"""
@@ -156,9 +166,11 @@ ESQUEMA = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "angulo": {"type": "string", "enum": ["noticioso", "confronto", "citacao"]},
+                    "angulo": {"type": "string"},
                     "tag": {"type": "string"},
                     "headline": {"type": "string"},
+                    "score_ctr": {"type": "integer"},
+                    "gatilho": {"type": "string"},
                 },
                 "required": ["angulo", "tag", "headline"],
             },
@@ -184,33 +196,42 @@ def headlines_heuristicas(titulo, resumo, categoria="", temas=(), destaques=(), 
         h_noticioso = f"Em análise, Renan Santos expõe: {alvo_limpo}"[:110]
         h_confronto = f"Renan Santos confronta e dispara: “{alvo_limpo}”"[:110]
         h_citacao = f"“{alvo_limpo}” — Renan Santos em fala contundente"[:110]
+        h_curiosidade = f"O detalhe que Renan Santos expôs sobre {alvo_limpo}"[:110]
         h_alerta = f"Alerta de Renan Santos sobre {alvo_limpo}"[:110]
+        h_impacto = f"Renan Santos detona e manda recado: “{alvo_limpo}”"[:110]
     elif locutor:
         h_noticioso = f"Em transmissão ao vivo, {locutor} analisa: {alvo_limpo}"[:110]
         h_confronto = f"{locutor} confronta ao vivo: “{alvo_limpo}”"[:110]
         h_citacao = f"“{alvo_limpo}” — {locutor} em debate ao vivo"[:110]
+        h_curiosidade = f"O detalhe imperdível que {locutor} expôs ao vivo: {alvo_limpo}"[:110]
         h_alerta = f"Atenção: {locutor} alerta sobre {alvo_limpo}"[:110]
+        h_impacto = f"{locutor} dispara ao vivo: “{alvo_limpo}”"[:110]
     else:
         h_noticioso = f"Em debate na transmissão: {alvo_limpo}"[:110]
         h_confronto = f"Discussão esquenta ao vivo: “{alvo_limpo}”"[:110]
         h_citacao = f"“{alvo_limpo}” — Momento marcante da live"[:110]
+        h_curiosidade = f"O detalhe inesperado que chamou atenção: {alvo_limpo}"[:110]
         h_alerta = f"Atenção: participante alerta sobre {alvo_limpo}"[:110]
+        h_impacto = f"Clima esquenta na transmissão: “{alvo_limpo}”"[:110]
 
+    # Para manter total compatibilidade com testes que exigem os 3 primeiros ângulos (noticioso, confronto, citacao)
     todas = [
-        {"angulo": "noticioso", "tag": "EM ALTA!", "headline": h_noticioso},
-        {"angulo": "confronto", "tag": "CONFRONTO!", "headline": h_confronto},
-        {"angulo": "citacao", "tag": "MANDOU A REAL!!", "headline": h_citacao},
-        {"angulo": "alerta", "tag": "URGENTE!", "headline": h_alerta},
+        {"angulo": "noticioso", "tag": "EM ALTA!", "headline": h_noticioso, "score_ctr": 8, "gatilho": "relevância noticiosa"},
+        {"angulo": "confronto", "tag": "CONFRONTO!", "headline": h_confronto, "score_ctr": 10, "gatilho": "embate direto e conflito"},
+        {"angulo": "citacao", "tag": "MANDOU A REAL!!", "headline": h_citacao, "score_ctr": 9, "gatilho": "frase de efeito contundente"},
+        {"angulo": "curiosidade", "tag": "INACREDITÁVEL!", "headline": h_curiosidade, "score_ctr": 9, "gatilho": "gap de curiosidade irresistível"},
+        {"angulo": "alerta", "tag": "URGENTE!", "headline": h_alerta, "score_ctr": 9, "gatilho": "senso de urgência e risco"},
+        {"angulo": "impacto", "tag": "DETONOU!!", "headline": h_impacto, "score_ctr": 10, "gatilho": "reação visceral e quebra de padrão"},
     ]
     return todas[:limite]
 
 
 def sugerir(titulo, resumo, texto_trecho, categoria="", temas=(), destaques=(),
             renan_falando=None, locutor="", limite_sugestoes=3, gerar=None):
-    """Gera de 3 a 8 opções {angulo, tag, headline}. Guarda em dados/headlines para economizar cotas."""
+    """Gera de 3 a 8 opções {angulo, tag, headline, score_ctr, gatilho}. Guarda em dados/headlines para economizar cotas."""
     if not (texto_trecho or "").strip():
         return {
-            "opcoes": [{"angulo": "neutro", "tag": "TRANSMISSÃO", "headline": "Trecho sem falas identificadas na live"}],
+            "opcoes": [{"angulo": "neutro", "tag": "TRANSMISSÃO", "headline": "Trecho sem falas identificadas na live", "score_ctr": 5, "gatilho": "neutro"}],
             "modelo": "vazio", "categoria": categoria, "temas": list(temas),
         }
 
@@ -228,7 +249,7 @@ def sugerir(titulo, resumo, texto_trecho, categoria="", temas=(), destaques=(),
         f"MOMENTOS FORTES: {' | '.join(destaques)}\n\n"
         f"TRANSCRIÇÃO DO CORTE:\n{texto_trecho[:6000]}"
     )
-    chave = hashlib.sha1(f"{conteudo}_renan={renan_falando}_limite={limite_sugestoes}".encode("utf-8")).hexdigest()
+    chave = hashlib.sha1(f"{conteudo}_renan={renan_falando}_limite={limite_sugestoes}_v2".encode("utf-8")).hexdigest()
     caminho = os.path.join(config.PASTA_DADOS, "headlines", chave + ".json")
     if os.path.exists(caminho):
         with open(caminho, encoding="utf-8") as arquivo:
@@ -241,15 +262,35 @@ def sugerir(titulo, resumo, texto_trecho, categoria="", temas=(), destaques=(),
         instrucao = montar_instrucao(categoria, temas, texto_trecho, renan_falando=renan_falando, locutor=locutor)
         dados, modelo = gerar(instrucao, conteudo, ESQUEMA)
         opcoes = [
-            {"angulo": o.get("angulo", ""), "tag": (o.get("tag") or "").strip().upper()[:30], "headline": (o.get("headline") or "").strip()[:160]}
+            {
+                "angulo": o.get("angulo", "noticioso"),
+                "tag": (o.get("tag") or "").strip().upper()[:30],
+                "headline": (o.get("headline") or "").strip()[:160],
+                "score_ctr": int(o.get("score_ctr") or 8),
+                "gatilho": (o.get("gatilho") or "").strip()[:80],
+            }
             for o in dados.get("opcoes") or [] if o.get("headline")
-        ][:limite_sugestoes]
+        ]
+        # Auto-avaliação e ranking: ordena pelo score de CTR decrescente
+        opcoes.sort(key=lambda x: x.get("score_ctr", 0), reverse=True)
+        opcoes = opcoes[:limite_sugestoes]
     except Exception:
         opcoes = headlines_heuristicas(titulo, resumo, categoria, temas, destaques, renan_falando=renan_falando, locutor=locutor, limite=limite_sugestoes)
         modelo = "heuristicas_locais"
     if not opcoes:
         opcoes = headlines_heuristicas(titulo, resumo, categoria, temas, destaques, renan_falando=renan_falando, locutor=locutor, limite=limite_sugestoes)
         modelo = modelo or "heuristicas_locais"
+
+    # Higienização estrita de locutor: se renan_falando for False, NUNCA permite "Renan Santos" nas headlines
+    if not renan_falando:
+        padrao_renan = re.compile(r"\brenan(\s+santos)?\b", re.IGNORECASE)
+        for item in opcoes:
+            if padrao_renan.search(item["headline"]):
+                substituto = locutor if locutor else "Participante"
+                item["headline"] = padrao_renan.sub(substituto, item["headline"])
+            if padrao_renan.search(item["tag"]):
+                item["tag"] = "EM ALTA!"
+
     resultado = {"opcoes": opcoes, "modelo": modelo, "categoria": categoria, "temas": list(temas)}
     os.makedirs(os.path.dirname(caminho), exist_ok=True)
     with open(caminho, "w", encoding="utf-8") as arquivo:

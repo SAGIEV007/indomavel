@@ -219,6 +219,12 @@ class SincronizadorPlaylist:
                     proxima = float(estado_local.get("proxima_tentativa") or 0)
                     if agora >= proxima:
                         deve_enfileirar = True
+                elif estado_nome in ("blocos", "legenda", "transcrevendo"):
+                    # Detecta processos órfãos interrompidos por fechamento ou reinicialização anterior do servidor
+                    atualizado_em = float(estado_local.get("atualizado_em") or 0)
+                    if (agora - atualizado_em) > 600:
+                        deve_enfileirar = True
+                        log.info("Recuperando vídeo órfão parado no estado '%s': %s (%s)", estado_nome, tit, yid)
                 elif estado_nome == "falhou":
                     # Recupera automaticamente falhas anteriores que foram causadas por Gemini, timeout ou YouTube
                     msg = (estado_local.get("mensagem") or "").lower()

@@ -142,6 +142,7 @@ def quebrar_linhas(texto, arquivo_fonte, tamanho, largura_maxima, maximo_linhas=
 
 def layout(formato, estilo):
     """Posições em pixels do vídeo final: card, área do vídeo, legenda e rodapé."""
+    estilo = normalizar_estilo(estilo)
     largura, altura = FORMATOS[formato]
     escala = min(largura, altura) / 1080
     margem_x, margem_topo, margem_base, espaco = (round(v * escala) for v in (44, 34, 30, 8))
@@ -317,6 +318,7 @@ def filtro_ffmpeg(dados_layout, estilo, largura_fonte, altura_fonte, com_legenda
 
 def exportar(youtube_id, inicio, fim, formato, estilo, trechos, pasta_saida, titulo, ao_progredir=None, nome_arquivo=None):
     """Baixa o trecho, compõe o vídeo final e devolve o caminho do MP4."""
+    estilo = normalizar_estilo(estilo)
     dados_layout = layout(formato, estilo)
     os.makedirs(pasta_saida, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="indomavel_") as temporaria:

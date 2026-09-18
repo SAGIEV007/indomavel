@@ -1,6 +1,7 @@
 .venv/
 __pycache__/
 .env
+ativar_drive.py
 
 # Vídeos baixados e editados, e dados gerados pelo uso: ficam só no computador
 downloads/

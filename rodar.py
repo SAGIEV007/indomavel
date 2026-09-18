@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 if "--porta" in sys.argv:
     os.environ["PORTA"] = sys.argv[sys.argv.index("--porta") + 1]
 
+
 from indomavel.servidor import main  # noqa: E402
 
 main()

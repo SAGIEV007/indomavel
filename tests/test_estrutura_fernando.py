@@ -56,13 +56,15 @@ class TestEstruturaFernando(unittest.TestCase):
         os.makedirs(pasta_corte, exist_ok=True)
         prefixo = "Fernando01"
 
-        # Cria os 4 arquivos válidos com tamanho > 0
+        # Cria os 5 arquivos válidos com tamanho > 0
         with open(os.path.join(pasta_corte, f"{prefixo}_com_legenda.mp4"), "wb") as f:
             f.write(b"video_com_legenda_bytes")
         with open(os.path.join(pasta_corte, f"{prefixo}_sem_legenda.mp4"), "wb") as f:
             f.write(b"video_sem_legenda_bytes")
         with open(os.path.join(pasta_corte, f"{prefixo}_cru.mp4"), "wb") as f:
             f.write(b"video_cru_bytes")
+        with open(os.path.join(pasta_corte, f"{prefixo}_cru.srt"), "w", encoding="utf-8") as f:
+            f.write("1\n00:00:00,000 --> 00:00:05,000\nLegenda\n")
         with open(os.path.join(pasta_corte, f"{prefixo}_headlines.txt"), "w", encoding="utf-8") as f:
             f.write("Sugestões de Headlines")
 
@@ -77,7 +79,7 @@ class TestEstruturaFernando(unittest.TestCase):
             f.write(b"video_bytes")
         with open(os.path.join(pasta_corte, f"{prefixo}_cru.mp4"), "wb") as f:
             f.write(b"video_cru_bytes")
-        # Falta _sem_legenda.mp4 e _headlines.txt
+        # Falta _sem_legenda.mp4, _cru.srt e _headlines.txt
 
         self.assertFalse(cortador_automatico.verificar_pacote_completo(pasta_corte, prefixo))
 
@@ -92,6 +94,8 @@ class TestEstruturaFernando(unittest.TestCase):
             f.write(b"")  # Vazio (0 bytes)
         with open(os.path.join(pasta_corte, f"{prefixo}_cru.mp4"), "wb") as f:
             f.write(b"video_cru_bytes")
+        with open(os.path.join(pasta_corte, f"{prefixo}_cru.srt"), "w", encoding="utf-8") as f:
+            f.write("1\n00:00:00,000 --> 00:00:05,000\nLegenda\n")
         with open(os.path.join(pasta_corte, f"{prefixo}_headlines.txt"), "w", encoding="utf-8") as f:
             f.write("Headlines")
 
@@ -224,6 +228,8 @@ class TestEstruturaFernando(unittest.TestCase):
             for nome in [f"{prefixo}_com_legenda.mp4", f"{prefixo}_sem_legenda.mp4", f"{prefixo}_cru.mp4"]:
                 with open(os.path.join(pasta_corte, nome), "wb") as f:
                     f.write(b"video_data")
+            with open(os.path.join(pasta_corte, f"{prefixo}_cru.srt"), "w", encoding="utf-8") as f:
+                f.write("1\n00:00:00,000 --> 00:00:05,000\nLegenda\n")
             with open(os.path.join(pasta_corte, f"{prefixo}_headlines.txt"), "w", encoding="utf-8") as f:
                 f.write("Headlines")
             return {"pasta": pasta_corte, "prefixo": prefixo}
@@ -241,6 +247,7 @@ class TestEstruturaFernando(unittest.TestCase):
                                     "frases": None,
                                     "max_cortes": 1,
                                     "refazer": False,
+                                    "enfileirado_em": 0,
                                 })
 
         status = cortador_automatico.obter_status_cortes(youtube_id)
@@ -281,13 +288,61 @@ class TestEstruturaFernando(unittest.TestCase):
             self.assertTrue(d_geral.get("ok"))
             self.assertEqual(d_geral.get("mb_liberados"), 120.0)
 
-    def test_repo_git_sincronizado(self):
-        import subprocess
-        st = subprocess.run(["git", "status", "--porcelain"], cwd=r"C:\indomavel", capture_output=True, text=True).stdout.strip()
-        if st:
-            subprocess.run(["git", "commit", "-a", "-m", "test: suite de testes e validacoes completas da estrutura FernandoXX"], cwd=r"C:\indomavel")
-        st_apos = subprocess.run(["git", "status", "--porcelain"], cwd=r"C:\indomavel", capture_output=True, text=True).stdout.strip()
-        self.assertEqual(st_apos, "")
+        # 4. Status de corte via GET /api/cortes/<id>
+        with patch("indomavel.cortador_automatico.obter_status_cortes", return_value={"estado": "concluido"}):
+            resp_st = self.cliente.get("/api/cortes/vid_limpar1")
+            self.assertEqual(resp_st.status_code, 200)
+            self.assertEqual(resp_st.get_json().get("status", {}).get("estado"), "concluido")
+
+    def test_acervo_local_inclui_status_cortes(self):
+        from indomavel import acervo_local
+        pasta_dados = os.path.join(self.temp_dir, "dados")
+        yid = "vid_local_teste"
+        pasta_v = os.path.join(pasta_dados, "videos", yid)
+        os.makedirs(pasta_v, exist_ok=True)
+
+        with open(os.path.join(pasta_v, "info.json"), "w", encoding="utf-8") as f:
+            json.dump({"titulo": "Vídeo Local Teste"}, f)
+        with open(os.path.join(pasta_v, "estado.json"), "w", encoding="utf-8") as f:
+            json.dump({"estado": "pronto"}, f)
+        with open(os.path.join(pasta_v, "cortes_automaticos.json"), "w", encoding="utf-8") as f:
+            json.dump({"estado": "concluido", "feitos": 4}, f)
+
+        with patch("indomavel.config.PASTA_DADOS", pasta_dados):
+            lista = acervo_local.listar()
+            self.assertEqual(len(lista), 1)
+            self.assertEqual(lista[0]["youtube_id"], yid)
+            self.assertIn("cortes", lista[0])
+            self.assertIsNotNone(lista[0]["cortes"])
+            self.assertEqual(lista[0]["cortes"].get("estado"), "concluido")
+            self.assertEqual(lista[0]["cortes"].get("feitos"), 4)
+
+    def test_remover_video_cache_multiplos_formatos(self):
+        yid = "multi_vid_123"
+        f_mp4 = os.path.join(self.pasta_videos, f"{yid}.mp4")
+        f_json = os.path.join(self.pasta_videos, f"{yid}.json")
+        f_part = os.path.join(self.pasta_videos, f"{yid}.part")
+        f_webm = os.path.join(self.pasta_videos, f"{yid}.f137.webm")
+
+        for caminho in (f_mp4, f_json, f_part, f_webm):
+            with open(caminho, "wb") as f:
+                f.write(b"sample_content_12345")
+
+        with patch("indomavel.config.PASTA_VIDEOS", self.pasta_videos):
+            liberados = youtube.remover_video_cache(yid)
+            self.assertGreaterEqual(liberados, 4 * 20)
+            self.assertFalse(os.path.exists(f_mp4))
+            self.assertFalse(os.path.exists(f_json))
+            self.assertFalse(os.path.exists(f_part))
+            self.assertFalse(os.path.exists(f_webm))
+
+    def test_abrir_pasta_drive_local_endpoint(self):
+        with patch("os.startfile") as mock_startfile:
+            resp = self.cliente.post("/api/drive/abrir-pasta-local")
+            self.assertEqual(resp.status_code, 200)
+            dados = resp.get_json()
+            self.assertTrue(dados.get("ok"))
+            mock_startfile.assert_called_once()
 
 
 if __name__ == "__main__":
