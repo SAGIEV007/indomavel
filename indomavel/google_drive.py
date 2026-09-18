@@ -306,6 +306,105 @@ def obter_ou_criar_pasta_drive(nome_pasta, id_pai=ID_PASTA_PADRAO, token=None):
     return None
 
 
+def buscar_pasta_drive(nome_pasta, id_pai=ID_PASTA_PADRAO, token=None):
+    """Busca uma subpasta no Google Drive por nome SEM criá-la."""
+    if not token:
+        token, _ = obter_token_acesso()
+        if not token:
+            return None
+
+    chave_cache = f"{id_pai}_{nome_pasta}"
+    with _TRAVA_DRIVE:
+        if chave_cache in _CACHE_PASTAS:
+            return _CACHE_PASTAS[chave_cache]
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json; charset=UTF-8",
+    }
+    query = f"'{id_pai}' in parents and name = '{nome_pasta}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+    url_busca = f"https://www.googleapis.com/drive/v3/files?q={urllib.parse.quote(query)}&fields=files(id,name)"
+
+    try:
+        req = urllib.request.Request(url_busca, headers=headers)
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            dados = json.loads(resp.read().decode("utf-8"))
+            arquivos = dados.get("files", [])
+            if arquivos:
+                pasta_id = arquivos[0]["id"]
+                with _TRAVA_DRIVE:
+                    _CACHE_PASTAS[chave_cache] = pasta_id
+                return pasta_id
+    except Exception as e:
+        log.warning("Erro ao buscar pasta '%s' no Drive: %s", nome_pasta, e)
+    return None
+
+
+def listar_todos_arquivos_drive(query_extra="", token=None):
+    """Executa busca genérica no Google Drive com paginação."""
+    if not token:
+        token, _ = obter_token_acesso()
+        if not token:
+            return []
+    headers = {"Authorization": f"Bearer {token}"}
+    itens = []
+    page_token = None
+    query = "trashed = false"
+    if query_extra:
+        query += f" and ({query_extra})"
+
+    while True:
+        url = f"https://www.googleapis.com/drive/v3/files?q={urllib.parse.quote(query)}&fields=nextPageToken,files(id,name,mimeType,size,parents)&pageSize=200"
+        if page_token:
+            url += f"&pageToken={urllib.parse.quote(page_token)}"
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                dados = json.loads(resp.read().decode("utf-8"))
+                itens.extend(dados.get("files", []))
+                page_token = dados.get("nextPageToken")
+                if not page_token:
+                    break
+        except Exception as e:
+            log.warning("Erro ao buscar arquivos no Drive (%s): %s", query, e)
+            break
+    return itens
+
+
+def obter_maior_numero_fernando(pasta_base_local=None, pasta_raiz_id=ID_PASTA_PADRAO, token=None):
+    """Encontra o maior número FernandoXX já usado tanto no disco local quanto no Google Drive."""
+    numeros = set()
+    padrao = re.compile(r"Fernando(\d+)", re.IGNORECASE)
+
+    # 1. Local
+    pasta_local = pasta_base_local or config.PASTA_GOOGLE_DRIVE
+    if os.path.isdir(pasta_local):
+        for raiz, dirs, arqs in os.walk(pasta_local):
+            for d in dirs:
+                m = padrao.search(d)
+                if m:
+                    numeros.add(int(m.group(1)))
+            for a in arqs:
+                m = padrao.search(a)
+                if m:
+                    numeros.add(int(m.group(1)))
+
+    # 2. Google Drive
+    if not token:
+        token, _ = obter_token_acesso()
+    if token:
+        try:
+            arqs_drive = listar_todos_arquivos_drive("name contains 'Fernando'", token=token)
+            for item in arqs_drive:
+                m = padrao.search(item.get("name", ""))
+                if m:
+                    numeros.add(int(m.group(1)))
+        except Exception as e:
+            log.warning("Erro ao buscar números Fernando no Drive: %s", e)
+
+    return max(numeros) if numeros else 0
+
+
 def enviar_arquivo_drive(caminho_local, nome_arquivo, id_pasta_destino, token=None):
     """Envia um arquivo local para o Google Drive via Resumable Upload ou Multipart."""
     if not os.path.isfile(caminho_local):
@@ -730,3 +829,104 @@ def subir_cortes_locais_pendentes(pasta_id_raiz=None):
         "detalhes": detalhes,
         "mensagem": f"Sincronização concluída: {enviados} arquivos enviados para o Google Drive na nuvem.",
     }
+
+
+def baixar_arquivo_drive(id_arquivo, caminho_destino, token=None):
+    """Baixa um arquivo do Google Drive para o disco local usando alt=media."""
+    if not token:
+        token, _ = obter_token_acesso()
+        if not token:
+            return False, "Sem token de acesso ao Google Drive"
+
+    url = f"https://www.googleapis.com/drive/v3/files/{id_arquivo}?alt=media"
+    headers = {"Authorization": f"Bearer {token}"}
+    req = urllib.request.Request(url, headers=headers)
+
+    os.makedirs(os.path.dirname(os.path.abspath(caminho_destino)), exist_ok=True)
+    caminho_tmp = caminho_destino + ".tmp"
+
+    try:
+        with urllib.request.urlopen(req, timeout=300) as resp, open(caminho_tmp, "wb") as f_out:
+            while True:
+                chunk = resp.read(1024 * 1024)  # 1MB chunks
+                if not chunk:
+                    break
+                f_out.write(chunk)
+        if os.path.exists(caminho_destino):
+            os.remove(caminho_destino)
+        os.rename(caminho_tmp, caminho_destino)
+        sz = os.path.getsize(caminho_destino)
+        log.info("Arquivo baixado do Google Drive: %s (%d bytes)", caminho_destino, sz)
+        return True, None
+    except Exception as e:
+        if os.path.exists(caminho_tmp):
+            try:
+                os.remove(caminho_tmp)
+            except Exception:
+                pass
+        log.error("Erro ao baixar arquivo %s do Drive: %s", id_arquivo, e)
+        return False, str(e)
+
+
+def arquivo_existe_no_drive(nome_arquivo, id_pasta_pai, token=None):
+    """Verifica se um arquivo com o mesmo nome já existe dentro da pasta pai no Drive com tamanho > 0."""
+    if not token:
+        token, _ = obter_token_acesso()
+        if not token:
+            return False
+    query = f"'{id_pasta_pai}' in parents and name = '{nome_arquivo}' and trashed = false"
+    url = f"https://www.googleapis.com/drive/v3/files?q={urllib.parse.quote(query)}&fields=files(id,name,size)"
+    headers = {"Authorization": f"Bearer {token}"}
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            dados = json.loads(resp.read().decode("utf-8"))
+            files = dados.get("files", [])
+            for f in files:
+                sz = f.get("size")
+                if sz is None or int(sz) > 0:
+                    return True
+            return False
+    except Exception as e:
+        log.debug("Aviso ao checar existência de %s no Drive: %s", nome_arquivo, e)
+        return False
+
+
+def listar_videos_pasta_drive(id_pasta=ID_PASTA_PADRAO, token=None):
+    """Lista todos os arquivos de vídeo (.mp4, .mkv, .mov, etc.) presentes diretamente na pasta indicada do Drive."""
+    if not token:
+        token, _ = obter_token_acesso()
+        if not token:
+            return []
+    query = f"'{id_pasta}' in parents and (mimeType contains 'video/' or name contains '.mp4' or name contains '.mkv' or name contains '.mov') and trashed = false"
+    url = f"https://www.googleapis.com/drive/v3/files?q={urllib.parse.quote(query)}&fields=files(id,name,mimeType,size,createdTime)&pageSize=100"
+    headers = {"Authorization": f"Bearer {token}"}
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            dados = json.loads(resp.read().decode("utf-8"))
+            return dados.get("files", [])
+    except Exception as e:
+        log.warning("Erro ao listar vídeos da pasta %s no Drive: %s", id_pasta, e)
+        return []
+
+
+def listar_arquivos_subpasta(id_pasta, token=None):
+    """Lista todos os arquivos dentro de uma pasta do Drive."""
+    if not token:
+        token, _ = obter_token_acesso()
+        if not token:
+            return []
+    query = f"'{id_pasta}' in parents and trashed = false"
+    url = f"https://www.googleapis.com/drive/v3/files?q={urllib.parse.quote(query)}&fields=files(id,name,mimeType,size)&pageSize=100"
+    headers = {"Authorization": f"Bearer {token}"}
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            dados = json.loads(resp.read().decode("utf-8"))
+            return dados.get("files", [])
+    except Exception as e:
+        log.warning("Erro ao listar arquivos da pasta %s no Drive: %s", id_pasta, e)
+        return []
+
+

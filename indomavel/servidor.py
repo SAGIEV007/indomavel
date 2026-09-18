@@ -6,11 +6,12 @@ import os
 import re
 import subprocess
 import threading
+import time
 import urllib.parse
 
 from flask import Flask, jsonify, request, send_file, send_from_directory
 
-from . import acervo_local, config, cortador_automatico, google_drive, gravador_live, headlines, legenda, legendas, palavras, render, versao
+from . import acervo_local, config, cortador_automatico, cortador_drive, google_drive, gravador_live, headlines, legenda, legendas, palavras, render, versao
 from .automacao import Automacao
 from .chub import Chub, ChubErro
 from .gemini import GeminiErro
@@ -28,6 +29,7 @@ chub = Chub()
 links = FilaDeLinks()
 sincronizador = SincronizadorPlaylist(fila_links=links)
 sincronizador.iniciar()
+cortador_drive.vigilante_drive.iniciar()
 
 
 def frases_do_video(youtube_id):
@@ -576,6 +578,114 @@ def subir_cortes_locais():
     pasta_id = request.args.get("pasta_id") or (cfg.get("drive") or {}).get("pasta_id")
     res = google_drive.subir_cortes_locais_pendentes(pasta_id_raiz=pasta_id)
     return jsonify(res)
+
+
+@app.get("/api/drive/debug/listar-raiz")
+def drive_debug_listar_raiz():
+    pasta_id = request.args.get("pasta_id") or google_drive.obter_pasta_id_ativa()
+    token, err = google_drive.obter_token_acesso()
+    itens = google_drive.listar_arquivos_subpasta(pasta_id, token=token)
+    return jsonify({"ok": True, "pasta_id": pasta_id, "total": len(itens), "itens": itens})
+
+
+@app.get("/api/drive/debug/info-pasta/<pasta_id>")
+def drive_debug_info_pasta(pasta_id):
+    token, err = google_drive.obter_token_acesso()
+    url = f"https://www.googleapis.com/drive/v3/files/{pasta_id}?fields=id,name,parents,mimeType"
+    req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}"})
+    with urllib.request.urlopen(req, timeout=10) as resp:
+        return jsonify(json.loads(resp.read().decode("utf-8")))
+
+
+@app.get("/api/drive/debug/videos-recentes")
+def drive_debug_videos_recentes():
+    token, err = google_drive.obter_token_acesso()
+    if not token:
+        return jsonify({"ok": False, "erro": err})
+    query = "(mimeType contains 'video/' or name contains '.mp4' or name contains '.mkv' or name contains '.mov' or name contains '.ts') and trashed = false"
+    url = f"https://www.googleapis.com/drive/v3/files?q={urllib.parse.quote(query)}&fields=files(id,name,mimeType,size,parents,createdTime,modifiedTime)&pageSize=30&orderBy=createdTime%20desc"
+    req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}"})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            dados = json.loads(resp.read().decode("utf-8"))
+            return jsonify({"ok": True, "videos": dados.get("files", [])})
+    except Exception as e:
+        return jsonify({"ok": False, "erro": str(e)})
+
+
+@app.get("/api/drive/debug/diagnostico-scanner")
+def drive_debug_diagnostico_scanner():
+    import traceback
+    try:
+        from . import cortador_drive
+        token, err = google_drive.obter_token_acesso()
+        pasta_destino = cortador_drive.PASTA_DESTINO_CORTES_PADRAO
+        pasta_fonte = cortador_drive.PASTA_FONTE_LIVES_PADRAO
+        itens_fonte = google_drive.listar_arquivos_subpasta(pasta_fonte, token=token)
+        amostras = []
+        for f in itens_fonte:
+            sub_arqs = google_drive.listar_arquivos_subpasta(f["id"], token=token)
+            for a in sub_arqs[:3]:
+                base = os.path.splitext(a["name"])[0]
+                tit = cortador_drive.sanitizar_nome_video(f"{f['name']} - {base}")
+                existe = cortador_drive._ja_possui_cortes_no_drive(tit, pasta_destino, token)
+                amostras.append({"pasta": f["name"], "arquivo": a["name"], "titulo": tit, "ja_existe": existe})
+        return jsonify({"ok": True, "total_subpastas": len(itens_fonte), "amostras": amostras})
+    except Exception as e:
+        return jsonify({"ok": False, "erro": str(e), "trace": traceback.format_exc()})
+
+
+@app.get("/api/drive/escanear")
+def drive_escanear_videos():
+    import traceback
+    try:
+        t0 = time.time()
+        pendentes = cortador_drive.escanear_videos_pendentes_drive()
+        t1 = time.time()
+        return jsonify({"ok": True, "duracao_s": round(t1 - t0, 2), "pendentes": pendentes, "total": len(pendentes)})
+    except Exception as e:
+        return jsonify({"ok": False, "erro": str(e), "trace": traceback.format_exc()})
+
+
+@app.get("/api/drive/vigilante/status")
+def drive_vigilante_status():
+    return jsonify(cortador_drive.vigilante_drive.status())
+
+
+@app.post("/api/drive/vigilante/iniciar")
+def drive_vigilante_iniciar():
+    cortador_drive.vigilante_drive.iniciar()
+    return jsonify({"ok": True, "status": cortador_drive.vigilante_drive.status()})
+
+
+@app.post("/api/drive/vigilante/parar")
+def drive_vigilante_parar():
+    cortador_drive.vigilante_drive.parar()
+    return jsonify({"ok": True, "status": cortador_drive.vigilante_drive.status()})
+
+
+@app.post("/api/drive/processar-agora")
+def drive_processar_agora():
+    threading.Thread(target=cortador_drive.vigilante_drive.executar_uma_vez, daemon=True).start()
+    return jsonify({"ok": True, "mensagem": "Processamento imediato dos vídeos do Drive iniciado em background."})
+
+
+@app.get("/api/drive/historico")
+def drive_historico_processados():
+    caminho = os.path.join(config.PASTA_DADOS, "automacao", "drive_processados.json")
+    if os.path.isfile(caminho):
+        try:
+            with open(caminho, "r", encoding="utf-8") as f:
+                return jsonify({"ok": True, "historico": json.load(f)})
+        except Exception:
+            pass
+    return jsonify({"ok": True, "historico": {}})
+
+
+@app.post("/api/automacao/cortes/desativar-youtube")
+def desativar_modo_youtube():
+    cortador_automatico.definir_modo_automatico(False)
+    return jsonify({"ok": True, "modo_automatico": False, "mensagem": "Modo automático do YouTube desativado."})
 
 
 @app.post("/api/cortes/<youtube_id>/disparar")

@@ -13,6 +13,14 @@ if "--porta" in sys.argv:
     os.environ["PORTA"] = sys.argv[sys.argv.index("--porta") + 1]
 
 
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%H:%M:%S",
+)
+
 from indomavel.servidor import main  # noqa: E402
 
 main()

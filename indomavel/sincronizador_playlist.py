@@ -135,6 +135,10 @@ class SincronizadorPlaylist:
                 time.sleep(1)
 
     def _executar_sincronizacao(self):
+        from . import cortador_automatico
+        if not cortador_automatico.obter_modo_automatico():
+            return
+
         with self._trava:
             if self._sincronizando:
                 return
