@@ -615,9 +615,17 @@ class GerenciadorGravacaoLive:
                 raise RuntimeError("Informe a URL ou canal da transmissão ao vivo.")
 
             info = obter_informacoes_live(url_alvo)
-            youtube_id = info.get("youtube_id") or extrair_id(url_alvo)
+            raw_yt_id = info.get("youtube_id") or extrair_id(url_alvo)
+            if raw_yt_id and len(raw_yt_id) == 11 and re.match(r"^[A-Za-z0-9_-]{11}$", raw_yt_id):
+                youtube_id = raw_yt_id
+            elif info.get("url_video") and re.search(r"/id/([A-Za-z0-9_-]{11})", str(info.get("url_video"))):
+                youtube_id = re.search(r"/id/([A-Za-z0-9_-]{11})", str(info.get("url_video"))).group(1)
+            else:
+                youtube_id = re.sub(r"[^A-Za-z0-9_-]", "_", raw_yt_id or "live")[:32]
+
             titulo = info.get("titulo") or f"Live {youtube_id}"
             self._stream_title = titulo
+            self._url_monitorada = url_alvo
 
             # Trava de Segurança Multi-Notebook: Apenas o LÍDER pode gravar
             if not cluster.evaluate_leadership(titulo):

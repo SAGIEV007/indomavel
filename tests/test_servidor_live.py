@@ -79,6 +79,26 @@ class TestServidorLive(unittest.TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertTrue(resp.get_json()["ok"])
 
+    def test_checar_live_endpoint(self):
+        with patch.object(gravador_live, "resolve_youtube_stream_info", return_value=(True, "9XJfP7qObF8", "Live Teste", "https://hls.test/m3u8")), \
+             patch.object(gravador_live.gravador, "obter_status", return_value={"ok": True, "online": True}):
+            resp = self.cliente.post("/api/live/checar", json={"url": "https://www.youtube.com/@PartidoMissao"})
+            self.assertEqual(resp.status_code, 200)
+            dados = resp.get_json()
+            self.assertTrue(dados["ok"])
+            self.assertTrue(dados["online"])
+            self.assertEqual(dados["youtube_id"], "9XJfP7qObF8")
+            self.assertEqual(dados["titulo"], "Live Teste")
+
+    def test_novo_link_com_canal_resolve_id_de_live(self):
+        with patch("indomavel.gravador_live.resolve_youtube_stream_info", return_value=(True, "9XJfP7qObF8", "Live Teste", "https://hls.test/m3u8")), \
+             patch.object(servidor.links, "adicionar", return_value=True), \
+             patch.object(servidor.chub, "video", return_value=None):
+            resp = self.cliente.post("/api/links", json={"link": "https://www.youtube.com/@PartidoMissao"})
+            self.assertEqual(resp.status_code, 202)
+            dados = resp.get_json()
+            self.assertEqual(dados["youtube_id"], "9XJfP7qObF8")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -321,7 +321,13 @@ function desenharOrigemLives(partes) {
     li.appendChild(corpo);
     li.addEventListener("click", () => {
       if (parte.youtube_id && parte.youtube_id.length === 11) {
-        abrirVideo(parte.youtube_id);
+        abrirVideo({
+          youtube_id: parte.youtube_id,
+          titulo: `${parte.sessao_titulo || "Live"} · Bloco ${parte.numero_parte}`,
+          duracao_s: parte.duracao_s || 0,
+          origem: "local",
+          caminho_video: parte.caminho_video
+        });
       } else {
         trocarAbaPainel("live");
       }
@@ -613,6 +619,14 @@ async function enviarLink(link, refazer) {
 // ---------- abrir vídeo e selecionar bloco ----------
 
 async function abrirVideo(video) {
+  if (typeof video === "string") {
+    video = {
+      youtube_id: video,
+      titulo: `Vídeo ${video}`,
+      duracao_s: 0,
+      origem: "local",
+    };
+  }
   estado.video = video;
   estado.bloco = null;
   estado.blocos = [];
@@ -2878,6 +2892,10 @@ function atualizarUiLive(dados) {
     }
   }
 
+  if (estado.origemLista === "lives") {
+    desenharOrigemLives(partes);
+  }
+
   // 8. Terminal de logs
   renderizarLogsTerminal(logs);
 }
@@ -3498,8 +3516,13 @@ function vincular() {
         url = (ultimoStatusLive.url || "").trim();
       }
       if (!url) {
-        avisar("Informe o link ou canal da transmissão ao vivo.", "atencao");
-        return;
+        try {
+          const st = await api("/api/live/status");
+          if (st && st.url) url = st.url.trim();
+        } catch (_) {}
+      }
+      if (!url) {
+        url = "https://www.youtube.com/@PartidoMissao/live";
       }
       const playlist_id = ($("live-playlist") ? $("live-playlist").value : "").trim();
       const dvr = $("live-dvr") ? $("live-dvr").checked : true;
@@ -3510,7 +3533,7 @@ function vincular() {
       btnIniciarLive.disabled = true;
       try {
         await postar("/api/live/iniciar", { url, playlist_id, dvr, duracao_chunk_s, qualidade, auto_cortar });
-        avisar("Gravação iniciada com sucesso! Pipeline ativo.");
+        avisar("Gravação iniciada com sucesso! Pipeline ativo.", "ok");
         carregarLiveStatus();
       } catch (err) {
         avisar("Erro ao iniciar gravação: " + err.message, "erro");
@@ -3570,6 +3593,9 @@ function vincular() {
 
         const res = await postar("/api/live/config", payload);
         avisar("Configurações do Gravador 24/7 salvas com sucesso!", "ok");
+        if ($("live-url")) {
+          delete $("live-url").dataset.modificado;
+        }
         if (res && res.status) atualizarUiLive(res.status);
       } catch (err) {
         avisar("Erro ao salvar configurações: " + err.message, "erro");
@@ -3595,8 +3621,15 @@ function vincular() {
     btnForcarChecagemLive.addEventListener("click", async () => {
       btnForcarChecagemLive.disabled = true;
       try {
-        avisar("Checando status no YouTube...");
-        await carregarLiveStatus();
+        const url = ($("live-url") ? $("live-url").value : "").trim();
+        avisar("Checando status ao vivo no YouTube...", "ok");
+        const res = await postar("/api/live/checar", { url });
+        if (res && res.online) {
+          avisar(`🟢 Canal AO VIVO: "${res.titulo || "Transmissão ativa"}"!`, "ok");
+        } else {
+          avisar("⚪ Canal está offline no momento.", "atencao");
+        }
+        if (res && res.status) atualizarUiLive(res.status);
       } catch (err) {
         avisar("Erro ao checar status: " + err.message, "erro");
       } finally {

@@ -163,6 +163,23 @@ class TestGravadorLive(unittest.TestCase):
             "https://www.youtube.com/watch?v=9XJfP7qObF8"
         )
 
+    def test_iniciar_gravacao_normaliza_e_sincroniza_url(self):
+        with patch.object(self.gerenciador, "_iniciar_processos_pipeline") as mock_pipeline, \
+             patch.object(gravador_live.cluster, "evaluate_leadership", return_value=True), \
+             patch.object(gravador_live, "obter_informacoes_live", return_value={
+                 "youtube_id": "9XJfP7qObF8",
+                 "titulo": "Live Partido Missão",
+                 "is_live": True,
+                 "url_video": "https://hls.test/manifest.m3u8",
+                 "url_audio": None
+             }):
+            res = self.gerenciador.iniciar_gravacao(url_ou_id="https://www.youtube.com/@PartidoMissao")
+            self.assertEqual(res["youtube_id"], "9XJfP7qObF8")
+            self.assertEqual(self.gerenciador._url_monitorada, "https://www.youtube.com/@PartidoMissao/live")
+            mock_pipeline.assert_called_once()
+            # Limpar sessão ativa
+            self.gerenciador.parar_gravacao(res["sessao_id"])
+
 
 if __name__ == "__main__":
     unittest.main()

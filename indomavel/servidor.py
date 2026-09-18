@@ -210,7 +210,20 @@ def transcricao(youtube_id):
 @app.post("/api/links")
 def novo_link():
     dados = request.get_json(silent=True) or {}
-    youtube_id = legendas.id_do_link(str(dados.get("link", "")))
+    link_str = str(dados.get("link", "")).strip()
+    youtube_id = legendas.id_do_link(link_str)
+    if not youtube_id and link_str:
+        try:
+            from indomavel.gravador_live import resolve_youtube_stream_info, extrair_id
+            extracted = extrair_id(link_str)
+            if len(extracted) == 11 and re.match(r"^[A-Za-z0-9_-]{11}$", extracted):
+                youtube_id = extracted
+            else:
+                _, vid_id, _, _ = resolve_youtube_stream_info(link_str, timeout=10)
+                if vid_id and len(vid_id) == 11 and re.match(r"^[A-Za-z0-9_-]{11}$", vid_id):
+                    youtube_id = vid_id
+        except Exception:
+            pass
     if not youtube_id:
         return _erro("não reconheci um link do YouTube", 400)
     refazer = bool(dados.get("refazer"))
@@ -995,6 +1008,23 @@ def live_config():
         monitor_ativo=dados.get("monitor_ativo"),
     )
     return jsonify({"ok": True, "status": gravador_live.gravador.obter_status()})
+
+
+@app.post("/api/live/checar")
+def live_checar():
+    dados = request.get_json(force=True, silent=True) or {}
+    url = str(dados.get("url", "")).strip() or (gravador_live.gravador._url_monitorada or "").strip()
+    online, vid_id, titulo, hls_url = gravador_live.resolve_youtube_stream_info(url, timeout=15)
+    gravador_live.gravador._is_live_online = online
+    if titulo and titulo != "Live Stream":
+        gravador_live.gravador._stream_title = titulo
+    return jsonify({
+        "ok": True,
+        "online": online,
+        "youtube_id": vid_id,
+        "titulo": titulo,
+        "status": gravador_live.gravador.obter_status()
+    })
 
 
 @app.get("/api/live/logs")
