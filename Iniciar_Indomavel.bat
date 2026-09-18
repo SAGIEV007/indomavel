@@ -43,11 +43,13 @@ findstr /c:"%VERSAO%" "%RESPOSTA%" >nul
 if not errorlevel 1 goto abrir
 echo Tem um Indomavel de outra versao aberto na porta %PORTA%. Reiniciando com a versao atual...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-NetTCPConnection -LocalPort %PORTA% -State Listen -ErrorAction SilentlyContinue | ForEach-Object { $p = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $_.OwningProcess); if ($p.CommandLine -match 'rodar.py') { Stop-Process -Id $_.OwningProcess -Force } }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"
 ping -n 3 127.0.0.1 >nul
 curl.exe -s -f -o nul "%URL%/api/vivo"
 if not errorlevel 1 goto porta_ocupada
 
 :iniciar
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"
 echo Iniciando o servidor em %URL% ...
 start "Indomavel - servidor" /min "%PY%" rodar.py
 set /a TENTATIVA=0

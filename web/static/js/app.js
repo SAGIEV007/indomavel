@@ -2349,65 +2349,249 @@ function formatarMinutos(segundos) {
 function formatarEstadoLive(est) {
   const mapa = {
     gravando: "🔴 Gravando",
-    gravado: "💾 Gravado",
+    gravado: "💾 Salvo",
     analisando_ia: "🧠 Analisando IA",
     pronto_upload: "📤 Pronto p/ Upload",
-    enviando: "🚀 Enviando",
-    enviado: "✅ Enviado",
+    enviando: "🚀 Enviando Drive",
+    enviado: "✅ Enviado Drive",
     erro: "⚠️ Erro",
+    interrompido: "⏹ Interrompido",
   };
   return mapa[est] || est;
+}
+
+function escaparHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function renderizarLogsTerminal(logs) {
+  const terminal = $("live-terminal-logs");
+  if (!terminal) return;
+  if (!logs || !logs.length) {
+    terminal.innerHTML = '<span style="color: #666;">Nenhum log registrado ainda.</span>';
+    return;
+  }
+  const estavaNoFim = terminal.scrollHeight - terminal.scrollTop <= terminal.clientHeight + 40;
+  terminal.innerHTML = logs.map((l) => {
+    const nivel = (l.level || "INFO").toUpperCase();
+    let corNivel = "#2ed573";
+    if (nivel === "WARNING" || nivel === "WARN") corNivel = "#ffa502";
+    else if (nivel === "ERROR" || nivel === "CRITICAL") corNivel = "#ff4757";
+    return `<div style="line-height: 1.4; font-family: monospace; font-size: 11px; margin-bottom: 2px;">` +
+      `<span style="color: #70a1ff;">[${escaparHtml(l.timestamp || "")}]</span> ` +
+      `<span style="color: ${corNivel}; font-weight: 700;">[${escaparHtml(nivel)}]</span> ` +
+      `<span style="color: #f1f2f6;">${escaparHtml(l.message || "")}</span>` +
+      `</div>`;
+  }).join("");
+  if (estavaNoFim) {
+    terminal.scrollTop = terminal.scrollHeight;
+  }
 }
 
 function atualizarUiLive(dados) {
   if (!dados) return;
   const gravando = Boolean(dados.gravando);
+  const monitorAtivo = Boolean(dados.monitor_ativo);
+  const online = Boolean(dados.online);
   const sessao = dados.sessao_ativa;
   const partes = dados.partes || [];
+  const logs = dados.logs || [];
+  const duracaoTotal = dados.duracao_total_s || 0;
+  const blocoSegundos = dados.bloco_atual_segundos || 0;
+  const blocoNumero = dados.bloco_atual_numero || 0;
+  const driveConectado = Boolean(dados.drive_conectado);
 
-  // Top header badge
-  const badgeHeader = $("badge-live-rec");
-  if (badgeHeader) {
-    badgeHeader.hidden = !gravando;
-    if (gravando && sessao) {
-      const decorrido = Math.floor(Date.now() / 1000) - (sessao.criado_em || Math.floor(Date.now() / 1000));
-      $("texto-badge-live").textContent = `GRAVANDO LIVE (${formatarTempoS(decorrido)})`;
+  // 1. Single Master Status Pill in Header
+  const pillMaster = $("pill-status-master");
+  const txtMaster = $("texto-status-master");
+  const pontoMaster = $("ponto-status-master");
+  const isLeader = dados.is_leader !== false;
+  const clusterRole = dados.cluster_role || (isLeader ? "LEADER" : "STANDBY");
+  const leaderHost = (dados.cluster && dados.cluster.leader_hostname) ? dados.cluster.leader_hostname : "Outro PC";
+
+  if (pillMaster && txtMaster && pontoMaster) {
+    if (gravando) {
+      txtMaster.textContent = `🔴 GRAVANDO (${formatarTempoS(duracaoTotal)})`;
+      pillMaster.className = "chip chip-status-master chip-status-gravando";
+      pontoMaster.style.background = "#ff3b30";
+      pontoMaster.style.boxShadow = "0 0 8px #ff3b30";
+    } else if (online) {
+      txtMaster.textContent = "🟢 AO VIVO NO YOUTUBE";
+      pillMaster.className = "chip chip-status-master chip-status-vigiando";
+      pontoMaster.style.background = "#2ed573";
+      pontoMaster.style.boxShadow = "0 0 8px #2ed573";
+    } else if (clusterRole === "STANDBY" && !isLeader) {
+      txtMaster.textContent = `🛡️ STANDBY (LÍDER: ${leaderHost})`;
+      pillMaster.className = "chip chip-status-master chip-status-cluster-standby";
+      pontoMaster.style.background = "#3fb950";
+      pontoMaster.style.boxShadow = "0 0 6px #3fb950";
+    } else if (monitorAtivo) {
+      txtMaster.textContent = "🟡 VIGIANDO CANAL 24/7";
+      pillMaster.className = "chip chip-status-master chip-status-vigiando";
+      pontoMaster.style.background = "#ffa502";
+      pontoMaster.style.boxShadow = "0 0 6px #ffa502";
+    } else {
+      txtMaster.textContent = "⚪ STANDBY (PRONTO)";
+      pillMaster.className = "chip chip-status-master chip-status-standby";
+      pontoMaster.style.background = "#8b949e";
+      pontoMaster.style.boxShadow = "none";
     }
   }
 
-  // Live panel counter badge
+  // Multi-notebook protection banner
+  const boxCluster = $("box-cluster-aviso");
+  const clusterLiderNome = $("cluster-lider-nome");
+  const clusterRoleCard = $("live-cluster-role");
+  if (clusterRoleCard) {
+    clusterRoleCard.textContent = clusterRole;
+    clusterRoleCard.style.color = (clusterRole === "LEADER" || isLeader) ? "var(--ok, #2ed573)" : "#ffa502";
+  }
+
+  if (boxCluster) {
+    if (clusterRole === "STANDBY" && !isLeader) {
+      boxCluster.style.display = "block";
+      if (clusterLiderNome) clusterLiderNome.textContent = leaderHost;
+    } else {
+      boxCluster.style.display = "none";
+    }
+  }
+
+  // Toggle button for 24/7 monitor
+  const btnToggleMonitor = $("btn-toggle-monitor-247");
+  if (btnToggleMonitor) {
+    if (monitorAtivo) {
+      btnToggleMonitor.textContent = "⏸ Pausar Monitoramento 24/7";
+      btnToggleMonitor.className = "botao-sec largo";
+    } else {
+      btnToggleMonitor.textContent = "▶ Ativar Monitoramento 24/7";
+      btnToggleMonitor.className = "botao-pri largo";
+    }
+  }
+
+  // 2. Tab Badge
   const contadorAba = $("contador-live");
   if (contadorAba) {
-    contadorAba.textContent = gravando ? "●" : (partes.length ? `(${partes.length})` : "");
-    contadorAba.style.color = gravando ? "#ff4757" : "";
-  }
-
-  // Panel buttons and badges
-  const badgePainel = $("live-badge-status");
-  const btnIniciar = $("btn-iniciar-live");
-  const btnParar = $("btn-parar-live");
-  const cardMonitor = $("live-card-monitor");
-
-  if (badgePainel) {
-    badgePainel.textContent = gravando ? "GRAVANDO AO VIVO" : (sessao ? "FINALIZADO" : "PRONTO");
-    badgePainel.className = "chip " + (gravando ? "chip-gravando-live" : "chip-sucesso");
-  }
-
-  if (btnIniciar) btnIniciar.hidden = gravando;
-  if (btnParar) btnParar.hidden = !gravando;
-
-  if (cardMonitor) {
-    cardMonitor.hidden = !sessao && !gravando;
-    if (sessao) {
-      $("live-monitor-titulo").textContent = sessao.titulo || sessao.youtube_id;
-      const decorrido = (gravando ? Math.floor(Date.now() / 1000) : (sessao.atualizado_em || Math.floor(Date.now() / 1000))) - (sessao.criado_em || Math.floor(Date.now() / 1000));
-      $("live-tempo-decorrido").textContent = formatarTempoS(Math.max(0, decorrido));
-      $("live-bloco-atual").textContent = `Parte ${(partes.length + 1)}`;
-      $("live-pasta-info").textContent = `📁 ${sessao.pasta_destino}`;
+    if (gravando) {
+      contadorAba.textContent = "●";
+      contadorAba.style.color = "#ff3b30";
+    } else if (online) {
+      contadorAba.textContent = "●";
+      contadorAba.style.color = "#2ed573";
+    } else {
+      contadorAba.textContent = partes.length ? `(${partes.length})` : "";
+      contadorAba.style.color = "";
     }
   }
 
-  // Render partes
+  // 3. Painel - Badge de status e ponto indicador
+  const badgePainel = $("live-badge-status");
+  if (badgePainel) {
+    if (gravando) {
+      badgePainel.textContent = "🔴 GRAVANDO AO VIVO";
+      badgePainel.className = "chip chip-gravando-live";
+    } else if (online) {
+      badgePainel.textContent = "🟢 AO VIVO DETECTADO";
+      badgePainel.className = "chip chip-sucesso";
+    } else if (monitorAtivo) {
+      badgePainel.textContent = "📡 MONITOR 24/7 ATIVO";
+      badgePainel.className = "chip chip-monitorando-live";
+    } else {
+      badgePainel.textContent = "STANDBY / PARADO";
+      badgePainel.className = "chip chip-carregando";
+    }
+  }
+
+  const pontoStatus = $("live-ponto-status");
+  const onlineTexto = $("live-online-texto");
+  if (pontoStatus && onlineTexto) {
+    if (gravando) {
+      pontoStatus.style.background = "#ff3b30";
+      pontoStatus.style.boxShadow = "0 0 8px #ff3b30";
+      onlineTexto.textContent = "🔴 Transmissão ao vivo em gravação contínua (-c copy) e fatiamento";
+      onlineTexto.style.color = "#ff4d4d";
+    } else if (online) {
+      pontoStatus.style.background = "#2ed573";
+      pontoStatus.style.boxShadow = "0 0 8px #2ed573";
+      onlineTexto.textContent = "🟢 Canal está AO VIVO no YouTube! Gravação iniciando...";
+      onlineTexto.style.color = "#2ed573";
+    } else if (monitorAtivo) {
+      pontoStatus.style.background = "#ffa502";
+      pontoStatus.style.boxShadow = "0 0 6px #ffa502";
+      onlineTexto.textContent = "🟡 Canal offline. Monitor contínuo ativo (checando a cada 20s)";
+      onlineTexto.style.color = "var(--texto-sec, #aaa)";
+    } else {
+      pontoStatus.style.background = "#747d8c";
+      pontoStatus.style.boxShadow = "none";
+      onlineTexto.textContent = "⚪ Monitor pausado. Inicie manualmente ou salve as configurações.";
+      onlineTexto.style.color = "var(--texto-sec, #888)";
+    }
+  }
+
+  const titMonitor = $("live-monitor-titulo");
+  if (titMonitor) {
+    titMonitor.textContent = (sessao && sessao.titulo) || dados.titulo || (dados.url ? `Alvo: ${dados.url}` : "Canal: @PartidoMissao");
+  }
+
+  // 4. Cartões de Telemetria
+  const elTempoDecorrido = $("live-tempo-decorrido");
+  if (elTempoDecorrido) elTempoDecorrido.textContent = formatarTempoS(duracaoTotal);
+
+  const elBlocoAtual = $("live-bloco-atual");
+  if (elBlocoAtual) {
+    elBlocoAtual.textContent = gravando ? `Bloco #${blocoNumero || 1}` : (partes.length ? `Total: ${partes.length}` : "Aguardando");
+    elBlocoAtual.style.color = gravando ? "#ff3b30" : "var(--texto, #f1f2f6)";
+  }
+
+  const elTempoBloco = $("live-tempo-bloco");
+  if (elTempoBloco) elTempoBloco.textContent = formatarTempoS(blocoSegundos);
+
+  const elDriveInfo = $("live-drive-info");
+  if (elDriveInfo) {
+    elDriveInfo.textContent = driveConectado ? "☁️ Conectado" : "⚠️ Desconectado";
+    elDriveInfo.style.color = driveConectado ? "var(--ok, #2ed573)" : "#ff4757";
+  }
+
+  const elPastaInfo = $("live-pasta-info");
+  if (elPastaInfo) {
+    elPastaInfo.textContent = `📁 ${sessao && sessao.pasta_destino ? sessao.pasta_destino : "C:\\indomavel\\dados\\lives"}`;
+  }
+
+  // 5. Botões principais
+  const btnIniciar = $("btn-iniciar-live");
+  const btnCortarAgora = $("btn-cortar-agora");
+  const btnParar = $("btn-parar-live");
+
+  if (btnIniciar) btnIniciar.hidden = gravando;
+  if (btnCortarAgora) btnCortarAgora.hidden = !gravando;
+  if (btnParar) btnParar.hidden = !gravando;
+
+  // 6. Sincronização dos campos do formulário (sem atropelar o usuário digitando)
+  if ($("live-url") && !$("live-url").dataset.modificado && dados.url && document.activeElement !== $("live-url")) {
+    $("live-url").value = dados.url;
+  }
+  if ($("live-duracao") && dados.duracao_chunk_s && document.activeElement !== $("live-duracao")) {
+    $("live-duracao").value = String(dados.duracao_chunk_s);
+  }
+  if ($("live-qualidade") && dados.qualidade && document.activeElement !== $("live-qualidade")) {
+    $("live-qualidade").value = dados.qualidade;
+  }
+  if ($("live-auto-cortar") && dados.auto_cortar !== undefined && document.activeElement !== $("live-auto-cortar")) {
+    $("live-auto-cortar").checked = Boolean(dados.auto_cortar);
+  }
+  if ($("live-monitor-auto") && dados.monitor_ativo !== undefined && document.activeElement !== $("live-monitor-auto")) {
+    $("live-monitor-auto").checked = Boolean(dados.monitor_ativo);
+  }
+  if ($("live-dvr") && dados.dvr !== undefined && document.activeElement !== $("live-dvr")) {
+    $("live-dvr").checked = Boolean(dados.dvr);
+  }
+
+  // 7. Lista de Partes com badges de Drive e Cortes IA
   const listaPartes = $("live-lista-partes");
   const contadorPartes = $("live-contador-partes");
   if (contadorPartes) contadorPartes.textContent = partes.length;
@@ -2415,84 +2599,162 @@ function atualizarUiLive(dados) {
   if (listaPartes) {
     if (!partes.length) {
       listaPartes.innerHTML = '<li class="vazio-lista">Nenhuma parte gravada nesta sessão ainda.</li>';
-      return;
+    } else {
+      listaPartes.innerHTML = "";
+      partes.forEach((parte) => {
+        const li = el("li", "live-parte-item");
+
+        // Topo da parte com título e badges
+        const topo = el("div", "live-parte-topo");
+        topo.style.display = "flex";
+        topo.style.justifyContent = "space-between";
+        topo.style.alignItems = "center";
+        topo.style.gap = "8px";
+        topo.style.flexWrap = "wrap";
+
+        const tit = el("strong", "live-parte-titulo", `Parte ${parte.numero_parte} (${((parte.tamanho_bytes || 0) / (1024 * 1024)).toFixed(1)} MB)`);
+        topo.appendChild(tit);
+
+        const badgesBox = el("div", "live-badges-container");
+        badgesBox.style.display = "flex";
+        badgesBox.style.gap = "6px";
+        badgesBox.style.flexWrap = "wrap";
+
+        // Badge Drive
+        const dStatus = parte.drive_status || "pendente";
+        let dClass = "mini-badge";
+        let dTexto = "☁️ Drive: Pendente";
+        if (dStatus === "enviado") {
+          dClass = "mini-badge ok";
+          dTexto = "☁️ Drive: OK";
+        } else if (dStatus === "enviando") {
+          dClass = "mini-badge proc";
+          dTexto = "☁️ Drive: Enviando...";
+        } else if (dStatus === "erro") {
+          dClass = "mini-badge erro";
+          dTexto = "☁️ Drive: Erro";
+        }
+        const bDrive = el("span", dClass, dTexto);
+        badgesBox.appendChild(bDrive);
+
+        // Badge Cortes IA
+        const cStatus = parte.cortes_status || "pendente";
+        let cClass = "mini-badge";
+        let cTexto = "✂️ Cortes: Pendente";
+        if (cStatus === "concluido") {
+          cClass = "mini-badge ok";
+          cTexto = `✂️ Cortes: ${parte.cortes_total || 0} cortes (3 mod.)`;
+        } else if (cStatus === "processando") {
+          cClass = "mini-badge proc";
+          cTexto = "✂️ Cortes: IA processando...";
+        } else if (cStatus === "erro") {
+          cClass = "mini-badge erro";
+          cTexto = "✂️ Cortes: Falhou";
+        }
+        const bCortes = el("span", cClass, cTexto);
+        badgesBox.appendChild(bCortes);
+
+        topo.appendChild(badgesBox);
+        li.appendChild(topo);
+
+        // Subtítulo com tempos e arquivo
+        const sub = el("div", "dica");
+        sub.style.fontSize = "11px";
+        sub.style.margin = "4px 0 6px 0";
+        sub.textContent = `⏱ ${formatarMinutos(parte.inicio_s)} - ${formatarMinutos(parte.fim_s)}  |  📄 ${parte.nome_arquivo}`;
+        li.appendChild(sub);
+
+        if (parte.erro_mensagem) {
+          const erroBox = el("div", "dica", `⚠️ ${parte.erro_mensagem}`);
+          erroBox.style.color = "#ff6b6b";
+          li.appendChild(erroBox);
+        }
+
+        // Detalhes expansíveis (Capítulos e Resumo)
+        if (parte.resumo || parte.capitulos) {
+          const detalhes = el("div", "live-detalhes-bloco");
+          if (parte.capitulos) {
+            const detCap = el("details", "");
+            const sumCap = el("summary", "", "⏱ Capítulos do YouTube");
+            const preCap = el("pre", "", parte.capitulos);
+            detCap.appendChild(sumCap);
+            detCap.appendChild(preCap);
+            detalhes.appendChild(detCap);
+          }
+          if (parte.resumo) {
+            const detRes = el("details", "");
+            const sumRes = el("summary", "", "📋 Resumo IA");
+            const pRes = el("p", "dica", parte.resumo);
+            pRes.style.color = "#eee";
+            detRes.appendChild(sumRes);
+            detRes.appendChild(pRes);
+            detalhes.appendChild(detRes);
+          }
+          li.appendChild(detalhes);
+        }
+
+        // Ações do bloco
+        const acoes = el("div", "dock-item-acoes");
+        acoes.style.display = "flex";
+        acoes.style.gap = "6px";
+        acoes.style.flexWrap = "wrap";
+        acoes.style.marginTop = "6px";
+
+        const btnAbrir = el("button", "botao-sec pequeno", "📁 Abrir Vídeo");
+        btnAbrir.type = "button";
+        btnAbrir.addEventListener("click", () => {
+          api(`/api/live/partes/${parte.id}/abrir`, { method: "POST" }).catch((err) => avisar(err.message, "erro"));
+        });
+        acoes.appendChild(btnAbrir);
+
+        const btnCortarParte = el("button", "botao-alerta pequeno", "✂️ Gerar Cortes Agora");
+        btnCortarParte.type = "button";
+        btnCortarParte.title = "Dispara a transcrição Whisper + Gemini para gerar as 3 modalidades no Google Drive";
+        btnCortarParte.addEventListener("click", async () => {
+          btnCortarParte.disabled = true;
+          try {
+            avisar(`Disparando esteira de cortes para a Parte ${parte.numero_parte}...`);
+            await api(`/api/live/partes/${parte.id}/cortar`, { method: "POST" });
+            avisar(`Cortes da Parte ${parte.numero_parte} iniciados com sucesso!`, "ok");
+            carregarLiveStatus();
+          } catch (err) {
+            avisar(err.message, "erro");
+          } finally {
+            btnCortarParte.disabled = false;
+          }
+        });
+        acoes.appendChild(btnCortarParte);
+
+        if (parte.drive_url) {
+          const linkDrive = el("a", "botao-sec pequeno", "☁️ Ver no Drive ↗");
+          linkDrive.href = parte.drive_url;
+          linkDrive.target = "_blank";
+          linkDrive.rel = "noopener";
+          acoes.appendChild(linkDrive);
+        }
+
+        const btnReprocessar = el("button", "botao-sec pequeno", "🔄 Reprocessar");
+        btnReprocessar.type = "button";
+        btnReprocessar.title = "Reprocessa áudio e resumo";
+        btnReprocessar.addEventListener("click", async () => {
+          try {
+            await api(`/api/live/partes/${parte.id}/reprocessar`, { method: "POST" });
+            avisar(`Reprocessando Parte ${parte.numero_parte}...`);
+            carregarLiveStatus();
+          } catch (err) {
+            avisar(err.message, "erro");
+          }
+        });
+        acoes.appendChild(btnReprocessar);
+
+        li.appendChild(acoes);
+        listaPartes.appendChild(li);
+      });
     }
-    listaPartes.innerHTML = "";
-    partes.forEach((parte) => {
-      const li = el("li", "live-parte-item");
-
-      const topo = el("div", "live-parte-topo");
-      const tit = el("strong", "live-parte-titulo", `Parte ${parte.numero_parte} [${formatarMinutos(parte.inicio_s)} - ${formatarMinutos(parte.fim_s)}]`);
-      const statusBadge = el("span", `live-parte-status live-status-${parte.estado}`, formatarEstadoLive(parte.estado));
-      topo.appendChild(tit);
-      topo.appendChild(statusBadge);
-      li.appendChild(topo);
-
-      if (parte.erro_mensagem) {
-        const erroBox = el("div", "dica", `⚠️ ${parte.erro_mensagem}`);
-        erroBox.style.color = "#ff6b6b";
-        li.appendChild(erroBox);
-      }
-
-      // Detalhes expansíveis (Capítulos e Resumo)
-      if (parte.resumo || parte.capitulos) {
-        const detalhes = el("div", "live-detalhes-bloco");
-        if (parte.capitulos) {
-          const detCap = el("details", "");
-          const sumCap = el("summary", "", "⏱ Capítulos do YouTube");
-          const preCap = el("pre", "", parte.capitulos);
-          detCap.appendChild(sumCap);
-          detCap.appendChild(preCap);
-          detalhes.appendChild(detCap);
-        }
-        if (parte.resumo) {
-          const detRes = el("details", "");
-          const sumRes = el("summary", "", "📋 Resumo IA");
-          const pRes = el("p", "dica", parte.resumo);
-          pRes.style.color = "#eee";
-          detRes.appendChild(sumRes);
-          detRes.appendChild(pRes);
-          detalhes.appendChild(detRes);
-        }
-        li.appendChild(detalhes);
-      }
-
-      // Ações do bloco
-      const acoes = el("div", "dock-item-acoes");
-      acoes.style.marginTop = "6px";
-
-      if (parte.youtube_url) {
-        const linkYt = el("a", "botao-pri pequeno", "Ver no YouTube ↗");
-        linkYt.href = parte.youtube_url;
-        linkYt.target = "_blank";
-        linkYt.rel = "noopener";
-        acoes.appendChild(linkYt);
-      }
-
-      const btnAbrir = el("button", "botao-sec pequeno", "📁 Abrir Arquivo");
-      btnAbrir.type = "button";
-      btnAbrir.addEventListener("click", () => {
-        api(`/api/live/partes/${parte.id}/abrir`, { method: "POST" }).catch((err) => avisar(err.message, "erro"));
-      });
-      acoes.appendChild(btnAbrir);
-
-      const btnReprocessar = el("button", "botao-sec pequeno", "🔄 Reprocessar IA");
-      btnReprocessar.type = "button";
-      btnReprocessar.addEventListener("click", async () => {
-        try {
-          await api(`/api/live/partes/${parte.id}/reprocessar`, { method: "POST" });
-          avisar(`Reprocessando IA da Parte ${parte.numero_parte}...`);
-          carregarLiveStatus();
-        } catch (err) {
-          avisar(err.message, "erro");
-        }
-      });
-      acoes.appendChild(btnReprocessar);
-
-      li.appendChild(acoes);
-      listaPartes.appendChild(li);
-    });
   }
+
+  // 8. Terminal de logs
+  renderizarLogsTerminal(logs);
 }
 
 async function carregarModoCortes() {
@@ -3070,30 +3332,84 @@ function vincular() {
     desenharAutomacao();
   }));
 
-  // Gravação de live
+  // Master Status Pill click listener
+  const pillMaster = $("pill-status-master");
+  if (pillMaster) {
+    pillMaster.style.cursor = "pointer";
+    pillMaster.addEventListener("click", () => trocarPainel("live"));
+  }
+
+  // Toggle button for 24/7 Monitor (Safe Mode)
+  const btnToggleMonitor = $("btn-toggle-monitor-247");
+  if (btnToggleMonitor) {
+    btnToggleMonitor.addEventListener("click", async () => {
+      btnToggleMonitor.disabled = true;
+      try {
+        const status = await api("/api/live/status");
+        const novoEstado = !status.monitor_ativo;
+        await api("/api/live/config", {
+          method: "POST",
+          body: JSON.stringify({ monitor_ativo: novoEstado }),
+        });
+        avisar(novoEstado ? "Monitoramento 24/7 ATIVADO." : "Monitoramento 24/7 PAUSADO (Standby).", "ok");
+        carregarLiveStatus();
+      } catch (err) {
+        avisar("Erro ao alterar monitoramento: " + err.message, "erro");
+      } finally {
+        btnToggleMonitor.disabled = false;
+      }
+    });
+  }
+
+  const inLiveUrl = $("live-url");
+  if (inLiveUrl) {
+    inLiveUrl.addEventListener("input", () => {
+      inLiveUrl.dataset.modificado = "1";
+    });
+  }
+
   const btnIniciarLive = $("btn-iniciar-live");
   if (btnIniciarLive) {
     btnIniciarLive.addEventListener("click", async () => {
       const url = ($("live-url").value || "").trim();
       if (!url) {
-        avisar("Informe o link da transmissão ao vivo.", "atencao");
+        avisar("Informe o link ou canal da transmissão ao vivo.", "atencao");
         return;
       }
-      const playlist_id = ($("live-playlist").value || "").trim();
-      const dvr = $("live-dvr").checked;
+      const playlist_id = ($("live-playlist") ? $("live-playlist").value : "").trim();
+      const dvr = $("live-dvr") ? $("live-dvr").checked : true;
       const duracao_chunk_s = parseInt($("live-duracao").value, 10) || 1800;
+      const qualidade = $("live-qualidade") ? $("live-qualidade").value : "best";
+      const auto_cortar = $("live-auto-cortar") ? $("live-auto-cortar").checked : true;
+
       btnIniciarLive.disabled = true;
       try {
         await api("/api/live/iniciar", {
           method: "POST",
-          body: JSON.stringify({ url, playlist_id, dvr, duracao_chunk_s }),
+          body: JSON.stringify({ url, playlist_id, dvr, duracao_chunk_s, qualidade, auto_cortar }),
         });
-        avisar("Gravação iniciada! Acompanhe o progresso no painel.");
+        avisar("Gravação iniciada com sucesso! Pipeline ativo.");
         carregarLiveStatus();
       } catch (err) {
         avisar("Erro ao iniciar gravação: " + err.message, "erro");
       } finally {
         btnIniciarLive.disabled = false;
+      }
+    });
+  }
+
+  const btnCortarAgora = $("btn-cortar-agora");
+  if (btnCortarAgora) {
+    btnCortarAgora.addEventListener("click", async () => {
+      btnCortarAgora.disabled = true;
+      try {
+        const res = await api("/api/live/cortar-agora", { method: "POST" });
+        avisar(res.mensagem || "Bloco atual cortado! Enviando para o Drive e gerando cortes com IA.", "ok");
+        carregarLiveStatus();
+      } catch (err) {
+        avisar("Erro ao cortar bloco: " + err.message, "erro");
+      } finally {
+        btnCortarAgora.disabled = false;
       }
     });
   }
@@ -3110,6 +3426,70 @@ function vincular() {
         avisar("Erro ao parar: " + err.message, "erro");
       } finally {
         btnPararLive.disabled = false;
+      }
+    });
+  }
+
+  const btnSalvarConfigLive = $("btn-salvar-config-live");
+  if (btnSalvarConfigLive) {
+    btnSalvarConfigLive.addEventListener("click", async () => {
+      btnSalvarConfigLive.disabled = true;
+      try {
+        const url = ($("live-url").value || "").trim();
+        const duracao_chunk_s = parseInt($("live-duracao").value, 10) || 1800;
+        const qualidade = $("live-qualidade") ? $("live-qualidade").value : "best";
+        const auto_cortar = $("live-auto-cortar") ? $("live-auto-cortar").checked : true;
+        const monitor_ativo = $("live-monitor-auto") ? $("live-monitor-auto").checked : true;
+        const dvr = $("live-dvr") ? $("live-dvr").checked : true;
+
+        const res = await api("/api/live/config", {
+          method: "POST",
+          body: JSON.stringify({ url, duracao_chunk_s, qualidade, auto_cortar, monitor_ativo, dvr }),
+        });
+        avisar("Configurações do Gravador 24/7 salvas com sucesso!", "ok");
+        if (res && res.status) atualizarUiLive(res.status);
+      } catch (err) {
+        avisar("Erro ao salvar configurações: " + err.message, "erro");
+      } finally {
+        btnSalvarConfigLive.disabled = false;
+      }
+    });
+  }
+
+  const btnAbrirPastaGravacoes = $("btn-abrir-pasta-gravacoes");
+  if (btnAbrirPastaGravacoes) {
+    btnAbrirPastaGravacoes.addEventListener("click", async () => {
+      try {
+        await api("/api/live/abrir-pasta", { method: "POST" });
+      } catch (err) {
+        avisar("Erro ao abrir pasta: " + err.message, "erro");
+      }
+    });
+  }
+
+  const btnForcarChecagemLive = $("btn-forcar-checagem-live");
+  if (btnForcarChecagemLive) {
+    btnForcarChecagemLive.addEventListener("click", async () => {
+      btnForcarChecagemLive.disabled = true;
+      try {
+        avisar("Checando status no YouTube...");
+        await carregarLiveStatus();
+      } catch (err) {
+        avisar("Erro ao checar status: " + err.message, "erro");
+      } finally {
+        btnForcarChecagemLive.disabled = false;
+      }
+    });
+  }
+
+  const btnLimparLogsUi = $("btn-limpar-logs-ui");
+  if (btnLimparLogsUi) {
+    btnLimparLogsUi.addEventListener("click", async () => {
+      try {
+        const res = await api("/api/live/logs?limite=80");
+        if (res && res.logs) renderizarLogsTerminal(res.logs);
+      } catch (err) {
+        // silencioso
       }
     });
   }

@@ -28,6 +28,9 @@ log = logging.getLogger("indomavel.cortador_drive")
 PASTA_DRIVE_TEMP = os.path.join(config.PASTA_DOWNLOADS, "drive_fontes")
 os.makedirs(PASTA_DRIVE_TEMP, exist_ok=True)
 
+_processando_lock = threading.Lock()
+_videos_em_processamento = set()
+
 
 def limpar_arquivos_drive_locais():
     """Remove arquivos brutos baixados do Drive para liberar espaço em disco."""
@@ -239,6 +242,9 @@ def escanear_videos_pendentes_drive(pasta_destino_id=None, pasta_fonte_id=None):
 
     # Ordenação por nome da live e número da parte sequencial
     pendentes.sort(key=lambda x: (x.get("pasta_fonte_nome", ""), x.get("numero_parte", 9999), x.get("nome_arquivo", "")))
+    with _processando_lock:
+        em_andamento = set(_videos_em_processamento)
+    pendentes = [p for p in pendentes if re.sub(r'\s+', ' ', str(p.get("titulo", ""))).strip().lower() not in em_andamento]
     return pendentes
 
 
@@ -248,15 +254,30 @@ def processar_video_drive(video_info, max_cortes=50, ao_progredir=None):
     fid = video_info["id"]
     nome_arq = video_info["nome_arquivo"]
 
-    log.info("Iniciando processamento de vídeo do Google Drive: '%s' (ID: %s)...", titulo, fid)
-    if ao_progredir:
-        ao_progredir(f"Baixando vídeo fonte do Google Drive: {nome_arq}...", 0.05)
+    chave_proc = re.sub(r'\s+', ' ', str(titulo)).strip().lower()
+    with _processando_lock:
+        if chave_proc in _videos_em_processamento:
+            log.info("Vídeo '%s' já está em processamento por outra thread/rotina. Ignorando chamada duplicada.", titulo)
+            return {"sucesso": True, "duplicado": True, "titulo": titulo, "cortes_gerados": 0}
+        _videos_em_processamento.add(chave_proc)
 
-    caminho_local_video = os.path.join(PASTA_DRIVE_TEMP, f"{fid}_{nome_arq}")
-    ok_dl, err_dl = google_drive.baixar_arquivo_drive(fid, caminho_local_video)
-    if not ok_dl or not os.path.isfile(caminho_local_video):
-        log.error("Falha ao baixar vídeo %s do Drive: %s", nome_arq, err_dl)
-        return {"sucesso": False, "erro": f"Falha no download: {err_dl}"}
+    log.info("Iniciando processamento de vídeo: '%s' (ID/Caminho: %s)...", titulo, fid)
+    caminho_local_video = video_info.get("caminho_local")
+    caminho_baixado_temporario = False
+
+    if caminho_local_video and os.path.isfile(caminho_local_video):
+        log.info("Vídeo fonte já disponível no disco local: '%s'. Pulando download do Drive!", caminho_local_video)
+        if ao_progredir:
+            ao_progredir(f"Vídeo fonte local identificado: {nome_arq}...", 0.05)
+    else:
+        if ao_progredir:
+            ao_progredir(f"Baixando vídeo fonte do Google Drive: {nome_arq}...", 0.05)
+        caminho_local_video = os.path.join(PASTA_DRIVE_TEMP, f"{fid}_{nome_arq}")
+        ok_dl, err_dl = google_drive.baixar_arquivo_drive(fid, caminho_local_video)
+        if not ok_dl or not os.path.isfile(caminho_local_video):
+            log.error("Falha ao baixar vídeo %s do Drive: %s", nome_arq, err_dl)
+            return {"sucesso": False, "erro": f"Falha no download: {err_dl}"}
+        caminho_baixado_temporario = True
 
     try:
         # 1. Extração de áudio
@@ -276,7 +297,7 @@ def processar_video_drive(video_info, max_cortes=50, ao_progredir=None):
         # 3. Blocagem com IA / Heurísticas
         if ao_progredir:
             ao_progredir("Dividindo em blocos narrativos e ranqueando trechos virais...", 0.40)
-        contexto = f"VÍDEO: {titulo}\nORIGEM: Google Drive\nARQUIVO: {nome_arq}"
+        contexto = f"VÍDEO: {titulo}\nORIGEM: {'Local' if not caminho_baixado_temporario else 'Google Drive'}\nARQUIVO: {nome_arq}"
         blocos, ignorados, modelos = blocador.dividir(frases, contexto)
         if not blocos:
             return {"sucesso": False, "erro": "Nenhum bloco narrativo identificado"}
@@ -285,15 +306,15 @@ def processar_video_drive(video_info, max_cortes=50, ao_progredir=None):
         total = len(top_blocos)
         log.info("Vídeo '%s': %d blocos virais selecionados para corte.", titulo, total)
 
-        # 4. Configuração de Cortes Ativa
+        # 4. Configuração de Cortes Ativa (Regra do Usuário: 3 modalidades completas)
         cfg_cortes = cortador_automatico.carregar_config_cortes()
         cfg_cortes["proporcao"] = "1:1"
         cfg_cortes["variacoes"] = {
-            "com_legenda": False,
-            "sem_legenda": True,
+            "com_legenda": True,   # Cortes com headline e legenda
+            "sem_legenda": True,   # Cortes com headline
             "so_legenda": False,
-            "cru": True,
-            "headlines": True,
+            "cru": True,           # Cortes originais (+ .srt)
+            "headlines": True,     # Arquivo .txt com sugestões adicionais
         }
 
         # 5. Geração Sequencial de Cortes com Numeração Segura
@@ -305,10 +326,12 @@ def processar_video_drive(video_info, max_cortes=50, ao_progredir=None):
         cfg_cortes["drive"]["upload_ativo"] = True
         token, _ = google_drive.obter_token_acesso()
 
-        # Garante pastas no Drive
+        # Garante pastas hierárquicas no Drive conforme especificação exata do usuário:
+        # Raiz / [Nome do Vídeo] / [Modalidades]
         id_pasta_video_drive = google_drive.obter_ou_criar_pasta_drive(titulo, id_pai=id_pasta_raiz_drive, token=token)
         id_pasta_hl_drive = google_drive.obter_ou_criar_pasta_drive("Cortes com headline", id_pai=id_pasta_video_drive, token=token)
         id_pasta_cru_drive = google_drive.obter_ou_criar_pasta_drive("Cortes originais", id_pai=id_pasta_video_drive, token=token)
+        id_pasta_com_drive = google_drive.obter_ou_criar_pasta_drive("Cortes com headline e legenda", id_pai=id_pasta_video_drive, token=token)
 
         maior_fernando = google_drive.obter_maior_numero_fernando(pasta_base_drive, id_pasta_raiz_drive, token=token)
         proximo_numero = max(1, maior_fernando + 1)
@@ -323,8 +346,10 @@ def processar_video_drive(video_info, max_cortes=50, ao_progredir=None):
             # REGRA CRÍTICA: Não sobrepor arquivos que já existem no Drive!
             nome_hl_mp4 = f"{prefixo}_sem_legenda.mp4"
             nome_cru_mp4 = f"{prefixo}_cru.mp4"
+            nome_com_mp4 = f"{prefixo}_com_legenda.mp4"
             while (google_drive.arquivo_existe_no_drive(nome_hl_mp4, id_pasta_hl_drive, token=token) or
-                   google_drive.arquivo_existe_no_drive(nome_cru_mp4, id_pasta_cru_drive, token=token)):
+                   google_drive.arquivo_existe_no_drive(nome_cru_mp4, id_pasta_cru_drive, token=token) or
+                   google_drive.arquivo_existe_no_drive(nome_com_mp4, id_pasta_com_drive, token=token)):
                 log.info("Corte %s já existe no Drive. Incrementando número para não sobrepor...", prefixo)
                 proximo_numero += 1
                 prefixo = f"Fernando{proximo_numero:02d}"
@@ -332,10 +357,11 @@ def processar_video_drive(video_info, max_cortes=50, ao_progredir=None):
                 os.makedirs(pasta_corte, exist_ok=True)
                 nome_hl_mp4 = f"{prefixo}_sem_legenda.mp4"
                 nome_cru_mp4 = f"{prefixo}_cru.mp4"
+                nome_com_mp4 = f"{prefixo}_com_legenda.mp4"
 
             if ao_progredir:
                 p_atual = 0.40 + (idx / total) * 0.55
-                ao_progredir(f"Gerando corte {idx} de {total} ({prefixo}): 1:1 headline + cru...", p_atual)
+                ao_progredir(f"Gerando corte {idx} de {total} ({prefixo}): headline + legenda + cru...", p_atual)
 
             pacote = cortador_automatico.gerar_pacote_corte(
                 youtube_id=fid[:11] if len(fid) >= 11 else fid,
@@ -376,10 +402,10 @@ def processar_video_drive(video_info, max_cortes=50, ao_progredir=None):
                 except Exception as e_esp:
                     log.debug("Aviso ao limpar espelho do vídeo %s: %s", prefixo, e_esp)
 
-        # 6. Liberação Automática de Disco (exclusão dos arquivos físicos locais intermediários e brutos)
+        # 6. Liberação Automática de Disco (exclusão dos arquivos físicos intermediários e brutos temporários)
         log.info("Cortes de '%s' concluídos e confirmados no Drive. Liberando cache e arquivos temporários...", titulo)
         try:
-            if os.path.exists(caminho_local_video):
+            if caminho_baixado_temporario and os.path.exists(caminho_local_video):
                 os.remove(caminho_local_video)
             if os.path.exists(caminho_audio):
                 os.remove(caminho_audio)
@@ -417,9 +443,11 @@ def processar_video_drive(video_info, max_cortes=50, ao_progredir=None):
         }
 
     finally:
-        # Garante remoção de sobras se houver erro
+        with _processando_lock:
+            _videos_em_processamento.discard(chave_proc)
+        # Garante remoção de sobras temporárias se houver erro
         try:
-            if os.path.exists(caminho_local_video):
+            if caminho_baixado_temporario and os.path.exists(caminho_local_video):
                 os.remove(caminho_local_video)
             if 'caminho_audio' in locals() and os.path.exists(caminho_audio):
                 os.remove(caminho_audio)

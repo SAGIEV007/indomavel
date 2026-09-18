@@ -74,4 +74,13 @@ FFMPEG = _achar_programa("ffmpeg", [
     r"%LOCALAPPDATA%\Microsoft\WinGet\Links\ffmpeg.exe",
     r"%LOCALAPPDATA%\Microsoft\WinGet\Packages\Gyan.FFmpeg*\*\bin\ffmpeg.exe",
 ])
+STREAMLINK = _achar_programa("streamlink", [
+    r"%LOCALAPPDATA%\Programs\Python\Python3*\Scripts\streamlink.exe",
+    r"%APPDATA%\Python\Python3*\Scripts\streamlink.exe",
+])
 NODE = _achar_programa("node", [r"%LOCALAPPDATA%\hermes\node\node.exe"])
+
+COOKIES_TXT = valor("COOKIES_TXT", os.path.join(RAIZ, "cookies.txt"))
+URL_LIVE_PADRAO = valor("URL_LIVE_PADRAO", "https://www.youtube.com/@PartidoMissao/live")
+PASTA_FONTE_LIVES_PADRAO = valor("PASTA_FONTE_LIVES_PADRAO", "1Rzc1NQ0RDzeId6L_7O8QiP1P13bTooFl")
+

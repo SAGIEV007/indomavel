@@ -11,11 +11,14 @@
 <header class="topo">
   <div class="marca">
     <span class="marca-nome">INDOMÁVEL</span>
-    <span class="marca-sub">cortes prontos a partir do Campaign Hub</span>
+    <span class="marca-sub">STUDIO 24/7</span>
   </div>
+  <button id="pill-status-master" class="chip chip-status-master" type="button" title="Clique para abrir o painel de Gravação 24/7">
+    <span id="ponto-status-master" class="ponto-sync"></span>
+    <span id="texto-status-master">STANDBY</span>
+  </button>
   <div id="status-chub" class="chip chip-carregando">Conectando ao Chub…</div>
-  <div id="badge-live-rec" class="chip chip-gravando-live" hidden><span class="ponto-rec-pulso"></span> <span id="texto-badge-live">GRAVANDO LIVE</span></div>
-  <button id="btn-exportacoes" class="botao-sec">Exportações <span id="contador-tarefas"></span></button>
+  <button id="btn-exportacoes" class="botao-sec pequeno">Exportações <span id="contador-tarefas"></span></button>
 </header>
 <div id="faixa-servidor" class="faixa-servidor" hidden>
   <span id="faixa-texto"></span>
@@ -34,6 +37,7 @@
         <button class="aba ativa" data-origem="chub" type="button">Acervo Chub</button>
         <button class="aba" data-origem="playlist" type="button">🔴 Indomável <span id="contador-playlist"></span></button>
         <button class="aba" data-origem="local" type="button">Meus links <span id="contador-locais"></span></button>
+        <button class="aba" data-origem="lives" type="button" id="aba-origem-lives">📡 Lives Zema <span id="contador-lives-origem"></span></button>
       </div>
       <div id="barra-playlist" class="barra-playlist" hidden>
         <div class="playlist-info">
@@ -187,11 +191,11 @@
   <!-- Direita: blocos, estilo do card e da legenda, exportação -->
   <aside class="coluna coluna-painel">
     <div class="abas abas-painel">
-      <button class="aba ativa" data-painel="blocos" type="button">Blocos</button>
-      <button class="aba" data-painel="estilo" type="button">Card e legenda</button>
-      <button class="aba" data-painel="exportar" type="button">Exportar <span id="contador-painel"></span></button>
-      <button class="aba" data-painel="automatico" type="button">Em massa <span id="contador-automatico"></span></button>
-      <button class="aba" data-painel="live" type="button" id="aba-live">🔴 Gravar Live <span id="contador-live"></span></button>
+      <button class="aba ativa" data-painel="blocos" type="button" title="Blocos narrativos identificados pela IA">🎯 Blocos</button>
+      <button class="aba" data-painel="estilo" type="button" title="Edição de cards, fontes e legendas">🎨 Estilo</button>
+      <button class="aba" data-painel="exportar" type="button" title="Fila de exportação e renderização">⚡ Fila <span id="contador-painel"></span></button>
+      <button class="aba" data-painel="automatico" type="button" title="Cortes automáticos em massa">📦 Massa <span id="contador-automatico"></span></button>
+      <button class="aba" data-painel="live" type="button" id="aba-live" title="Estúdio e monitoramento contínuo 24/7 de lives">📡 Live 24/7 <span id="contador-live"></span></button>
     </div>
 
     <section id="painel-blocos" class="painel">
@@ -368,23 +372,72 @@
     </section>
 
     <section id="painel-live" class="painel" hidden>
+      <!-- Telemetria do Gravador 24/7 & Multi-Notebook Cluster -->
       <div class="card">
         <div class="linha-rotulo">
-          <span class="rotulo">Gravação Automática de Live</span>
-          <span id="live-badge-status" class="chip">Pronto</span>
+          <span class="rotulo">📡 Gravador de Lives 24/7</span>
+          <span id="live-badge-status" class="chip chip-carregando">STANDBY</span>
         </div>
-        <p class="dica">Grava transmissões ao vivo contínuas em blocos de 30 minutos, gera capítulos e resumo via Gemini Flash e envia para o YouTube (Não Listado).</p>
 
-        <label class="campo">Link ou ID da Live no YouTube
-          <input type="text" id="live-url" class="campo-texto" placeholder="https://www.youtube.com/watch?v=G9FJr1EX0wU" value="https://www.youtube.com/watch?v=G9FJr1EX0wU">
+        <div id="box-cluster-aviso" style="display:none; margin: 8px 0; padding: 10px 12px; background: rgba(210,153,34,0.15); border: 1px solid #d29922; border-radius: 8px; font-size: 12px; color: #ffd60a;">
+          🛡️ <strong>Modo Standby Protegido:</strong> O notebook <code id="cluster-lider-nome">Líder</code> já está gravando no Google Drive. Esta máquina está protegida para não sobrepor arquivos.
+        </div>
+
+        <div id="live-online-box" style="display: flex; align-items: center; gap: 8px; margin: 4px 0 8px 0;">
+          <span id="live-ponto-status" class="ponto-sync"></span>
+          <span id="live-online-texto" style="font-size: 12px; font-weight: 700;">Standby (Pausado)</span>
+        </div>
+        <h4 id="live-monitor-titulo" style="margin: 0 0 6px 0; font-size: 13px; color: var(--texto); line-height: 1.3;"></h4>
+
+        <div class="live-metricas-grade">
+          <div class="live-metrica-card">
+            <span class="live-metrica-rotulo">Tempo Total</span>
+            <span id="live-tempo-decorrido" class="live-metrica-valor">00:00:00</span>
+          </div>
+          <div class="live-metrica-card">
+            <span class="live-metrica-rotulo">Bloco Atual</span>
+            <span id="live-bloco-atual" class="live-metrica-valor" style="color: #FF3B30;">Aguardando</span>
+          </div>
+          <div class="live-metrica-card">
+            <span class="live-metrica-rotulo">Tempo Bloco</span>
+            <span id="live-tempo-bloco" class="live-metrica-valor">00:00:00</span>
+          </div>
+          <div class="live-metrica-card">
+            <span class="live-metrica-rotulo">Trava Cluster</span>
+            <span id="live-cluster-role" class="live-metrica-valor" style="font-size: 12px; color: #2ed573;">LOCAL</span>
+          </div>
+        </div>
+
+        <div id="live-pasta-info" class="dica" style="word-break: break-all; font-family: monospace; font-size: 11px;"></div>
+
+        <!-- Botões de Ação Principal -->
+        <div class="acoes-live" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <button id="btn-toggle-monitor-247" class="botao-pri largo" type="button">▶ Ativar Monitoramento 24/7</button>
+          <button id="btn-iniciar-live" class="botao-sec largo" type="button">🔴 Iniciar Gravação Manual</button>
+          <button id="btn-cortar-agora" class="botao-alerta largo" type="button" title="Fecha a fatia atual imediatamente e envia para geração de 3 cortes no Drive" hidden>✂️ Cortar Bloco Agora (Gerar Cortes)</button>
+          <button id="btn-parar-live" class="botao-perigo largo" type="button" hidden>⏹ Parar Gravação</button>
+        </div>
+
+        <div class="acoes-secundarias-live" style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="btn-abrir-pasta-gravacoes" class="botao-sec pequeno" type="button" title="Abre a pasta local de vídeos de lives">📂 Abrir Pasta</button>
+          <button id="btn-limpar-retencao" class="botao-sec pequeno" type="button" title="Libera espaço em disco excluindo vídeos com mais de 48h já enviados">🧹 Limpar Disco (&gt; 48h)</button>
+          <button id="btn-forcar-checagem-live" class="botao-sec pequeno" type="button" title="Verifica status online no YouTube agora">🔄 Checar Ao Vivo</button>
+        </div>
+      </div>
+
+      <!-- Configurações do Gravador e Esteira IA -->
+      <div class="card">
+        <div class="linha-rotulo">
+          <span class="rotulo">⚙️ Configurações do Gravador 24/7</span>
+          <button id="btn-salvar-config-live" class="botao-pri pequeno" type="button">Salvar</button>
+        </div>
+        <p class="dica">Monitora automaticamente o canal do YouTube, grava sem sobrecarregar a CPU (-c copy) e fatia em 30 min.</p>
+
+        <label class="campo" style="margin-top: 8px;">Canal ou URL da Live no YouTube
+          <input type="text" id="live-url" class="campo-texto" placeholder="https://www.youtube.com/@PartidoMissao/live" value="https://www.youtube.com/@PartidoMissao/live">
         </label>
-        <button id="live-btn-usar-atual" class="botao-link pequeno" type="button" style="margin: 4px 0 8px 0;">Usar vídeo selecionado no momento</button>
 
-        <label class="campo">ID ou Link da Playlist do YouTube (Opcional)
-          <input type="text" id="live-playlist" class="campo-texto" placeholder="Ex: PL0123456789 ou link da playlist">
-        </label>
-
-        <div class="auto-campos" style="margin-top: 6px;">
+        <div class="auto-campos" style="margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
           <label class="campo">Duração dos Blocos
             <select id="live-duracao">
               <option value="1800" selected>30 minutos (Padrão)</option>
@@ -393,50 +446,48 @@
               <option value="120">2 minutos (Teste rápido)</option>
             </select>
           </label>
+          <label class="campo">Qualidade
+            <select id="live-qualidade">
+              <option value="best" selected>Melhor (1080p/720p)</option>
+              <option value="1080p">1080p</option>
+              <option value="720p">720p</option>
+              <option value="480p">480p</option>
+            </select>
+          </label>
         </div>
 
-        <label class="check" title="Baixa todo o histórico disponível no buffer da live antes de continuar no ao vivo" style="margin-top: 6px;">
-          <input type="checkbox" id="live-dvr" checked> <b>Catch-up DVR:</b> Baixar conteúdo já transmitido e continuar ao vivo
-        </label>
-
-        <div class="acoes-live" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
-          <button id="btn-iniciar-live" class="botao-pri largo" type="button">🔴 Iniciar Gravação Automática</button>
-          <button id="btn-parar-live" class="botao-perigo largo" type="button" hidden>⏹ Parar Gravação</button>
-        </div>
-
-        <div class="acoes-secundarias-live" style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
-          <button id="btn-login-youtube" class="botao-sec pequeno" type="button" title="Abre o navegador para autenticar no YouTube Studio">🔑 Conectar Conta YouTube</button>
-          <button id="btn-limpar-retencao" class="botao-sec pequeno" type="button" title="Libera espaço em disco excluindo vídeos com mais de 48h já enviados">🧹 Limpar Disco (&gt; 48h)</button>
+        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+          <label class="check" title="Ao finalizar cada fatia, a IA do Indomável transcreve e corta nas 3 modalidades do Google Drive">
+            <input type="checkbox" id="live-auto-cortar" checked> <b>Cortar com IA automaticamente:</b> Gerar as 3 modalidades e subir no Drive
+          </label>
+          <label class="check" title="Inicia automaticamente a gravação assim que o canal abrir transmissão ao vivo">
+            <input type="checkbox" id="live-monitor-auto" checked> <b>Monitoramento 24/7 Ativo:</b> Gravar quando o canal entrar ao vivo
+          </label>
+          <label class="check" title="Baixa todo o histórico disponível no buffer da live antes de continuar no ao vivo">
+            <input type="checkbox" id="live-dvr" checked> <b>Catch-up DVR:</b> Baixar buffer gravado da transmissão
+          </label>
         </div>
       </div>
 
-      <div id="live-card-monitor" class="card" hidden>
-        <div class="linha-rotulo">
-          <span class="rotulo">Status da Gravação Ativa</span>
-          <span class="ponto-rec-pulso"></span>
-        </div>
-        <h4 id="live-monitor-titulo" style="margin: 4px 0 8px 0; font-size: 0.95rem; color: #fff;"></h4>
-        <div class="live-metricas" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-          <div class="metrica-bloco" style="background: rgba(255,255,255,0.04); padding: 8px; border-radius: 6px;">
-            <div class="rotulo-mini" style="font-size: 0.75rem; color: #888;">Tempo Decorrido</div>
-            <strong id="live-tempo-decorrido" style="font-size: 1.1rem; font-family: monospace;">00:00:00</strong>
-          </div>
-          <div class="metrica-bloco" style="background: rgba(255,255,255,0.04); padding: 8px; border-radius: 6px;">
-            <div class="rotulo-mini" style="font-size: 0.75rem; color: #888;">Bloco Atual</div>
-            <strong id="live-bloco-atual" style="font-size: 1.1rem; color: #ff4757;">Parte 1</strong>
-          </div>
-        </div>
-        <div id="live-pasta-info" class="dica" style="word-break: break-all;"></div>
-      </div>
-
+      <!-- Fatias Gravadas e Esteira de Cortes -->
       <div class="card">
         <div class="linha-rotulo">
-          <span class="rotulo">Partes Gravadas &amp; Publicação</span>
+          <span class="rotulo">📦 Fatias Gravadas &amp; Esteira de Cortes</span>
           <span id="live-contador-partes" class="contador">0</span>
         </div>
-        <ul id="live-lista-partes" class="lista-tarefas" style="max-height: 400px; overflow-y: auto; padding: 0;">
+        <p class="dica">Cada bloco concluído é enviado para a pasta 'Live 24 hrs' e cortado com IA nas 3 modalidades ('Cortes com headline', 'Cortes originais', 'Cortes com headline e legenda').</p>
+        <ul id="live-lista-partes" class="lista-tarefas" style="max-height: 420px; overflow-y: auto; padding: 0; margin-top: 8px;">
           <li class="vazio-lista">Nenhuma parte gravada nesta sessão.</li>
         </ul>
+      </div>
+
+      <!-- Log em Tempo Real do Gravador e Cortes -->
+      <div class="card">
+        <div class="linha-rotulo">
+          <span class="rotulo">📟 Log em Tempo Real (Gravador &amp; IA)</span>
+          <button id="btn-limpar-logs-ui" class="botao-link" type="button">Atualizar</button>
+        </div>
+        <div id="live-terminal-logs" class="live-terminal">Conectando ao monitor de logs...</div>
       </div>
     </section>
   </aside>
@@ -502,7 +553,7 @@
             </div>
           </label>
           <label class="opcao-checkbox">
-            <input type="checkbox" id="chk-var-com-legenda" name="var_com_legenda">
+            <input type="checkbox" id="chk-var-com-legenda" name="var_com_legenda" checked>
             <div class="opcao-checkbox-info">
               <strong>Com headline e com legenda</strong>
               <small>Subpasta: <code>[Nome do Vídeo]/Cortes com headline e legenda/FernandoXX_com_legenda.mp4</code></small>

@@ -935,6 +935,12 @@ def live_status():
     return jsonify(gravador_live.gravador.obter_status())
 
 
+@app.get("/api/live/todas-partes")
+def live_todas_partes():
+    limite = request.args.get("limite", default=100, type=int)
+    return jsonify({"partes": gravador_live.gravador.obter_todas_partes(limite=limite)})
+
+
 @app.post("/api/live/iniciar")
 def live_iniciar():
     dados = request.get_json(silent=True) or {}
@@ -944,10 +950,19 @@ def live_iniciar():
     playlist_id = str(dados.get("playlist_id", "")).strip() or None
     dvr = bool(dados.get("dvr", True))
     duracao_chunk_s = int(dados.get("duracao_chunk_s", 1800))
+    qualidade = str(dados.get("qualidade", "best")).strip()
+    auto_cortar = bool(dados.get("auto_cortar", True))
     if duracao_chunk_s < 30 or duracao_chunk_s > 7200:
         return _erro("duração do bloco deve estar entre 30 segundos e 2 horas", 400)
     try:
-        res = gravador_live.gravador.iniciar_gravacao(url, playlist_id=playlist_id, dvr=dvr, duracao_chunk_s=duracao_chunk_s)
+        res = gravador_live.gravador.iniciar_gravacao(
+            url,
+            playlist_id=playlist_id,
+            dvr=dvr,
+            duracao_chunk_s=duracao_chunk_s,
+            qualidade=qualidade,
+            auto_cortar=auto_cortar,
+        )
         return jsonify({"ok": True, "sessao": res}), 202
     except Exception as erro:
         return _erro(str(erro), 400)
@@ -959,6 +974,49 @@ def live_parar():
     sessao_id = dados.get("sessao_id")
     res = gravador_live.gravador.parar_gravacao(sessao_id)
     return jsonify({"ok": True, "resultado": res})
+
+
+@app.post("/api/live/cortar-agora")
+def live_cortar_agora():
+    res = gravador_live.gravador.cortar_agora()
+    status_code = 200 if res.get("ok") else 400
+    return jsonify(res), status_code
+
+
+@app.post("/api/live/config")
+def live_config():
+    dados = request.get_json(silent=True) or {}
+    gravador_live.gravador.salvar_config(
+        url=dados.get("url"),
+        duracao_chunk_s=int(dados["duracao_chunk_s"]) if "duracao_chunk_s" in dados and dados["duracao_chunk_s"] is not None else None,
+        qualidade=dados.get("qualidade"),
+        dvr=dados.get("dvr"),
+        auto_cortar=dados.get("auto_cortar"),
+        monitor_ativo=dados.get("monitor_ativo"),
+    )
+    return jsonify({"ok": True, "status": gravador_live.gravador.obter_status()})
+
+
+@app.get("/api/live/logs")
+def live_logs():
+    limite = request.args.get("limite", default=50, type=int)
+    return jsonify({"logs": gravador_live.gravador.obter_logs(limite=limite)})
+
+
+@app.post("/api/live/abrir-pasta")
+def live_abrir_pasta():
+    pasta = config.PASTA_LIVES
+    os.makedirs(pasta, exist_ok=True)
+    _mostrar_no_explorer(pasta)
+    return jsonify({"ok": True, "pasta": pasta})
+
+
+@app.post("/api/live/partes/<int:parte_id>/cortar")
+def live_cortar_parte(parte_id):
+    res = gravador_live.gravador.disparar_cortes_manuais(parte_id)
+    status_code = 200 if res.get("ok") else 400
+    return jsonify(res), status_code
+
 
 
 @app.post("/api/live/partes/<int:parte_id>/reprocessar")

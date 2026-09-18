@@ -8,9 +8,21 @@ downloads/
 videos/
 output/
 dados/
+temp/
+logs/
 *.mp4
 *.mov
 *.webm
+*.mp3
+*.wav
+*.m4a
+*.sqlite3*
+*.lock
+cookies*.txt
+token*.json
+credentials*.json
+.pytest_cache/
+.agents/
 
 # Playwright
 node_modules/
