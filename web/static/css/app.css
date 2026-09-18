@@ -81,7 +81,7 @@ input[type=search]:focus, input[type=text]:focus, select:focus, textarea:focus {
 .aba.ativa { background: var(--escuro); color: #fff; border-color: var(--escuro); }
 
 /* Grade Principal com Isolamento de Colunas */
-.grade { display: grid; grid-template-columns: 280px minmax(0, 1fr) 360px; gap: 12px; padding: 12px; height: calc(100vh - 48px); box-sizing: border-box; min-width: 0; overflow: hidden; }
+.grade { display: grid; grid-template-columns: 280px minmax(0, 1fr) clamp(380px, 24vw, 420px); gap: 12px; padding: 12px; height: calc(100vh - 48px); box-sizing: border-box; min-width: 0; overflow: hidden; }
 .coluna { min-height: 0; min-width: 0; overflow-y: auto; overflow-x: hidden; }
 
 /* Coluna de vídeos */
@@ -188,13 +188,14 @@ input[type=search]:focus, input[type=text]:focus, select:focus, textarea:focus {
 
 /* Coluna Direita com Abas Fixas (Sticky) */
 .coluna-painel { display: flex; flex-direction: column; height: 100%; overflow: hidden; min-width: 0; }
-.abas-painel { display: flex; background: var(--card); border: 1px solid var(--borda); border-radius: 10px; padding: 3px; flex-wrap: nowrap !important; gap: 2px; flex-shrink: 0; margin-bottom: 8px; z-index: 10; }
-.abas-painel .aba { flex: 1 1 0; min-width: 0; border: 0; background: none; border-radius: 8px; padding: 6px 2px; white-space: nowrap; font-size: 11px; font-weight: 700; text-align: center; overflow: hidden; text-overflow: ellipsis; color: var(--suave); transition: all 0.15s ease; }
+.abas-painel { display: flex; background: var(--card); border: 1px solid var(--borda); border-radius: 10px; padding: 4px; gap: 4px; flex-shrink: 0; margin-bottom: 10px; z-index: 10; overflow-x: auto; scrollbar-width: none; }
+.abas-painel::-webkit-scrollbar { display: none; }
+.abas-painel .aba { flex: 1 1 auto; min-width: max-content; border: 0; background: none; border-radius: 8px; padding: 7px 10px; white-space: nowrap; font-size: 12px; font-weight: 700; text-align: center; color: var(--suave); transition: all 0.15s ease; }
 .abas-painel .aba:hover { color: var(--texto); background: var(--card-2); }
-.abas-painel .aba.ativa { background: var(--escuro); color: #fff; border: 1px solid var(--borda); }
+.abas-painel .aba.ativa { background: var(--escuro); color: #fff; border: 1px solid var(--borda); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); }
 .painel { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding-right: 4px; display: flex; flex-direction: column; gap: 8px; scrollbar-width: thin; scrollbar-color: var(--borda) transparent; }
 .coluna-painel h3 { margin: 4px 0 6px; font-size: 16px; line-height: 1.3; font-weight: 800; }
-.resumo { margin: 0 0 10px; color: #3D3A33; font-size: 13px; }
+.resumo { margin: 0 0 12px; color: #e6edf3; font-size: 14px; line-height: 1.55; }
 .selos { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
 .selo { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--card-2); border: 1px solid var(--borda); }
 .selo-ok { background: var(--ok-fundo); color: var(--ok); border-color: #BFE3CB; }
@@ -206,7 +207,7 @@ input[type=search]:focus, input[type=text]:focus, select:focus, textarea:focus {
 .destaques li:hover { border-color: var(--amarelo-borda); }
 .tempo-mini { font-family: "Roboto Mono", monospace; font-weight: 700; font-size: 12px; }
 .destaque-texto { font-weight: 700; font-size: 13px; }
-.destaque-motivo { font-size: 12px; color: #5B5546; margin-top: 2px; }
+.destaque-motivo { font-size: 12px; color: #8b949e; margin-top: 3px; line-height: 1.4; }
 .abas-ordem { margin-bottom: 10px; }
 .lista-blocos { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .bloco { display: grid; grid-template-columns: 32px 1fr auto; gap: 10px; align-items: start; padding: 10px; border-radius: 12px; border: 1px solid var(--borda); background: var(--card-2); cursor: pointer; }
@@ -715,36 +716,72 @@ input[type=search]:focus, input[type=text]:focus, select:focus, textarea:focus {
   text-overflow: ellipsis;
 }
 
-/* Grade de Métricas em 4 Colunas Ultra-Compacta */
+/* Master Switch Card Heroico de Monitoramento 24/7 */
+.live-master-card {
+  background: var(--card-2);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+}
+.live-master-card.ativo {
+  background: rgba(255, 214, 10, 0.08);
+  border-color: var(--amarelo);
+  box-shadow: 0 0 12px rgba(255, 214, 10, 0.15);
+}
+.live-master-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.live-master-titulo {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--texto);
+}
+.live-master-desc {
+  font-size: 11.5px;
+  color: var(--suave);
+  margin: 6px 0 0;
+  line-height: 1.35;
+}
+
+/* Grade de Métricas em 2 Colunas e 2 Linhas (Zero Colisão) */
 .live-metricas-grade {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  margin: 6px 0;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 10px 0;
 }
 .live-metrica-card {
   background: var(--card-2);
   border: 1px solid var(--borda);
-  border-radius: 6px;
-  padding: 5px 4px;
+  border-radius: 8px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  text-align: center;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
 }
 .live-metrica-rotulo {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .04em;
+  letter-spacing: .05em;
   color: var(--suave);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 .live-metrica-valor {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 800;
   font-family: "Roboto Mono", monospace;
   color: var(--texto);
@@ -915,36 +952,17 @@ input[type=search]:focus, input[type=text]:focus, select:focus, textarea:focus {
 /* Breakpoints Responsivos (Notebooks 1366x768 até 4K) */
 @media (max-width: 1400px) {
   .grade {
-    grid-template-columns: 250px minmax(0, 1fr) 330px;
-    gap: 8px;
-    padding: 8px;
-  }
-  .video {
-    grid-template-columns: 80px 1fr;
-    gap: 8px;
-    padding: 6px;
-  }
-  .video img {
-    width: 80px;
-  }
-  .palco-externo {
-    height: clamp(220px, 46vh, 600px);
+    grid-template-columns: 260px minmax(0, 1fr) 380px;
+    gap: 10px;
+    padding: 10px;
   }
 }
 
 @media (max-width: 1180px) {
   .grade {
-    grid-template-columns: 220px minmax(0, 1fr) 300px;
-    gap: 6px;
-    padding: 6px;
-  }
-  .coluna-videos .aba {
-    padding: 4px 6px;
-    font-size: 10px;
-  }
-  .coluna-painel .abas-painel .aba {
-    padding: 5px 2px;
-    font-size: 10px;
+    grid-template-columns: 240px minmax(0, 1fr) 350px;
+    gap: 8px;
+    padding: 8px;
   }
 }
 

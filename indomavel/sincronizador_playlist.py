@@ -317,4 +317,32 @@ class SincronizadorPlaylist:
                 "atualizado_em": estado.get("atualizado_em") or item.get("adicionado_em") or 0,
             })
 
+        # Incorporar vídeos detectados diretamente na pasta do Google Drive
+        try:
+            from . import google_drive
+            drive_videos = google_drive.listar_videos_pasta_drive()
+            for f in drive_videos:
+                fid = f.get("id")
+                nome = f.get("name", "Vídeo Drive")
+                if any(v["youtube_id"] == fid for v in resultado):
+                    continue
+                resultado.append({
+                    "youtube_id": fid,
+                    "titulo": nome,
+                    "publicado_em": f.get("createdTime"),
+                    "duracao_s": 0,
+                    "fontes": "☁️ Google Drive",
+                    "tem_transcricao": False,
+                    "blocos": 0,
+                    "blocos_qa": 0,
+                    "cortes": None,
+                    "origem": "drive",
+                    "estado": "pronto",
+                    "mensagem": "Vídeo no Google Drive",
+                    "progresso": 1.0,
+                    "atualizado_em": time.time(),
+                })
+        except Exception as e:
+            log.debug("Aviso ao carregar vídeos do Drive para a lista: %s", e)
+
         return resultado

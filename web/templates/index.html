@@ -374,9 +374,13 @@
     <section id="painel-live" class="painel" hidden>
       <!-- Telemetria do Gravador 24/7 & Multi-Notebook Cluster -->
       <div class="card card-live-telemetria">
-        <div class="linha-rotulo">
-          <span class="rotulo">📡 Gravador de Lives 24/7</span>
-          <span id="live-badge-status" class="chip chip-carregando">STANDBY</span>
+        <!-- Master Switch Único Hero Card -->
+        <div id="live-master-card" class="live-master-card">
+          <div class="live-master-topo">
+            <span class="live-master-titulo">📡 Monitoramento 24/7</span>
+            <button id="btn-toggle-monitor-247" class="botao-pri pequeno" type="button">▶ Ativar</button>
+          </div>
+          <p id="live-master-desc" class="live-master-desc">Vigilância pausada. Ative para monitorar e fatiar automaticamente lives do canal.</p>
         </div>
 
         <div id="box-cluster-aviso" class="live-cluster-aviso" style="display:none;">
@@ -389,38 +393,38 @@
         </div>
         <h4 id="live-monitor-titulo" class="live-monitor-titulo"></h4>
 
+        <!-- Grade de Métricas 2x2 Ampla (Zero Colisão) -->
         <div class="live-metricas-grade">
           <div class="live-metrica-card">
-            <span class="live-metrica-rotulo">Tempo Total</span>
+            <span class="live-metrica-rotulo">⏱️ Tempo Total</span>
             <span id="live-tempo-decorrido" class="live-metrica-valor">00:00:00</span>
           </div>
           <div class="live-metrica-card">
-            <span class="live-metrica-rotulo">Bloco Atual</span>
+            <span class="live-metrica-rotulo">📦 Bloco Atual</span>
             <span id="live-bloco-atual" class="live-metrica-valor">Aguardando</span>
           </div>
           <div class="live-metrica-card">
-            <span class="live-metrica-rotulo">Tempo Bloco</span>
+            <span class="live-metrica-rotulo">⏳ Tempo Bloco</span>
             <span id="live-tempo-bloco" class="live-metrica-valor">00:00:00</span>
           </div>
           <div class="live-metrica-card">
-            <span class="live-metrica-rotulo">Trava Cluster</span>
+            <span class="live-metrica-rotulo">🛡️ Trava Cluster</span>
             <span id="live-cluster-role" class="live-metrica-valor cluster-role">LOCAL</span>
           </div>
         </div>
 
         <div id="live-pasta-info" class="live-pasta-info" title="Pasta de destino das gravações"></div>
 
-        <!-- Botões de Ação Principal em Grade de 2 Colunas -->
-        <div class="acoes-live">
-          <button id="btn-toggle-monitor-247" class="botao-pri" type="button">▶ Monitorar 24/7</button>
-          <button id="btn-iniciar-live" class="botao-sec" type="button">🔴 Gravação Manual</button>
-          <button id="btn-cortar-agora" class="botao-alerta" type="button" title="Fecha a fatia atual imediatamente e envia para geração de 3 cortes no Drive" hidden>✂️ Cortar Bloco</button>
-          <button id="btn-parar-live" class="botao-perigo" type="button" hidden>⏹ Parar Gravação</button>
+        <!-- Botões de Ação Principal -->
+        <div class="acoes-live" style="display: flex; flex-direction: column; gap: 6px;">
+          <button id="btn-iniciar-live" class="botao-sec largo" type="button">🔴 Iniciar Gravação Manual</button>
+          <button id="btn-cortar-agora" class="botao-alerta largo" type="button" title="Fecha a fatia atual imediatamente e envia para geração de 3 cortes no Drive" hidden>✂️ Cortar Bloco Agora (Gerar Cortes)</button>
+          <button id="btn-parar-live" class="botao-perigo largo" type="button" hidden>⏹ Parar Gravação</button>
         </div>
 
         <!-- Ações Secundárias em Linha Única -->
         <div class="acoes-secundarias-live">
-          <button id="btn-abrir-pasta-gravacoes" class="botao-sec pequeno" type="button" title="Abre a pasta local de vídeos de lives">📂 Abrir Pasta</button>
+          <button id="btn-abrir-pasta-gravacoes" class="botao-sec pequeno" type="button" title="Abre a pasta local de vídeos de lives">📂 Pasta</button>
           <button id="btn-limpar-retencao" class="botao-sec pequeno" type="button" title="Libera espaço em disco excluindo vídeos com mais de 48h já enviados">🧹 Limpar (&gt; 48h)</button>
           <button id="btn-forcar-checagem-live" class="botao-sec pequeno" type="button" title="Verifica status online no YouTube agora">🔄 Checar Ao Vivo</button>
         </div>
@@ -429,10 +433,10 @@
       <!-- Configurações do Gravador e Esteira IA -->
       <div class="card card-live-config">
         <div class="linha-rotulo">
-          <span class="rotulo">⚙️ Configurações 24/7</span>
+          <span class="rotulo">⚙️ Configurações da Transmissão</span>
           <button id="btn-salvar-config-live" class="botao-pri pequeno" type="button">Salvar</button>
         </div>
-        <p class="dica dica-compacta">Monitora canal YouTube (-c copy sem CPU) e fatia blocos com IA.</p>
+        <p class="dica dica-compacta">Parâmetros de gravação e fatiamento sem sobrecarregar a CPU (-c copy).</p>
 
         <label class="campo">Canal ou URL da Live
           <input type="text" id="live-url" class="campo-texto" placeholder="https://www.youtube.com/@PartidoMissao/live" value="https://www.youtube.com/@PartidoMissao/live">
@@ -457,18 +461,15 @@
           </label>
         </div>
 
+        <!-- Regras Complementares Sem Checkbox Redundante -->
         <div class="live-checks-grupo">
           <label class="check" title="Ao finalizar cada fatia, a IA do Indomável transcreve e corta nas 3 modalidades do Google Drive">
             <input type="checkbox" id="live-auto-cortar" checked>
-            <span><b>Cortar com IA:</b> 3 modalidades no Drive</span>
-          </label>
-          <label class="check" title="Inicia automaticamente a gravação assim que o canal abrir transmissão ao vivo">
-            <input type="checkbox" id="live-monitor-auto" checked>
-            <span><b>Monitoramento 24/7:</b> Gravar quando abrir live</span>
+            <span><b>Cortar com IA:</b> 3 modalidades no Google Drive (ID: 1wBxCAat68t-jLBl3RJxCBJmZNvPAjz-G)</span>
           </label>
           <label class="check" title="Baixa todo o histórico disponível no buffer da live antes de continuar no ao vivo">
             <input type="checkbox" id="live-dvr" checked>
-            <span><b>Catch-up DVR:</b> Baixar buffer gravado</span>
+            <span><b>Catch-up DVR:</b> Baixar buffer gravado da transmissão</span>
           </label>
         </div>
       </div>

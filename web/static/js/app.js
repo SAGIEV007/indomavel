@@ -306,45 +306,81 @@ async function carregarPlaylist() {
 
 function desenharPlaylist() {
   const lista = $("lista-videos");
-  lista.innerHTML = "";
+  if (!lista) return;
+
+  const posicaoScrollAnterior = lista.scrollTop;
+
   if (!estado.playlist.length) {
-    const li = el("li", "vazio-lista", "Ainda não há vídeos catalogados na aba Indomável. O sistema está monitorando a playlist em tempo real.");
-    lista.appendChild(li);
+    lista.innerHTML = '<li class="vazio-lista">Ainda não há vídeos catalogados na aba Indomável (Drive). Monitorando em tempo real.</li>';
     return;
   }
+
+  if (lista.querySelector(".vazio-lista") || lista.querySelector(".erro-lista") || lista.querySelector(".carregando")) {
+    lista.innerHTML = "";
+  }
+
+  const idsAtuais = new Set(estado.playlist.map((v) => v.youtube_id));
+
+  Array.from(lista.children).forEach((li) => {
+    if (li.dataset.id && !idsAtuais.has(li.dataset.id)) {
+      li.remove();
+    }
+  });
+
   estado.playlist.forEach((video) => {
     const pronto = video.estado === "pronto" || (video.blocos && video.blocos > 0);
-    const item = itemVideo(video, pronto);
-    const corpo = item.querySelector(".video-corpo");
-    corpo.querySelector(".video-meta").textContent = [
-      fmtData(video.publicado_em),
-      video.duracao_s ? fmtDuracao(video.duracao_s) : "",
-      pronto ? video.blocos + " blocos" + (video.blocos_qa ? ` (${video.blocos_qa} prontos)` : "") : ""
-    ].filter(Boolean).join(" · ");
-    
-    const nome = ESTADOS_LOCAIS[video.estado] || video.estado || (pronto ? "Pronto" : "Aguardando");
-    corpo.appendChild(el("div", "video-estado estado-" + (pronto ? "pronto" : video.estado), pronto ? "✅ " + nome : "⏳ " + nome + (video.mensagem ? ": " + video.mensagem : "")));
-    
-    if (!pronto && video.estado !== "falhou" && video.estado !== "interrompido" && video.progresso != null) {
-      const barra = el("div", "progresso");
-      const cheio = el("div");
-      cheio.style.width = Math.round(100 * video.progresso) + "%";
-      barra.appendChild(cheio);
-      corpo.appendChild(barra);
+    let itemExistente = lista.querySelector(`li.video[data-id="${video.youtube_id}"]`);
+
+    if (!itemExistente) {
+      const novoItem = itemVideo(video, pronto);
+      const corpo = novoItem.querySelector(".video-corpo");
+      if (corpo && pronto) {
+        corpo.appendChild(criarPainelCortes(video, carregarPlaylist));
+      }
+      lista.appendChild(novoItem);
+      itemExistente = novoItem;
     }
-    if (["falhou", "interrompido", "aguardando_retentativa", "aguardando_youtube"].includes(video.estado)) {
-      const botao = el("button", "botao-sec pequeno", "Processar de novo");
-      botao.type = "button";
-      botao.addEventListener("click", (evento) => {
-        evento.stopPropagation();
-        enviarLink(video.youtube_id, true);
-      });
-      corpo.appendChild(botao);
+
+    const corpo = itemExistente.querySelector(".video-corpo");
+    if (corpo) {
+      const elMeta = corpo.querySelector(".video-meta");
+      if (elMeta) {
+        elMeta.textContent = [
+          fmtData(video.publicado_em),
+          video.duracao_s ? fmtDuracao(video.duracao_s) : "",
+          pronto ? video.blocos + " blocos" + (video.blocos_qa ? ` (${video.blocos_qa} prontos)` : "") : ""
+        ].filter(Boolean).join(" · ");
+      }
+
+      let elEstado = corpo.querySelector(".video-estado");
+      const nome = ESTADOS_LOCAIS[video.estado] || video.estado || (pronto ? "Pronto" : "Aguardando");
+      const textoEstado = pronto ? "✅ " + nome : "⏳ " + nome + (video.mensagem ? ": " + video.mensagem : "");
+      if (elEstado) {
+        elEstado.className = "video-estado estado-" + (pronto ? "pronto" : video.estado);
+        elEstado.textContent = textoEstado;
+      } else {
+        corpo.appendChild(el("div", "video-estado estado-" + (pronto ? "pronto" : video.estado), textoEstado));
+      }
+
+      if (!pronto && video.estado !== "falhou" && video.estado !== "interrompido" && video.progresso != null) {
+        let barra = corpo.querySelector(".progresso");
+        if (!barra) {
+          barra = el("div", "progresso");
+          const cheio = el("div");
+          barra.appendChild(cheio);
+          corpo.appendChild(barra);
+        }
+        const cheio = barra.querySelector("div");
+        if (cheio) cheio.style.width = Math.round(100 * video.progresso) + "%";
+      }
     }
-    if (pronto) {
-      corpo.appendChild(criarPainelCortes(video, carregarPlaylist));
+  });
+
+  lista.scrollTop = posicaoScrollAnterior;
+  requestAnimationFrame(() => {
+    if (Math.abs(lista.scrollTop - posicaoScrollAnterior) > 2) {
+      lista.scrollTop = posicaoScrollAnterior;
     }
-    lista.appendChild(item);
   });
 }
 
@@ -2462,15 +2498,29 @@ function atualizarUiLive(dados) {
     }
   }
 
-  // Toggle button for 24/7 monitor
+  // Master Switch Hero Card
+  const masterCard = $("live-master-card");
+  const masterDesc = $("live-master-desc");
   const btnToggleMonitor = $("btn-toggle-monitor-247");
+  if (masterCard) {
+    masterCard.className = monitorAtivo ? "live-master-card ativo" : "live-master-card";
+  }
+  if (masterDesc) {
+    if (monitorAtivo) {
+      masterDesc.textContent = "🟢 Vigilância 24/7 ATIVA no canal @PartidoMissao. Grava e fatia com IA automaticamente ao vivo.";
+      masterDesc.style.color = "var(--amarelo)";
+    } else {
+      masterDesc.textContent = "⚪ Vigilância pausada. Clique no botão ao lado para ativar o monitoramento 24/7.";
+      masterDesc.style.color = "var(--suave)";
+    }
+  }
   if (btnToggleMonitor) {
     if (monitorAtivo) {
-      btnToggleMonitor.textContent = "⏸ Pausar Monitoramento 24/7";
-      btnToggleMonitor.className = "botao-sec largo";
+      btnToggleMonitor.textContent = "⏸ Pausar";
+      btnToggleMonitor.className = "botao-sec pequeno";
     } else {
-      btnToggleMonitor.textContent = "▶ Ativar Monitoramento 24/7";
-      btnToggleMonitor.className = "botao-pri largo";
+      btnToggleMonitor.textContent = "▶ Ativar";
+      btnToggleMonitor.className = "botao-pri pequeno";
     }
   }
 
@@ -3439,12 +3489,16 @@ function vincular() {
         const duracao_chunk_s = parseInt($("live-duracao").value, 10) || 1800;
         const qualidade = $("live-qualidade") ? $("live-qualidade").value : "best";
         const auto_cortar = $("live-auto-cortar") ? $("live-auto-cortar").checked : true;
-        const monitor_ativo = $("live-monitor-auto") ? $("live-monitor-auto").checked : true;
         const dvr = $("live-dvr") ? $("live-dvr").checked : true;
+
+        const payload = { url, duracao_chunk_s, qualidade, auto_cortar, dvr };
+        if ($("live-monitor-auto")) {
+          payload.monitor_ativo = $("live-monitor-auto").checked;
+        }
 
         const res = await api("/api/live/config", {
           method: "POST",
-          body: JSON.stringify({ url, duracao_chunk_s, qualidade, auto_cortar, monitor_ativo, dvr }),
+          body: JSON.stringify(payload),
         });
         avisar("Configurações do Gravador 24/7 salvas com sucesso!", "ok");
         if (res && res.status) atualizarUiLive(res.status);
