@@ -2714,6 +2714,9 @@ function atualizarUiLive(dados) {
   if ($("live-duracao") && dados.duracao_chunk_s && document.activeElement !== $("live-duracao")) {
     $("live-duracao").value = String(dados.duracao_chunk_s);
   }
+  if ($("live-inicio-offset") && dados.inicio_offset_s !== undefined && document.activeElement !== $("live-inicio-offset")) {
+    $("live-inicio-offset").value = String(dados.inicio_offset_s);
+  }
   if ($("live-qualidade") && dados.qualidade && document.activeElement !== $("live-qualidade")) {
     $("live-qualidade").value = dados.qualidade;
   }
@@ -3092,21 +3095,22 @@ async function salvarConfigCortes(evento) {
 }
 
 function atualizarBotaoModoCortes() {
-  const btn = $("btn-toggle-auto-cortes");
-  if (!btn) return;
-  if (estado.modoAutoCortes) {
-    btn.textContent = "⚡ Cortes: LIGADO";
-    btn.style.background = "#2ed573";
-    btn.style.borderColor = "#2ed573";
-    btn.style.color = "#000";
-    btn.style.fontWeight = "bold";
-  } else {
-    btn.textContent = "⚡ Cortes: DESLIGADO";
-    btn.style.background = "";
-    btn.style.borderColor = "";
-    btn.style.color = "";
-    btn.style.fontWeight = "";
-  }
+  const botoes = [$("btn-toggle-auto-cortes"), $("btn-toggle-auto-cortes-live")].filter(Boolean);
+  botoes.forEach((btn) => {
+    if (estado.modoAutoCortes) {
+      btn.textContent = "⚡ Cortes Drive: LIGADO";
+      btn.style.background = "#2ed573";
+      btn.style.borderColor = "#2ed573";
+      btn.style.color = "#000";
+      btn.style.fontWeight = "bold";
+    } else {
+      btn.textContent = "⚡ Cortes Drive: DESLIGADO";
+      btn.style.background = "";
+      btn.style.borderColor = "";
+      btn.style.color = "";
+      btn.style.fontWeight = "";
+    }
+  });
 }
 
 function vincular() {
@@ -3115,27 +3119,27 @@ function vincular() {
     if ($("link").value.trim()) enviarLink($("link").value.trim(), false);
   });
   document.querySelectorAll(".aba[data-origem]").forEach((aba) => aba.addEventListener("click", () => trocarOrigem(aba.dataset.origem)));
-  if ($("btn-toggle-auto-cortes")) {
-    $("btn-toggle-auto-cortes").addEventListener("click", async () => {
-      const btn = $("btn-toggle-auto-cortes");
-      btn.disabled = true;
-      try {
-        const dados = await postar("/api/automacao/cortes/toggle", { ativo: !estado.modoAutoCortes });
-        estado.modoAutoCortes = Boolean(dados.modo_automatico);
-        atualizarBotaoModoCortes();
-        if (estado.modoAutoCortes) {
-          const prop = (estado.configCortes && estado.configCortes.proporcao) || "1:1";
-          avisar(`⚡ Cortes automáticos ATIVADOS em formato ${prop} para Google Drive.`, "ok");
-        } else {
-          avisar(dados.mensagem || "Modo de cortes alterado", "ok");
-        }
-      } catch (e) {
-        avisar("Erro ao alterar modo: " + e.message, "erro");
-      } finally {
-        btn.disabled = false;
+  const dispararToggleCortes = async () => {
+    const botoes = [$("btn-toggle-auto-cortes"), $("btn-toggle-auto-cortes-live")].filter(Boolean);
+    botoes.forEach((b) => (b.disabled = true));
+    try {
+      const dados = await postar("/api/automacao/cortes/toggle", { ativo: !estado.modoAutoCortes });
+      estado.modoAutoCortes = Boolean(dados.modo_automatico);
+      atualizarBotaoModoCortes();
+      if (estado.modoAutoCortes) {
+        const prop = (estado.configCortes && estado.configCortes.proporcao) || "1:1";
+        avisar(`⚡ Cortes automáticos ATIVADOS em formato ${prop} para Google Drive.`, "ok");
+      } else {
+        avisar(dados.mensagem || "Modo de cortes alterado", "ok");
       }
-    });
-  }
+    } catch (e) {
+      avisar("Erro ao alterar modo: " + e.message, "erro");
+    } finally {
+      botoes.forEach((b) => (b.disabled = false));
+    }
+  };
+  if ($("btn-toggle-auto-cortes")) $("btn-toggle-auto-cortes").addEventListener("click", dispararToggleCortes);
+  if ($("btn-toggle-auto-cortes-live")) $("btn-toggle-auto-cortes-live").addEventListener("click", dispararToggleCortes);
   if ($("btn-config-auto-cortes")) {
     $("btn-config-auto-cortes").addEventListener("click", () => abrirModalConfigCortes());
   }
@@ -3529,10 +3533,11 @@ function vincular() {
       const duracao_chunk_s = parseInt($("live-duracao") ? $("live-duracao").value : "1800", 10) || 1800;
       const qualidade = $("live-qualidade") ? $("live-qualidade").value : "best";
       const auto_cortar = $("live-auto-cortar") ? $("live-auto-cortar").checked : true;
+      const inicio_offset_s = parseInt($("live-inicio-offset") ? $("live-inicio-offset").value : "1800", 10);
 
       btnIniciarLive.disabled = true;
       try {
-        await postar("/api/live/iniciar", { url, playlist_id, dvr, duracao_chunk_s, qualidade, auto_cortar });
+        await postar("/api/live/iniciar", { url, playlist_id, dvr, duracao_chunk_s, qualidade, auto_cortar, inicio_offset_s });
         avisar("Gravação iniciada com sucesso! Pipeline ativo.", "ok");
         carregarLiveStatus();
       } catch (err) {
@@ -3585,8 +3590,9 @@ function vincular() {
         const qualidade = $("live-qualidade") ? $("live-qualidade").value : "best";
         const auto_cortar = $("live-auto-cortar") ? $("live-auto-cortar").checked : true;
         const dvr = $("live-dvr") ? $("live-dvr").checked : true;
+        const inicio_offset_s = parseInt($("live-inicio-offset") ? $("live-inicio-offset").value : "0", 10);
 
-        const payload = { url, duracao_chunk_s, qualidade, auto_cortar, dvr };
+        const payload = { url, duracao_chunk_s, qualidade, auto_cortar, dvr, inicio_offset_s };
         if ($("live-monitor-auto")) {
           payload.monitor_ativo = $("live-monitor-auto").checked;
         }

@@ -965,6 +965,7 @@ def live_iniciar():
     duracao_chunk_s = int(dados.get("duracao_chunk_s", 1800))
     qualidade = str(dados.get("qualidade", "best")).strip()
     auto_cortar = bool(dados.get("auto_cortar", True))
+    inicio_offset_s = int(dados.get("inicio_offset_s", 0))
     if duracao_chunk_s < 30 or duracao_chunk_s > 7200:
         return _erro("duração do bloco deve estar entre 30 segundos e 2 horas", 400)
     try:
@@ -975,6 +976,7 @@ def live_iniciar():
             duracao_chunk_s=duracao_chunk_s,
             qualidade=qualidade,
             auto_cortar=auto_cortar,
+            inicio_offset_s=inicio_offset_s,
         )
         return jsonify({"ok": True, "sessao": res}), 202
     except Exception as erro:
@@ -999,6 +1001,7 @@ def live_cortar_agora():
 @app.post("/api/live/config")
 def live_config():
     dados = request.get_json(force=True, silent=True) or {}
+    inicio_offset = int(dados["inicio_offset_s"]) if "inicio_offset_s" in dados and dados["inicio_offset_s"] is not None else None
     gravador_live.gravador.salvar_config(
         url=dados.get("url"),
         duracao_chunk_s=int(dados["duracao_chunk_s"]) if "duracao_chunk_s" in dados and dados["duracao_chunk_s"] is not None else None,
@@ -1006,6 +1009,7 @@ def live_config():
         dvr=dados.get("dvr"),
         auto_cortar=dados.get("auto_cortar"),
         monitor_ativo=dados.get("monitor_ativo"),
+        inicio_offset_s=inicio_offset,
     )
     return jsonify({"ok": True, "status": gravador_live.gravador.obter_status()})
 

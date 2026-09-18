@@ -459,18 +459,38 @@
               <option value="480p">480p</option>
             </select>
           </label>
+          <label class="campo" style="grid-column: 1 / -1;">Ponto de Início da Gravação
+            <select id="live-inicio-offset">
+              <option value="1800" selected>⏱️ 30 min após início da live (Pular Abertura)</option>
+              <option value="0">🔴 Ao Vivo Agora (Ponta em Tempo Real)</option>
+              <option value="900">⏱️ 15 min após início da live</option>
+              <option value="3600">⏱️ 1 hora após início da live</option>
+              <option value="-1">⏮️ Desde o Início Completo (DVR 00:00:00)</option>
+            </select>
+          </label>
         </div>
 
         <!-- Regras Complementares Sem Checkbox Redundante -->
         <div class="live-checks-grupo">
           <label class="check" title="Ao finalizar cada fatia, a IA do Indomável transcreve e corta nas 3 modalidades do Google Drive">
             <input type="checkbox" id="live-auto-cortar" checked>
-            <span><b>Cortar com IA:</b> 3 modalidades no Google Drive (ID: 1wBxCAat68t-jLBl3RJxCBJmZNvPAjz-G)</span>
+            <span><b>Cortar Fatias com IA:</b> 3 modalidades no Google Drive</span>
           </label>
           <label class="check" title="Baixa todo o histórico disponível no buffer da live antes de continuar no ao vivo">
             <input type="checkbox" id="live-dvr" checked>
             <span><b>Catch-up DVR:</b> Baixar buffer gravado da transmissão</span>
           </label>
+        </div>
+
+        <!-- Controle Integrado de Cortes Automáticos do Drive (Vigilante) -->
+        <div class="card-bloco-auto-drive" style="margin-top: 10px; padding: 10px; background: rgba(46, 213, 115, 0.08); border: 1px solid rgba(46, 213, 115, 0.25); border-radius: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <div>
+              <strong style="color: #2ed573; font-size: 12px; display: block;">⚡ Cortes Automáticos nos Vídeos do Drive</strong>
+              <small style="color: var(--cor-texto-suave); font-size: 11px;">Vigilante contínuo: fatiar novos vídeos depositados no Google Drive automaticamente.</small>
+            </div>
+            <button id="btn-toggle-auto-cortes-live" class="botao-sec pequeno" type="button" style="white-space: nowrap;">⚡ Cortes Drive: DESLIGADO</button>
+          </div>
         </div>
       </div>
 

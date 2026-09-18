@@ -109,9 +109,14 @@ def _migrar_colunas_se_necessario(conn):
         for col, tipo in novas.items():
             if col not in colunas:
                 conn.execute(f"ALTER TABLE partes_live ADD COLUMN {col} {tipo}")
+
+        colunas_sessoes = {r[1] for r in conn.execute("PRAGMA table_info(sessoes_live)").fetchall()}
+        if "inicio_offset_s" not in colunas_sessoes:
+            conn.execute("ALTER TABLE sessoes_live ADD COLUMN inicio_offset_s INTEGER DEFAULT 0")
+
         conn.commit()
     except Exception as e:
-        log.debug("Aviso de migração de schema partes_live: %s", e)
+        log.debug("Aviso de migração de schema: %s", e)
 
 
 def iniciar_banco():
@@ -126,6 +131,7 @@ def iniciar_banco():
             pasta_destino TEXT NOT NULL,
             modo_dvr INTEGER DEFAULT 1,
             duracao_chunk_s INTEGER DEFAULT 1800,
+            inicio_offset_s INTEGER DEFAULT 0,
             estado TEXT DEFAULT 'gravando',
             pid_processo INTEGER,
             mensagem TEXT,
@@ -461,6 +467,7 @@ class GerenciadorGravacaoLive:
         self._duracao_chunk_s = 1800
         self._dvr = True
         self._auto_cortar = True
+        self._inicio_offset_s = 0
         self._is_live_online = False
         self._stream_title = "Live Stream"
         self._session_start_time: Optional[float] = None
@@ -490,12 +497,15 @@ class GerenciadorGravacaoLive:
                     self._dvr = cfg["dvr"] == "1"
                 if "auto_cortar" in cfg:
                     self._auto_cortar = cfg["auto_cortar"] == "1"
+                if "inicio_offset_s" in cfg:
+                    self._inicio_offset_s = int(cfg["inicio_offset_s"])
         except Exception as e:
             log.debug("Aviso ao carregar config_gravador: %s", e)
 
     def salvar_config(self, url: Optional[str] = None, duracao_chunk_s: Optional[int] = None,
                       qualidade: Optional[str] = None, dvr: Optional[bool] = None,
-                      auto_cortar: Optional[bool] = None, monitor_ativo: Optional[bool] = None):
+                      auto_cortar: Optional[bool] = None, monitor_ativo: Optional[bool] = None,
+                      inicio_offset_s: Optional[int] = None):
         with self._trava:
             if url is not None:
                 url_limpa = url.strip()
@@ -511,6 +521,8 @@ class GerenciadorGravacaoLive:
                 self._auto_cortar = bool(auto_cortar)
             if monitor_ativo is not None:
                 self._monitor_247_ativo = bool(monitor_ativo)
+            if inicio_offset_s is not None:
+                self._inicio_offset_s = int(inicio_offset_s)
 
             try:
                 with _conectar() as conn:
@@ -524,6 +536,7 @@ class GerenciadorGravacaoLive:
                         ("dvr", "1" if self._dvr else "0"),
                         ("auto_cortar", "1" if self._auto_cortar else "0"),
                         ("monitor_ativo", "1" if self._monitor_247_ativo else "0"),
+                        ("inicio_offset_s", str(self._inicio_offset_s)),
                     ])
                     conn.commit()
             except Exception as e:
@@ -576,6 +589,7 @@ class GerenciadorGravacaoLive:
             "auto_cortar": self._auto_cortar,
             "qualidade": self._qualidade,
             "dvr": self._dvr,
+            "inicio_offset_s": sessao.get("inicio_offset_s", self._inicio_offset_s) if sessao else self._inicio_offset_s,
             "pasta_destino_cortes": cortador_drive.PASTA_DESTINO_CORTES_PADRAO,
             "pasta_fonte_raw": config.PASTA_FONTE_LIVES_PADRAO,
             "drive_conectado": drive_conectado,
@@ -605,7 +619,8 @@ class GerenciadorGravacaoLive:
 
     def iniciar_gravacao(self, url_ou_id: Optional[str] = None, playlist_id: Optional[str] = None,
                          dvr: bool = True, duracao_chunk_s: int = 1800, pasta_base: Optional[str] = None,
-                         qualidade: Optional[str] = None, auto_cortar: bool = True) -> Dict[str, Any]:
+                         qualidade: Optional[str] = None, auto_cortar: bool = True,
+                         inicio_offset_s: int = 0) -> Dict[str, Any]:
         with self._trava:
             if self._processo_ffmpeg and self._processo_ffmpeg.poll() is None:
                 raise RuntimeError("Já existe uma gravação de live em andamento.")
@@ -638,6 +653,7 @@ class GerenciadorGravacaoLive:
             self._dvr = dvr
             self._qualidade = qualidade or self._qualidade
             self._auto_cortar = auto_cortar
+            self._inicio_offset_s = inicio_offset_s
 
             timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             nome_pasta = f"live_{youtube_id}_{timestamp_str}"
@@ -650,11 +666,11 @@ class GerenciadorGravacaoLive:
                 cursor = conn.execute("""
                     INSERT INTO sessoes_live (
                         youtube_id, url_live, titulo, playlist_id, pasta_destino,
-                        modo_dvr, duracao_chunk_s, estado, criado_em, atualizado_em, mensagem
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'gravando', ?, ?, 'Gravando...')
+                        modo_dvr, duracao_chunk_s, inicio_offset_s, estado, criado_em, atualizado_em, mensagem
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'gravando', ?, ?, 'Gravando...')
                 """, (
                     youtube_id, url_alvo, titulo, playlist_id or "", pasta_destino,
-                    1 if dvr else 0, duracao_chunk_s, agora, agora
+                    1 if dvr else 0, duracao_chunk_s, inicio_offset_s, agora, agora
                 ))
                 sessao_id = cursor.lastrowid
                 conn.commit()
@@ -666,7 +682,7 @@ class GerenciadorGravacaoLive:
             self._parar_evento.clear()
             self._corte_solicitado.clear()
 
-            self._iniciar_processos_pipeline(sessao_id, url_alvo, pasta_destino, duracao_chunk_s, dvr, self._qualidade, info)
+            self._iniciar_processos_pipeline(sessao_id, url_alvo, pasta_destino, duracao_chunk_s, dvr, self._qualidade, info, inicio_offset_s)
 
             # Inicia thread de monitoramento da sessão e watcher de segmentos
             self._thread_monitor = threading.Thread(
@@ -680,11 +696,12 @@ class GerenciadorGravacaoLive:
             # Inicia thread de processamento e IA
             self._iniciar_thread_ia()
 
-            log.info("🔴 Gravação 24/7 iniciada com sucesso: '%s' (Sessão #%d)", titulo, sessao_id)
+            log.info("🔴 Gravação 24/7 iniciada com sucesso: '%s' (Sessão #%d, Offset: %ds)", titulo, sessao_id, inicio_offset_s)
             return {"sessao_id": sessao_id, "youtube_id": youtube_id, "titulo": titulo, "pasta": pasta_destino}
 
     def _iniciar_processos_pipeline(self, sessao_id: int, url_alvo: str, pasta_destino: str,
-                                    duracao_chunk_s: int, dvr: bool, qualidade: str, info: Dict[str, Any]):
+                                    duracao_chunk_s: int, dvr: bool, qualidade: str, info: Dict[str, Any],
+                                    inicio_offset_s: int = 0):
         """Inicializa pipeline: Streamlink | FFmpeg (prioridade máxima) ou FFmpeg direto (fallback)."""
         creationflags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
         streamlink_bin = getattr(config, "STREAMLINK", None) or shutil.which("streamlink")
@@ -703,7 +720,18 @@ class GerenciadorGravacaoLive:
                     "--http-header", "Accept-Language=pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
                     "--stdout",
                 ])
-                if dvr:
+                if inicio_offset_s > 0:
+                    streamlink_cmd.append("--hls-live-restart")
+                    horas = inicio_offset_s // 3600
+                    minutos = (inicio_offset_s % 3600) // 60
+                    segundos = inicio_offset_s % 60
+                    offset_str = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
+                    streamlink_cmd.extend(["--hls-start-offset", offset_str])
+                    log.info("[Gravador Live] Captura HLS DVR iniciando em +%s (%ds após abertura)", offset_str, inicio_offset_s)
+                elif inicio_offset_s == -1:
+                    streamlink_cmd.append("--hls-live-restart")
+                    log.info("[Gravador Live] Captura HLS DVR iniciando do início absoluto (00:00:00)")
+                elif dvr:
                     streamlink_cmd.extend(["--hls-live-edge", "2"])
                 streamlink_cmd.extend([
                     "--stream-segment-threads", "2",
