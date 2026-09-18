@@ -39,6 +39,15 @@ def opcoes_ytdlp():
         opcoes["js_runtimes"] = {"node": {"path": config.NODE}}
     if config.FFMPEG:
         opcoes["ffmpeg_location"] = config.FFMPEG
+    candidatos_cookies = [
+        config.valor("COOKIES_YOUTUBE"),
+        os.path.join(config.RAIZ, "cookies.txt"),
+        os.path.join(config.PASTA_DADOS, "cookies.txt"),
+    ]
+    for c in candidatos_cookies:
+        if c and os.path.isfile(c):
+            opcoes["cookiefile"] = c
+            break
     return opcoes
 
 

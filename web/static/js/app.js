@@ -2526,10 +2526,10 @@ async function atualizarStatusDriveModal() {
   badge.className = "badge-drive";
   try {
     const res = await api("/api/drive/status");
-    if (res.conectado) {
-      badge.textContent = "☁️ Nuvem Ativa";
+    if (res.conectado && res.oauth_conectado) {
+      badge.textContent = "☁️ Nuvem Ativa (OAuth)";
       badge.className = "badge-drive nuvem";
-      if (msg) msg.textContent = `Conectado à nuvem na pasta ${res.pasta_id}. Uploads automáticos ativos.`;
+      if (msg) msg.textContent = `Conectado à nuvem pessoal na pasta ${res.pasta_id}. Uploads automáticos ativos.`;
       if (btnAuth) {
         btnAuth.textContent = "✅ Conta Google Conectada";
         btnAuth.style.background = "#2ed573";
@@ -2537,6 +2537,20 @@ async function atualizarStatusDriveModal() {
         btnAuth.disabled = true;
       }
       if (boxManual) boxManual.style.display = "none";
+    } else if (res.conectado && res.tipo_credencial === "service_account") {
+      badge.textContent = "⚠️ Cota 0b (Requer OAuth)";
+      badge.className = "badge-drive local";
+      if (msg) msg.textContent = res.mensagem;
+      if (btnAuth) {
+        btnAuth.textContent = "🔑 Conectar Conta Google Pessoal";
+        btnAuth.style.background = "#ff9f43";
+        btnAuth.style.borderColor = "#ff9f43";
+        btnAuth.disabled = false;
+        if (res.url_autorizacao) {
+          btnAuth.dataset.url = res.url_autorizacao;
+        }
+      }
+      if (boxManual) boxManual.style.display = res.oauth_configurado ? "block" : "none";
     } else {
       badge.textContent = "📁 Fallback Local";
       badge.className = "badge-drive local";
@@ -2787,7 +2801,7 @@ function vincular() {
           avisar("Janela de login do Google aberta! Conceda permissão para a pasta do Drive.", "ok");
           const intv = setInterval(async () => {
             const st = await api("/api/drive/status");
-            if (st && st.conectado) {
+            if (st && (st.oauth_conectado || st.tipo_credencial === 'oauth_token')) {
               clearInterval(intv);
               avisar("Google Drive conectado com sucesso na nuvem!", "ok");
               atualizarStatusDriveModal();

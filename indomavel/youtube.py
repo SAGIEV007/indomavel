@@ -48,6 +48,15 @@ def _opcoes(modelo_saida, silencioso, ao_progredir):
         opcoes["ffmpeg_location"] = config.FFMPEG
     if config.NODE:
         opcoes["js_runtimes"] = {"node": {"path": config.NODE}}
+    candidatos_cookies = [
+        config.valor("COOKIES_YOUTUBE"),
+        os.path.join(config.RAIZ, "cookies.txt"),
+        os.path.join(config.PASTA_DADOS, "cookies.txt"),
+    ]
+    for c in candidatos_cookies:
+        if c and os.path.isfile(c):
+            opcoes["cookiefile"] = c
+            break
     if ao_progredir:
         opcoes["progress_hooks"] = [ao_progredir]
     return opcoes

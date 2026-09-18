@@ -62,6 +62,16 @@ class TestBlocador(unittest.TestCase):
         self.assertEqual(final["destaques"][0]["texto"], "frase 0.")
         self.assertEqual(final["origem"], "gemini")
 
+    def test_fallback_quando_gemini_falha(self):
+        def falhador(instrucao, conteudo, esquema):
+            raise RuntimeError("Gemini 403 PERMISSION_DENIED")
+
+        blocos, ignorados, modelos = blocador.dividir(frases(60, passo=2.0), "contexto", gerar=falhador)
+        self.assertGreater(len(blocos), 0)
+        self.assertEqual(modelos, ["heuristicas_locais"])
+        self.assertTrue(blocos[0]["renan_falando"])
+        self.assertGreater(blocos[0]["duracao"], 15.0)
+
 
 if __name__ == "__main__":
     unittest.main()

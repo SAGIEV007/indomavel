@@ -316,8 +316,8 @@ def filtro_ffmpeg(dados_layout, estilo, largura_fonte, altura_fonte, com_legenda
     return ";".join(partes)
 
 
-def exportar(youtube_id, inicio, fim, formato, estilo, trechos, pasta_saida, titulo, ao_progredir=None, nome_arquivo=None):
-    """Baixa o trecho, compõe o vídeo final e devolve o caminho do MP4."""
+def exportar(youtube_id, inicio, fim, formato, estilo, trechos, pasta_saida, titulo, ao_progredir=None, nome_arquivo=None, caminho_fonte=None):
+    """Baixa ou recorta o trecho, compõe o vídeo final e devolve o caminho do MP4."""
     estilo = normalizar_estilo(estilo)
     dados_layout = layout(formato, estilo)
     os.makedirs(pasta_saida, exist_ok=True)
@@ -347,7 +347,25 @@ def exportar(youtube_id, inicio, fim, formato, estilo, trechos, pasta_saida, tit
                     etapa_nome="Processando arquivo de mídia",
                 )
 
-        bruto = youtube.baixar_trecho(youtube_id, inicio, fim, temporaria, "trecho", ao_progredir=ao_baixar)
+        bruto = None
+        if caminho_fonte and os.path.exists(caminho_fonte):
+            _notificar(ao_progredir, "Recortando trecho local do vídeo fonte…", progresso=15.0, etapa="processando", etapa_nome="Recortando trecho local")
+            caminho_trecho_local = os.path.join(temporaria, "trecho.mp4")
+            dur_recorte = max(0.1, float(fim) - float(inicio))
+            cmd_recorte = [
+                config.FFMPEG or "ffmpeg", "-y", "-ss", f"{float(inicio):.3f}", "-i", caminho_fonte,
+                "-t", f"{dur_recorte:.3f}", "-c:v", "libx264", "-preset", "ultrafast", "-crf", "18",
+                "-c:a", "aac", "-movflags", "+faststart", caminho_trecho_local
+            ]
+            try:
+                res_recorte = subprocess.run(cmd_recorte, capture_output=True, text=True)
+                if res_recorte.returncode == 0 and os.path.exists(caminho_trecho_local) and os.path.getsize(caminho_trecho_local) > 0:
+                    bruto = caminho_trecho_local
+            except Exception:
+                bruto = None
+
+        if not bruto:
+            bruto = youtube.baixar_trecho(youtube_id, inicio, fim, temporaria, "trecho", ao_progredir=ao_baixar)
         largura_fonte, altura_fonte, duracao = _sondar(bruto)
         desenhar_moldura(dados_layout).save(os.path.join(temporaria, "moldura.png"))
         com_legenda = estilo["legenda"] and bool(trechos)

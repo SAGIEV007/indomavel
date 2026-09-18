@@ -19,6 +19,7 @@ import json
 import logging
 import mimetypes
 import os
+import re
 import shutil
 import threading
 import time
@@ -50,7 +51,7 @@ def identificar_categoria_arquivo(nome_arquivo):
     nome = os.path.basename(nome_arquivo).lower()
     if "_com_legenda." in nome:
         return "com_legenda"
-    if "_sem_legenda." in nome:
+    if "_sem_legenda." in nome or "_headline." in nome or "_com_headline." in nome:
         return "sem_legenda"
     if "_so_legenda." in nome:
         return "so_legenda"
@@ -217,6 +218,11 @@ def obter_token_acesso():
             creds = Credentials.from_authorized_user_file(caminho, scopes=scopes)
             if creds.expired and creds.refresh_token:
                 creds.refresh(Request())
+                try:
+                    with open(caminho, "w", encoding="utf-8") as ft:
+                        ft.write(creds.to_json())
+                except Exception:
+                    pass
             if creds.token:
                 return creds.token, None
         except Exception as e_user:
@@ -306,6 +312,25 @@ def enviar_arquivo_drive(caminho_local, nome_arquivo, id_pasta_destino, token=No
     mime_type, _ = mimetypes.guess_type(caminho_local)
     mime_type = mime_type or "application/octet-stream"
 
+    # Deduplicação: verifica se arquivo com mesmo nome e tamanho já existe na pasta de destino
+    query = f"'{id_pasta_destino}' in parents and name = '{nome_arquivo}' and trashed = false"
+    url_busca = f"https://www.googleapis.com/drive/v3/files?q={urllib.parse.quote(query)}&fields=files(id,name,size)"
+    try:
+        req_b = urllib.request.Request(url_busca, headers={"Authorization": f"Bearer {token}"})
+        with urllib.request.urlopen(req_b, timeout=15) as resp_b:
+            dados_b = json.loads(resp_b.read().decode("utf-8"))
+            for f_existente in dados_b.get("files", []):
+                if int(f_existente.get("size", 0)) == tamanho:
+                    log.info("Arquivo já existe no Google Drive: %s (ID: %s). Re-upload evitado.", nome_arquivo, f_existente["id"])
+                    return {
+                        "id": f_existente["id"],
+                        "nome": nome_arquivo,
+                        "tamanho": tamanho,
+                        "mime_type": mime_type,
+                    }
+    except Exception as e_check:
+        log.debug("Aviso ao checar arquivo existente no Drive: %s", e_check)
+
     # Resumable upload para maior confiabilidade com vídeos MP4
     url_sessao = "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable"
     metadados = {
@@ -351,14 +376,63 @@ def enviar_arquivo_drive(caminho_local, nome_arquivo, id_pasta_destino, token=No
             }
 
     except Exception as e:
-        log.warning("Falha ao enviar arquivo %s para Google Drive: %s", nome_arquivo, e)
+        msg_erro = str(e)
+        if hasattr(e, "read"):
+            try:
+                msg_erro += " " + e.read().decode("utf-8", errors="ignore")
+            except Exception:
+                pass
+        if "storageQuotaExceeded" in msg_erro or "quota" in msg_erro.lower():
+            log.error(
+                "Cota do Google Drive excedida ao enviar %s: %s. "
+                "Contas de Serviço têm 0 bytes de cota em drives pessoais. "
+                "Execute Conectar_Google_Drive.bat para autenticar via OAuth pessoal.",
+                nome_arquivo, msg_erro,
+            )
+        else:
+            log.warning("Falha ao enviar arquivo %s para Google Drive: %s", nome_arquivo, e)
         return None
 
 
-def enviar_pacote_drive(pasta_corte, prefixo, variacoes_ativas=None, pasta_id_raiz=ID_PASTA_PADRAO):
+PASTAS_CATEGORIA_HIERARQUICA = {
+    "com_legenda": "Cortes com headline e legenda",
+    "sem_legenda": "Cortes com headline",
+    "so_legenda": "Cortes com legenda",
+    "cru": "Cortes originais",
+    "headlines": "Cortes com headline",
+}
+
+
+def obter_nome_subpasta_modalidade(categoria, variacoes_ativas=None):
+    """Determina o nome da subpasta hierárquica respeitando a especificação exata do usuário.
+    - Se marcado headline apenas: 'Cortes com headline' + 'Cortes originais'
+    - Se marcado legenda e headlines: 'Cortes com headline' + 'Cortes com headline e legenda' + 'Cortes originais'
+    - Se marcado apenas legenda: 'Cortes com legenda' + 'Cortes originais'
+    """
+    if categoria in ("sem_legenda", "headlines"):
+        return "Cortes com headline"
+    if categoria == "cru":
+        return "Cortes originais"
+    if categoria == "so_legenda":
+        return "Cortes com legenda"
+    if categoria == "com_legenda":
+        if variacoes_ativas and (variacoes_ativas.get("sem_legenda") or variacoes_ativas.get("headlines")):
+            return "Cortes com headline e legenda"
+        return "Cortes com legenda"
+    return PASTAS_CATEGORIA_HIERARQUICA.get(categoria, "Outros")
+
+
+def enviar_pacote_drive(pasta_corte, prefixo, variacoes_ativas=None, pasta_id_raiz=ID_PASTA_PADRAO, titulo_video=None):
     """Envia todos os arquivos gerados de um pacote FernandoXX para as respectivas pastas no Drive.
 
-    Também organiza localmente em subpastas de categoria em PASTA_GOOGLE_DRIVE como fallback
+    Quando titulo_video é informado:
+    Cria a pasta com o [Nome do Vídeo] sob a pasta raiz, e dentro dela uma subpasta para cada modalidade:
+    - 'Cortes com headline' (vídeo com headline + arquivo txt com sugestões de headlines)
+    - 'Cortes originais' (vídeo original cru + srt)
+    - 'Cortes com headline e legenda'
+    - 'Cortes com legenda'
+
+    Também organiza localmente com essa mesma hierarquia em PASTA_GOOGLE_DRIVE como fallback
     garantido ou espelhamento.
     """
     if not pasta_corte or not os.path.isdir(pasta_corte):
@@ -370,11 +444,25 @@ def enviar_pacote_drive(pasta_corte, prefixo, variacoes_ativas=None, pasta_id_ra
     pasta_base_local = config.PASTA_GOOGLE_DRIVE
     os.makedirs(pasta_base_local, exist_ok=True)
 
+    if titulo_video:
+        nome_pasta_video = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "", str(titulo_video)).strip() or "Vídeo"
+        pasta_video_local = os.path.join(pasta_base_local, nome_pasta_video)
+        os.makedirs(pasta_video_local, exist_ok=True)
+        id_pasta_video = obter_ou_criar_pasta_drive(nome_pasta_video, id_pai=pasta_id_raiz, token=token) if conectado_nuvem else None
+    else:
+        nome_pasta_video = None
+        pasta_video_local = pasta_base_local
+        id_pasta_video = pasta_id_raiz
+
     arquivos_locais = [f for f in os.listdir(pasta_corte) if os.path.isfile(os.path.join(pasta_corte, f))]
     resultado_arquivos = {}
     todos_ok = True
 
     for nome_arq in arquivos_locais:
+        # Metadados internos (.json) e arquivos ocultos não compõem pacotes de cortes para o usuário
+        if nome_arq.endswith(".json") or nome_arq.startswith("."):
+            continue
+
         caminho_origem = os.path.join(pasta_corte, nome_arq)
         cat = identificar_categoria_arquivo(nome_arq)
 
@@ -384,10 +472,16 @@ def enviar_pacote_drive(pasta_corte, prefixo, variacoes_ativas=None, pasta_id_ra
                 if not variacoes_ativas.get(cat, True):
                     continue
 
-        nome_pasta_cat = PASTAS_CATEGORIA.get(cat, "Outros")
+        if titulo_video:
+            nome_pasta_cat = obter_nome_subpasta_modalidade(cat, variacoes_ativas)
+            pasta_cat_local = os.path.join(pasta_video_local, nome_pasta_cat)
+            id_pai_cat = id_pasta_video
+        else:
+            nome_pasta_cat = PASTAS_CATEGORIA.get(cat, "Outros")
+            pasta_cat_local = os.path.join(pasta_base_local, nome_pasta_cat)
+            id_pai_cat = pasta_id_raiz
 
         # 1. Organização local por pasta de categoria (espelhamento garantido)
-        pasta_cat_local = os.path.join(pasta_base_local, nome_pasta_cat)
         os.makedirs(pasta_cat_local, exist_ok=True)
         destino_cat_local = os.path.join(pasta_cat_local, nome_arq)
         try:
@@ -397,14 +491,15 @@ def enviar_pacote_drive(pasta_corte, prefixo, variacoes_ativas=None, pasta_id_ra
             log.debug("Aviso ao copiar espelho local de %s: %s", nome_arq, e_copy)
 
         # 2. Upload para a nuvem no Google Drive se conectado
-        if conectado_nuvem:
-            id_pasta_cat = obter_ou_criar_pasta_drive(nome_pasta_cat, id_pai=pasta_id_raiz, token=token)
+        if conectado_nuvem and id_pai_cat:
+            id_pasta_cat = obter_ou_criar_pasta_drive(nome_pasta_cat, id_pai=id_pai_cat, token=token)
             if id_pasta_cat:
                 upload_info = enviar_arquivo_drive(caminho_origem, nome_arq, id_pasta_cat, token=token)
                 if upload_info:
                     resultado_arquivos[nome_arq] = {
                         "categoria": cat,
                         "pasta_drive": nome_pasta_cat,
+                        "pasta_video": nome_pasta_video,
                         "drive_id": upload_info["id"],
                         "tamanho": upload_info["tamanho"],
                         "status": "enviado_nuvem",
@@ -426,6 +521,7 @@ def enviar_pacote_drive(pasta_corte, prefixo, variacoes_ativas=None, pasta_id_ra
             resultado_arquivos[nome_arq] = {
                 "categoria": cat,
                 "pasta_drive": nome_pasta_cat,
+                "pasta_video": nome_pasta_video,
                 "caminho_local": destino_cat_local,
                 "status": "salvo_local_fallback",
             }
@@ -435,6 +531,7 @@ def enviar_pacote_drive(pasta_corte, prefixo, variacoes_ativas=None, pasta_id_ra
         "sucesso": todos_ok if conectado_nuvem else True,
         "modo": modo,
         "pasta_raiz_id": pasta_id_raiz,
+        "pasta_video": nome_pasta_video,
         "arquivos": resultado_arquivos,
         "mensagem": "Arquivos sincronizados na nuvem do Google Drive" if conectado_nuvem else f"Modo local (Google Drive aguardando credenciais: {motivo_sem_token})",
     }
@@ -461,20 +558,46 @@ def status_conexao():
     token, erro = obter_token_acesso()
     conectado = bool(token)
     oauth_dados = obter_dados_oauth_client()
+
+    tipo_cred = None
+    if cred_arquivo and os.path.isfile(cred_arquivo):
+        try:
+            with open(cred_arquivo, encoding="utf-8") as f:
+                c_data = json.load(f)
+            if c_data.get("type") == "service_account":
+                tipo_cred = "service_account"
+            elif "token" in c_data or "refresh_token" in c_data:
+                tipo_cred = "oauth_token"
+        except Exception:
+            pass
+
+    oauth_conectado = (tipo_cred == "oauth_token")
     url_auth = None
-    if not conectado and oauth_dados:
+    if (not conectado or not oauth_conectado) and oauth_dados:
         url_auth, _ = gerar_url_autorizacao()
 
-    msg = "Conectado ao Google Drive na nuvem. Uploads ativos." if conectado else (
-        "Cliente OAuth configurado. Clique em 'Conectar Google Drive' para autorizar." if oauth_dados else
-        f"Operando em fallback local (output/google_drive). Motivo: {erro}. "
-        "Para envio direto à nuvem, insira o arquivo de credenciais do Google Drive ou conecte o OAuth."
-    )
+    if conectado and oauth_conectado:
+        msg = "Conectado ao Google Drive pessoal (OAuth). Uploads ilimitados ativos na nuvem."
+    elif conectado and tipo_cred == "service_account":
+        msg = (
+            "Atenção: Conectado via Service Account (cota 0 bytes em drives pessoais). "
+            "Para uploads funcionarem sem erro de cota, conecte sua Conta Google via botão ou Conectar_Google_Drive.bat."
+        )
+    elif oauth_dados:
+        msg = "Operando em fallback local (output/google_drive). Cliente OAuth configurado. Clique em 'Conectar Google Drive' para autorizar."
+    else:
+        msg = (
+            f"Operando em fallback local (output/google_drive). Motivo: {erro}. "
+            "Para envio direto à nuvem, insira o arquivo de credenciais do Google Drive ou conecte o OAuth."
+        )
 
     pasta_ativa = obter_pasta_id_ativa()
+    modo_status = "nuvem" if (conectado and oauth_conectado) else ("service_account_limitado" if (conectado and tipo_cred == "service_account") else "fallback_local")
     return {
         "conectado": conectado,
-        "modo": "nuvem" if conectado else "fallback_local",
+        "oauth_conectado": oauth_conectado,
+        "tipo_credencial": tipo_cred,
+        "modo": modo_status,
         "pasta_id": pasta_ativa,
         "pasta_url": f"https://drive.google.com/drive/folders/{pasta_ativa}",
         "pasta_local": os.path.abspath(config.PASTA_GOOGLE_DRIVE),
@@ -518,7 +641,7 @@ def salvar_credenciais(conteudo_ou_dict):
 
 
 def subir_cortes_locais_pendentes(pasta_id_raiz=None):
-    """Varre todas as pastas FernandoXX em output/google_drive e envia os arquivos gerados para o Drive na nuvem."""
+    """Varre todas as pastas em output/google_drive e envia os arquivos gerados para o Drive na nuvem."""
     if not pasta_id_raiz:
         pasta_id_raiz = obter_pasta_id_ativa()
     pasta_base = config.PASTA_GOOGLE_DRIVE
@@ -529,26 +652,68 @@ def subir_cortes_locais_pendentes(pasta_id_raiz=None):
     if not token:
         return {"ok": False, "mensagem": f"Google Drive não conectado: {erro}"}
 
+    st_conn = status_conexao()
+    if st_conn.get("tipo_credencial") == "service_account":
+        log.warning("Upload na nuvem pausado: Contas de serviço possuem 0 bytes de cota em drives pessoais (@gmail.com). Cortes preservados localmente em %s.", pasta_base)
+        return {
+            "ok": False,
+            "aviso_cota": True,
+            "mensagem": "Contas de serviço possuem 0 bytes de cota em drives pessoais do Google Drive (@gmail.com). Conecte sua Conta Google via botão ou Conectar_Google_Drive.bat para realizar o envio à nuvem. Cortes estão salvos e espelhados localmente.",
+        }
+
     enviados = 0
     erros = 0
     detalhes = {}
 
     for item in sorted(os.listdir(pasta_base)):
         pasta_item = os.path.join(pasta_base, item)
-        if not os.path.isdir(pasta_item) or not item.startswith("Fernando"):
+        if not os.path.isdir(pasta_item):
             continue
 
-        res = enviar_pacote_drive(pasta_item, item, pasta_id_raiz=pasta_id_raiz)
-        detalhes[item] = res
-        if res.get("sucesso"):
-            enviados += 1
-        else:
-            erros += 1
+        # 1. Caso legado: pasta direta FernandoXX
+        if item.startswith("Fernando"):
+            tit_desc = None
+            txt_hl = os.path.join(pasta_item, f"{item}_headlines.txt")
+            if os.path.isfile(txt_hl):
+                try:
+                    with open(txt_hl, "r", encoding="utf-8") as f_hl:
+                        for lin in f_hl:
+                            if lin.startswith("Vídeo:") or lin.startswith("Video:"):
+                                m_tit = re.search(r"Vídeo:\s*([^(\n\r]+)", lin, re.IGNORECASE)
+                                if m_tit:
+                                    tit_desc = m_tit.group(1).strip()
+                                break
+                except Exception:
+                    pass
+            res = enviar_pacote_drive(pasta_item, item, pasta_id_raiz=pasta_id_raiz, titulo_video=tit_desc)
+            detalhes[item] = res
+            if res.get("sucesso"):
+                enviados += 1
+            else:
+                erros += 1
+            continue
+
+        # 2. Caso hierárquico: pasta com [Nome do Vídeo]
+        # Dentro dela existem subpastas de modalidade (ex: 'Cortes com headline', 'Cortes originais')
+        subpastas = [s for s in os.listdir(pasta_item) if os.path.isdir(os.path.join(pasta_item, s))]
+        if subpastas:
+            id_pasta_video = obter_ou_criar_pasta_drive(item, id_pai=pasta_id_raiz, token=token)
+            for sub in subpastas:
+                pasta_sub = os.path.join(pasta_item, sub)
+                id_pasta_cat = obter_ou_criar_pasta_drive(sub, id_pai=id_pasta_video, token=token) if id_pasta_video else None
+                for arq in os.listdir(pasta_sub):
+                    caminho_arq = os.path.join(pasta_sub, arq)
+                    if os.path.isfile(caminho_arq) and os.path.getsize(caminho_arq) > 0:
+                        up = enviar_arquivo_drive(caminho_arq, arq, id_pasta_cat, token=token) if id_pasta_cat else None
+                        if up:
+                            enviados += 1
+                        else:
+                            erros += 1
 
     return {
         "ok": True,
         "enviados": enviados,
         "erros": erros,
         "detalhes": detalhes,
-        "mensagem": f"Sincronização concluída: {enviados} pacotes enviados para o Google Drive na nuvem.",
+        "mensagem": f"Sincronização concluída: {enviados} arquivos enviados para o Google Drive na nuvem.",
     }

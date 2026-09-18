@@ -24,9 +24,9 @@ CONFIG_CORTES_PADRAO = {
     "proporcao": "1:1",
     "video_inicial_id": "",
     "variacoes": {
-        "com_legenda": False,
-        "sem_legenda": True,
-        "so_legenda": False,
+        "com_legenda": True,
+        "sem_legenda": False,
+        "so_legenda": True,
         "cru": True,
         "headlines": True,
     },
@@ -42,6 +42,7 @@ CONFIG_CORTES_PADRAO = {
         "upload_ativo": True,
     },
     "max_cortes_por_video": 4,
+    "modo_automatico": True,
 }
 
 
@@ -64,6 +65,8 @@ def carregar_config_cortes():
         if "drive" in carregado and isinstance(carregado["drive"], dict):
             resultado["drive"] = dict(CONFIG_CORTES_PADRAO["drive"])
             resultado["drive"].update(carregado["drive"])
+        if "modo_automatico" in carregado:
+            resultado["modo_automatico"] = bool(carregado["modo_automatico"])
         return resultado
     except Exception as e:
         log.warning("Erro ao ler %s: %s", caminho, e)
@@ -80,9 +83,11 @@ def salvar_config_cortes(dados):
                 atual["proporcao"] = prop
         if "max_cortes_por_video" in dados:
             try:
-                atual["max_cortes_por_video"] = max(1, min(20, int(dados["max_cortes_por_video"])))
+                atual["max_cortes_por_video"] = max(1, min(100, int(dados["max_cortes_por_video"])))
             except (ValueError, TypeError):
                 pass
+        if "modo_automatico" in dados:
+            atual["modo_automatico"] = bool(dados["modo_automatico"])
         if "variacoes" in dados and isinstance(dados["variacoes"], dict):
             for k in ("com_legenda", "sem_legenda", "so_legenda", "cru", "headlines"):
                 if k in dados["variacoes"]:
@@ -156,8 +161,16 @@ def video_eh_elegivel_por_ponto_partida(youtube_id):
         return True
 
 
-# Estado global do modo automático (desligado por padrão no boot conforme especificado pelo usuário)
-_MODO_AUTOMATICO = False
+def carregar_modo_automatico():
+    try:
+        cfg = carregar_config_cortes()
+        return bool(cfg.get("modo_automatico", True))
+    except Exception:
+        return True
+
+
+# Estado global do modo automático (persistido em config_cortes.json)
+_MODO_AUTOMATICO = carregar_modo_automatico()
 _TRAVA_MODO = threading.Lock()
 
 
@@ -165,6 +178,7 @@ def obter_modo_automatico():
     """Retorna se o modo de cortes automáticos está ativo."""
     global _MODO_AUTOMATICO
     with _TRAVA_MODO:
+        _MODO_AUTOMATICO = carregar_modo_automatico()
         return _MODO_AUTOMATICO
 
 
@@ -173,6 +187,7 @@ def definir_modo_automatico(ativo):
     global _MODO_AUTOMATICO
     with _TRAVA_MODO:
         _MODO_AUTOMATICO = bool(ativo)
+        salvar_config_cortes({"modo_automatico": _MODO_AUTOMATICO})
         log.info("Modo de cortes automáticos alterado para: %s", "LIGADO" if _MODO_AUTOMATICO else "DESLIGADO")
         return _MODO_AUTOMATICO
 
@@ -336,7 +351,10 @@ def verificar_pacote_completo(pasta_corte, prefixo=None, variacoes=None):
         if ativas.get("com_legenda"):
             arquivos_obrigatorios.append(f"{prefixo}_com_legenda.mp4")
         if ativas.get("sem_legenda"):
-            arquivos_obrigatorios.append(f"{prefixo}_sem_legenda.mp4")
+            if os.path.isfile(os.path.join(pasta_corte, f"{prefixo}_headline.mp4")):
+                arquivos_obrigatorios.append(f"{prefixo}_headline.mp4")
+            else:
+                arquivos_obrigatorios.append(f"{prefixo}_sem_legenda.mp4")
         if ativas.get("so_legenda"):
             arquivos_obrigatorios.append(f"{prefixo}_so_legenda.mp4")
         if ativas.get("cru"):
@@ -609,23 +627,46 @@ def gerar_pacote_corte(youtube_id, info, bloco, pasta_corte, prefixo, frases=Non
         except Exception:
             trechos_legenda = []
 
+    def _exec_render(estilo_render, trechos_render, nome_arq, titulo_corte):
+        try:
+            return render.exportar(
+                youtube_id=youtube_id,
+                inicio=inicio,
+                fim=fim,
+                formato=formato,
+                estilo=estilo_render,
+                trechos=trechos_render,
+                pasta_saida=pasta_corte,
+                titulo=titulo_corte,
+                ao_progredir=ao_progredir,
+                nome_arquivo=nome_arq,
+                caminho_fonte=caminho_fonte,
+            )
+        except TypeError:
+            return render.exportar(
+                youtube_id=youtube_id,
+                inicio=inicio,
+                fim=fim,
+                formato=formato,
+                estilo=estilo_render,
+                trechos=trechos_render,
+                pasta_saida=pasta_corte,
+                titulo=titulo_corte,
+                ao_progredir=ao_progredir,
+                nome_arquivo=nome_arq,
+            )
+
     # 4. Render COM legenda (card + headline + legenda)
     if variacoes.get("com_legenda", True):
         try:
             estilo_com = dict(estilo_base)
             estilo_com["card"] = True
             estilo_com["legenda"] = True
-            caminho_com_legenda = render.exportar(
-                youtube_id=youtube_id,
-                inicio=inicio,
-                fim=fim,
-                formato=formato,
-                estilo=estilo_com,
-                trechos=trechos_legenda,
-                pasta_saida=pasta_corte,
-                titulo=f"{prefixo}_com_legenda",
-                ao_progredir=ao_progredir,
-                nome_arquivo=f"{prefixo}_com_legenda.mp4",
+            caminho_com_legenda = _exec_render(
+                estilo_render=estilo_com,
+                trechos_render=trechos_legenda,
+                nome_arq=f"{prefixo}_com_legenda.mp4",
+                titulo_corte=f"{prefixo}_com_legenda",
             )
             arquivos_gerados["com_legenda"] = os.path.basename(caminho_com_legenda)
         except Exception as err_render:
@@ -637,17 +678,11 @@ def gerar_pacote_corte(youtube_id, info, bloco, pasta_corte, prefixo, frases=Non
             estilo_sem = dict(estilo_base)
             estilo_sem["card"] = True
             estilo_sem["legenda"] = False
-            caminho_sem_legenda = render.exportar(
-                youtube_id=youtube_id,
-                inicio=inicio,
-                fim=fim,
-                formato=formato,
-                estilo=estilo_sem,
-                trechos=[],
-                pasta_saida=pasta_corte,
-                titulo=f"{prefixo}_sem_legenda",
-                ao_progredir=ao_progredir,
-                nome_arquivo=f"{prefixo}_sem_legenda.mp4",
+            caminho_sem_legenda = _exec_render(
+                estilo_render=estilo_sem,
+                trechos_render=[],
+                nome_arq=f"{prefixo}_sem_legenda.mp4",
+                titulo_corte=f"{prefixo}_sem_legenda",
             )
             arquivos_gerados["sem_legenda"] = os.path.basename(caminho_sem_legenda)
         except Exception as err_render:
@@ -659,17 +694,11 @@ def gerar_pacote_corte(youtube_id, info, bloco, pasta_corte, prefixo, frases=Non
             estilo_so = dict(estilo_base)
             estilo_so["card"] = False
             estilo_so["legenda"] = True
-            caminho_so_legenda = render.exportar(
-                youtube_id=youtube_id,
-                inicio=inicio,
-                fim=fim,
-                formato=formato,
-                estilo=estilo_so,
-                trechos=trechos_legenda,
-                pasta_saida=pasta_corte,
-                titulo=f"{prefixo}_so_legenda",
-                ao_progredir=ao_progredir,
-                nome_arquivo=f"{prefixo}_so_legenda.mp4",
+            caminho_so_legenda = _exec_render(
+                estilo_render=estilo_so,
+                trechos_render=trechos_legenda,
+                nome_arq=f"{prefixo}_so_legenda.mp4",
+                titulo_corte=f"{prefixo}_so_legenda",
             )
             arquivos_gerados["so_legenda"] = os.path.basename(caminho_so_legenda)
         except Exception as err_render:
@@ -696,6 +725,7 @@ def gerar_pacote_corte(youtube_id, info, bloco, pasta_corte, prefixo, frases=Non
             prefixo=prefixo,
             variacoes_ativas=variacoes,
             pasta_id_raiz=drive_pasta_id,
+            titulo_video=titulo_video,
         )
 
     return {
@@ -926,11 +956,15 @@ except Exception as _e:
 
 
 def processar_blocos_automaticamente(fila, youtube_id, info, blocos, frases=None,
-                                     exportar_crus=True, exportar_9x16=True, max_9x16=4,
+                                     exportar_crus=True, exportar_9x16=True, max_9x16=None,
                                      refazer=False):
     """Gatilho unificado: enfileira para a fila sequencial FernandoXX mantendo retrocompatibilidade com fila antiga."""
     if not blocos:
         return None
+
+    if max_9x16 is None:
+        cfg = carregar_config_cortes()
+        max_9x16 = cfg.get("max_cortes_por_video", 50)
 
     # Enfileira no executor sequencial rigoroso
     status = executor_sequencial.enfileirar(
@@ -958,3 +992,126 @@ def processar_blocos_automaticamente(fila, youtube_id, info, blocos, frases=None
             pass
 
     return status
+
+
+class VigilanteCortesContinuo:
+    """Supervisiona continuamente vídeos da playlist para garantir que nenhum vídeo das 21h em diante fique sem blocos ou cortes."""
+
+    def __init__(self, intervalo_s=20):
+        self.intervalo_s = intervalo_s
+        self._thread = None
+        self._ativo = True
+
+    def iniciar(self):
+        if self._thread and self._thread.is_alive():
+            return
+        self._thread = threading.Thread(target=self._loop, name="vigilante-cortes-continuo", daemon=True)
+        self._thread.start()
+        log.info("Vigilante contínuo de cortes automáticos iniciado (intervalo: %ds).", self.intervalo_s)
+
+    def parar(self):
+        self._ativo = False
+
+    def _loop(self):
+        time.sleep(5)
+        while self._ativo:
+            try:
+                if obter_modo_automatico():
+                    self.verificar_e_processar()
+            except Exception as e:
+                log.warning("Erro no loop do vigilante contínuo: %s", e)
+            for _ in range(max(1, int(self.intervalo_s))):
+                if not self._ativo:
+                    break
+                time.sleep(1)
+
+    def verificar_e_processar(self):
+        caminho_reg = os.path.join(config.PASTA_DADOS, "playlist_aovivo.json")
+        if not os.path.exists(caminho_reg):
+            return
+
+        try:
+            with open(caminho_reg, encoding="utf-8") as f:
+                reg = json.load(f)
+            videos = reg.get("videos", [])
+        except Exception:
+            return
+
+        for vid in videos:
+            yid = vid.get("youtube_id")
+            if not yid:
+                continue
+
+            if not video_eh_elegivel_por_ponto_partida(yid):
+                continue
+
+            info = acervo_local.ler(yid, "info.json") or {
+                "youtube_id": yid,
+                "titulo": vid.get("titulo") or f"Vídeo {yid}",
+                "duracao_s": vid.get("duracao_s", 0),
+            }
+            dados_blocos = acervo_local.ler(yid, "blocos.json")
+            blocos = dados_blocos.get("blocos") if dados_blocos else None
+
+            # 1. Se não tem blocos mas tem frases, gera blocos imediatamente
+            if not blocos:
+                dados_frases = acervo_local.ler(yid, "frases.json")
+                if dados_frases and dados_frases.get("frases"):
+                    try:
+                        from . import blocador
+                        log.info("Vigilante: Gerando blocos para %s (%s)...", info.get("titulo"), yid)
+                        novos_b, ign, mod = blocador.dividir(
+                            dados_frases["frases"],
+                            f"VÍDEO: {info.get('titulo')}\nID: {yid}",
+                        )
+                        if novos_b:
+                            acervo_local.salvar(yid, "blocos.json", {
+                                "blocos": novos_b,
+                                "ignorados": ign,
+                                "modelos": mod,
+                                "gerado_em": time.time(),
+                                "origem_frases": dados_frases.get("origem", "local"),
+                            })
+                            acervo_local.salvar_estado(yid, "pronto", f"{len(novos_b)} blocos", 1.0)
+                            blocos = novos_b
+                    except Exception as err_bl:
+                        log.warning("Vigilante: erro ao blocar %s: %s", yid, err_bl)
+                else:
+                    # Se não tem frases nem blocos, dispara transcrição
+                    try:
+                        from .servidor import links
+                        if links and yid not in links.ativos():
+                            est_local = acervo_local.ler(yid, "estado.json", {})
+                            st_nome = est_local.get("estado")
+                            if st_nome not in ("blocos", "legenda", "transcrevendo", "aguardando_retentativa"):
+                                log.info("Vigilante: Enfileirando transcrição para %s (%s)", info.get("titulo"), yid)
+                                links.adicionar(yid)
+                    except Exception:
+                        pass
+
+            # 2. Se tem blocos, verifica se os cortes foram feitos ou estão em andamento
+            if blocos:
+                st = obter_status_cortes(yid) or {}
+                estado_cortes = st.get("estado")
+                status_exec = executor_sequencial.status_atual()
+                vid_atual = status_exec.get("video_em_andamento")
+
+                if estado_cortes not in ("concluido", "processando", "em_fila") and yid != vid_atual:
+                    dados_frases = acervo_local.ler(yid, "frases.json")
+                    frases = dados_frases.get("frases") if dados_frases else None
+                    cfg_cortes = carregar_config_cortes()
+                    max_c = cfg_cortes.get("max_cortes_por_video", 50)
+                    log.info("Vigilante: Enfileirando cortes para %s (%s)", info.get("titulo"), yid)
+                    executor_sequencial.enfileirar(
+                        youtube_id=yid,
+                        info=info,
+                        blocos=blocos,
+                        frases=frases,
+                        max_cortes=max_c,
+                    )
+
+
+# Instância global do vigilante contínuo
+vigilante_continuo = VigilanteCortesContinuo()
+vigilante_continuo.iniciar()
+

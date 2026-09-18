@@ -259,18 +259,22 @@ class TestEstruturaFernando(unittest.TestCase):
         self.assertFalse(os.path.exists(video_bruto))
 
     def test_endpoints_cortes_e_limpeza(self):
-        # 1. Toggle modo automático
-        resp = self.cliente.get("/api/automacao/cortes/status")
-        self.assertEqual(resp.status_code, 200)
-        dados = resp.get_json()
-        self.assertIn("modo_automatico", dados)
+        modo_anterior = cortador_automatico.obter_modo_automatico()
+        try:
+            # 1. Toggle modo automático
+            resp = self.cliente.get("/api/automacao/cortes/status")
+            self.assertEqual(resp.status_code, 200)
+            dados = resp.get_json()
+            self.assertIn("modo_automatico", dados)
 
-        resp_toggle = self.cliente.post("/api/automacao/cortes/toggle", json={"ativo": True})
-        self.assertEqual(resp_toggle.status_code, 200)
-        self.assertTrue(resp_toggle.get_json()["modo_automatico"])
+            resp_toggle = self.cliente.post("/api/automacao/cortes/toggle", json={"ativo": True})
+            self.assertEqual(resp_toggle.status_code, 200)
+            self.assertTrue(resp_toggle.get_json()["modo_automatico"])
 
-        # Desativa de volta
-        cortador_automatico.definir_modo_automatico(False)
+            # Desativa de volta
+            cortador_automatico.definir_modo_automatico(False)
+        finally:
+            cortador_automatico.definir_modo_automatico(True)
 
         # 2. Endpoint de limpeza de cache específico
         with patch("indomavel.cortador_automatico.liberar_cache_video", return_value=1024 * 1024 * 50):

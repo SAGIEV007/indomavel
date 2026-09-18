@@ -60,29 +60,31 @@ Desde o início do projeto, o Indomável Creator Studio foi desenhado e expandid
 - 3 Ângulos Oficiais: **Noticioso**, **Confronto** e **Citação Direta**.
 - **Locutor Inteligente**: Detecção rigorosa de quem está falando. NÃO assume cegamente que é o Renan Santos — só atribui ao Renan quando confirmado pela transcrição ou metadados; caso contrário, foca no debate ou no orador convidado.
 
-### 7. Pacotes de Cortes `FernandoXX` e Google Drive (`indomavel/cortador_automatico.py`, `indomavel/google_drive.py`)
-- Criação sequencial de subpastas numeradas sem colisão (`Fernando01/`, `Fernando02/`, etc.) em `PASTA_GOOGLE_DRIVE` (`output/google_drive/` ou pasta do Drive).
-- **Proporção Padrão 1:1 (Quadrado)** configurada como inicial, com total flexibilidade para 9:16, 4:5, 3:4 ou 16:9 via modal `[⚙️ Configurar]`.
-- **Organização Modular por Categoria**:
-  * `Com headline e legenda/` -> `FernandoXX_com_legenda.mp4` (card superior com headline viral, legendas animadas ASS Bebas)
-  * `Com headline e sem legenda/` -> `FernandoXX_sem_legenda.mp4` (opcional via checkbox)
-  * `Só legenda/` -> `FernandoXX_so_legenda.mp4` (vídeo limpo com legenda animada)
-  * `Cortes crus/` -> `FernandoXX_cru.mp4` + `FernandoXX_cru.srt` (lossless stream copy original)
-  * `Headlines/` -> `FernandoXX_headlines.txt` (3 a 8 sugestões avaliadas com notas de CTR e arquétipos)
-- **Integração Google Drive Nuvem**:
-  * Upload direto para a pasta compartilhada `1wBxCAat68t-jLBl3RJxCBJmZNvPAjz-G` via Service Account ou OAuth.
-  * **Fallback Local Garantido**: na ausência de chave de nuvem, salva tudo organizado localmente em `output/google_drive/`.
-  * Botão de 1 clique no frontend **`[📂 Abrir Cortes]`** para abrir imediatamente os arquivos no Windows Explorer.
+### 7. Pacotes de Cortes e Google Drive (`indomavel/cortador_automatico.py`, `indomavel/google_drive.py`)
+- **Estrutura Hierárquica Oficial no Google Drive e Local**:
+  `[Pasta Raiz: 1wBxCAat68t-jLBl3RJxCBJmZNvPAjz-G ou output/google_drive/]`
+    └─ `[Nome do Vídeo Fonte]` (ex: `FUTURO GLORIOSO TOUR - SANTA CATARINA - Parte 7`)
+         ├─ `Cortes com headline/`
+         │     ├─ `FernandoXX_sem_legenda.mp4` (ou `_headline.mp4`)
+         │     └─ `FernandoXX_headlines.txt` (arquivo com sugestões extras de headline e arquétipos)
+         └─ `Cortes originais/`
+               ├─ `FernandoXX_cru.mp4` (corte sem perda na resolução original)
+               └─ `FernandoXX_cru.srt` (arquivo de legenda sincronizado)
+  *(Se habilitadas as modalidades adicionais: `Cortes com headline e legenda/` e `Cortes com legenda/`).*
+- **Proporção Padrão 1:1 (Quadrado)** com crop superior anti-banner configurado como padrão (`cortar_topo: 140px`).
+- **Autenticação e Cota Google Drive**:
+  * **Causa de Zero Cortes em Drives Pessoais com Service Account**: Contas de serviço GCP possuem 0 bytes de cota de armazenamento em contas pessoais `@gmail.com`. Elas conseguem criar pastas vazias (0 bytes), mas o upload de arquivos de vídeo falha com erro 403 `storageQuotaExceeded`.
+  * **Solução Oficial OAuth 2.0**: O script `Conectar_Google_Drive.bat` (ou o botão na interface web) autentica a conta pessoal do operador (Fernando) via OAuth 2.0 e salva `dados/token.json`, utilizando a cota real da sua conta Google e subindo todos os cortes pendentes automaticamente.
+  * **Espelhamento Local Garantido**: Enquanto o OAuth não for ativado, 100% dos cortes e pastas continuam sendo gerados na pasta local `output/google_drive/[Nome do Vídeo]/[Modalidade]/`.
 
 ### 8. Fila de Execução Sequencial Estrita
 - Garante a conclusão de 100% dos cortes de um vídeo antes de iniciar o próximo vídeo da fila, evitando sobrecarga de CPU/GPU e fragmentação de arquivos.
 
-### 9. Controle Manual & Automático de Cortes
-- O modo automático inicia **DESLIGADO** no boot para dar controle total ao operador.
+### 9. Automação Contínua Não-Parante (`VigilanteCortesContinuo`)
+- **Supervisão Contínua**: O `VigilanteCortesContinuo` monitora continuamente a playlist de transmissões (`dados/playlist_aovivo.json`).
+- **Resiliência Offline**: Se a API do Gemini falhar (ex: erro 403 de ativação ou cota), o sistema ativa automaticamente `blocos_heuristicos(...)` com segmentação determinística (30s a 75s), garantindo que nenhum vídeo das 21h em diante fique travado ou sem cortes.
+- **Não para até ser desativado**: Uma vez ativado (`modo_automatico: true` em `dados/automacao/config_cortes.json`), processa sequencialmente todos os vídeos produzidos sem interrupção.
 - Botão de alternância no frontend: `[⚡ Cortes: DESLIGADO / LIGADO]`.
-- Botões individuais em cada card de vídeo pronto:
-  * `[⚡ Gerar Cortes (FernandoXX)]`: Dispara a geração dos cortes do vídeo.
-  * `[🔄 Recortar do zero]`: Limpa cortes anteriores e regera os pacotes do zero.
 
 ### 10. Validação Rigorosa e Política de Exclusão Automática de Cache
 - **Verificação de Integridade**: Antes de qualquer exclusão, o sistema valida se todos os arquivos obrigatórios do pacote `FernandoXX` foram gerados com tamanho > 0 bytes.

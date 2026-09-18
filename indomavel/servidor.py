@@ -5,6 +5,8 @@ import logging
 import os
 import re
 import subprocess
+import threading
+import urllib.parse
 
 from flask import Flask, jsonify, request, send_file, send_from_directory
 
@@ -76,6 +78,8 @@ def ao_concluir_blocagem(youtube_id, info, blocos, frases):
         return
 
     try:
+        cfg_c = cortador_automatico.carregar_config_cortes()
+        max_c = cfg_c.get("max_cortes_por_video", 50)
         cortador_automatico.processar_blocos_automaticamente(
             fila=fila,
             youtube_id=youtube_id,
@@ -84,6 +88,7 @@ def ao_concluir_blocagem(youtube_id, info, blocos, frases):
             frases=frases,
             exportar_crus=True,
             exportar_9x16=True,
+            max_9x16=max_c,
         )
     except Exception as erro:
         logging.getLogger(__name__).warning("Erro ao disparar cortes automáticos de %s: %s", youtube_id, erro)
@@ -424,18 +429,29 @@ def status_modo_cortes_automaticos():
     })
 
 
-@app.post("/api/automacao/cortes/toggle")
+@app.route("/api/automacao/cortes/toggle", methods=["GET", "POST"])
 def toggle_modo_cortes_automaticos():
     dados = request.get_json(silent=True) or {}
     ativo = dados.get("ativo")
+    if ativo is None and "ativo" in request.args:
+        val_arg = request.args.get("ativo", "").lower()
+        ativo = val_arg in ("1", "true", "t", "sim", "yes")
     if ativo is None:
         ativo = not cortador_automatico.obter_modo_automatico()
     novo_estado = cortador_automatico.definir_modo_automatico(ativo)
+    if novo_estado:
+        threading.Thread(target=cortador_automatico.vigilante_continuo.verificar_e_processar, daemon=True).start()
     return jsonify({
         "ok": True,
         "modo_automatico": novo_estado,
         "mensagem": f"Modo de cortes automáticos {'ATIVADO' if novo_estado else 'DESLIGADO'}.",
     })
+
+
+@app.route("/api/automacao/cortes/processar-agora", methods=["GET", "POST"])
+def processar_cortes_vigilante_agora():
+    threading.Thread(target=cortador_automatico.vigilante_continuo.verificar_e_processar, daemon=True).start()
+    return jsonify({"ok": True, "mensagem": "Varredura contínua de cortes disparada com sucesso."})
 
 
 @app.get("/api/automacao/config-cortes")
@@ -510,6 +526,7 @@ def oauth2callback():
 
     ok, msg = google_drive.trocar_codigo_por_token(code)
     if ok:
+        threading.Thread(target=google_drive.subir_cortes_locais_pendentes, daemon=True).start()
         return """
         <html><body style="font-family:system-ui,sans-serif;background:#0d1117;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
           <div style="background:#161b22;padding:32px;border-radius:12px;max-width:500px;text-align:center;border:1px solid #30363d;">
@@ -548,6 +565,7 @@ def conectar_codigo_manual():
     ok, msg = google_drive.trocar_codigo_por_token(code)
     if not ok:
         return _erro(msg, 400)
+    threading.Thread(target=google_drive.subir_cortes_locais_pendentes, daemon=True).start()
     return jsonify({"ok": True, "mensagem": msg, "status": google_drive.status_conexao()})
 
 
