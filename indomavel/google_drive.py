@@ -162,6 +162,8 @@ def trocar_codigo_por_token(code, redirect_uri="http://127.0.0.1:5055/oauth2call
         if not access_token:
             return False, "Google não retornou access_token"
 
+        import datetime
+        dt_exp = datetime.datetime.fromtimestamp(time.time() + expires_in, datetime.timezone.utc)
         token_data = {
             "token": access_token,
             "refresh_token": refresh_token,
@@ -169,7 +171,7 @@ def trocar_codigo_por_token(code, redirect_uri="http://127.0.0.1:5055/oauth2call
             "client_id": oauth["client_id"],
             "client_secret": oauth["client_secret"],
             "scopes": ["https://www.googleapis.com/auth/drive"],
-            "expiry": time.time() + expires_in,
+            "expiry": dt_exp.strftime("%Y-%m-%dT%H:%M:%SZ"),
         }
 
         caminho_token = os.path.join(config.PASTA_DADOS, "token.json")
@@ -213,18 +215,29 @@ def obter_token_acesso():
         try:
             from google.oauth2.credentials import Credentials
             from google.auth.transport.requests import Request
+            import datetime
 
-            scopes = ["https://www.googleapis.com/auth/drive"]
-            creds = Credentials.from_authorized_user_file(caminho, scopes=scopes)
-            if creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-                try:
-                    with open(caminho, "w", encoding="utf-8") as ft:
-                        ft.write(creds.to_json())
-                except Exception:
-                    pass
-            if creds.token:
-                return creds.token, None
+            with open(caminho, encoding="utf-8") as ft:
+                dados_token = json.load(ft)
+            if isinstance(dados_token, dict) and ("token" in dados_token or "refresh_token" in dados_token):
+                exp = dados_token.get("expiry")
+                if isinstance(exp, (int, float)):
+                    dt = datetime.datetime.fromtimestamp(exp, datetime.timezone.utc)
+                    dados_token["expiry"] = dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+                    with open(caminho, "w", encoding="utf-8") as ft_out:
+                        json.dump(dados_token, ft_out, indent=2)
+
+                scopes = ["https://www.googleapis.com/auth/drive"]
+                creds = Credentials.from_authorized_user_info(dados_token, scopes=scopes)
+                if creds.expired and creds.refresh_token:
+                    creds.refresh(Request())
+                    try:
+                        with open(caminho, "w", encoding="utf-8") as ft:
+                            ft.write(creds.to_json())
+                    except Exception:
+                        pass
+                if creds.token:
+                    return creds.token, None
         except Exception as e_user:
             log.debug("Arquivo %s não é Token OAuth de usuário: %s", caminho, e_user)
 
