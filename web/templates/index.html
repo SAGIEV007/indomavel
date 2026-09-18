@@ -9,9 +9,9 @@
 </head>
 <body>
 <header class="topo">
-  <div class="marca">
-    <span class="marca-nome">INDOMÁVEL</span>
-    <span class="marca-sub">STUDIO 24/7</span>
+  <div class="topo-marca">
+    <span class="topo-marca-nome">INDOMÁVEL</span>
+    <span class="topo-marca-sub">STUDIO 24/7</span>
   </div>
   <button id="pill-status-master" class="chip chip-status-master" type="button" title="Clique para abrir o painel de Gravação 24/7">
     <span id="ponto-status-master" class="ponto-sync"></span>
@@ -373,21 +373,21 @@
 
     <section id="painel-live" class="painel" hidden>
       <!-- Telemetria do Gravador 24/7 & Multi-Notebook Cluster -->
-      <div class="card">
+      <div class="card card-live-telemetria">
         <div class="linha-rotulo">
           <span class="rotulo">📡 Gravador de Lives 24/7</span>
           <span id="live-badge-status" class="chip chip-carregando">STANDBY</span>
         </div>
 
-        <div id="box-cluster-aviso" style="display:none; margin: 8px 0; padding: 10px 12px; background: rgba(210,153,34,0.15); border: 1px solid #d29922; border-radius: 8px; font-size: 12px; color: #ffd60a;">
+        <div id="box-cluster-aviso" class="live-cluster-aviso" style="display:none;">
           🛡️ <strong>Modo Standby Protegido:</strong> O notebook <code id="cluster-lider-nome">Líder</code> já está gravando no Google Drive. Esta máquina está protegida para não sobrepor arquivos.
         </div>
 
-        <div id="live-online-box" style="display: flex; align-items: center; gap: 8px; margin: 4px 0 8px 0;">
+        <div id="live-online-box" class="live-online-box">
           <span id="live-ponto-status" class="ponto-sync"></span>
-          <span id="live-online-texto" style="font-size: 12px; font-weight: 700;">Standby (Pausado)</span>
+          <span id="live-online-texto" class="live-online-texto">Standby (Pausado)</span>
         </div>
-        <h4 id="live-monitor-titulo" style="margin: 0 0 6px 0; font-size: 13px; color: var(--texto); line-height: 1.3;"></h4>
+        <h4 id="live-monitor-titulo" class="live-monitor-titulo"></h4>
 
         <div class="live-metricas-grade">
           <div class="live-metrica-card">
@@ -396,7 +396,7 @@
           </div>
           <div class="live-metrica-card">
             <span class="live-metrica-rotulo">Bloco Atual</span>
-            <span id="live-bloco-atual" class="live-metrica-valor" style="color: #FF3B30;">Aguardando</span>
+            <span id="live-bloco-atual" class="live-metrica-valor">Aguardando</span>
           </div>
           <div class="live-metrica-card">
             <span class="live-metrica-rotulo">Tempo Bloco</span>
@@ -404,46 +404,47 @@
           </div>
           <div class="live-metrica-card">
             <span class="live-metrica-rotulo">Trava Cluster</span>
-            <span id="live-cluster-role" class="live-metrica-valor" style="font-size: 12px; color: #2ed573;">LOCAL</span>
+            <span id="live-cluster-role" class="live-metrica-valor cluster-role">LOCAL</span>
           </div>
         </div>
 
-        <div id="live-pasta-info" class="dica" style="word-break: break-all; font-family: monospace; font-size: 11px;"></div>
+        <div id="live-pasta-info" class="live-pasta-info" title="Pasta de destino das gravações"></div>
 
-        <!-- Botões de Ação Principal -->
-        <div class="acoes-live" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
-          <button id="btn-toggle-monitor-247" class="botao-pri largo" type="button">▶ Ativar Monitoramento 24/7</button>
-          <button id="btn-iniciar-live" class="botao-sec largo" type="button">🔴 Iniciar Gravação Manual</button>
-          <button id="btn-cortar-agora" class="botao-alerta largo" type="button" title="Fecha a fatia atual imediatamente e envia para geração de 3 cortes no Drive" hidden>✂️ Cortar Bloco Agora (Gerar Cortes)</button>
-          <button id="btn-parar-live" class="botao-perigo largo" type="button" hidden>⏹ Parar Gravação</button>
+        <!-- Botões de Ação Principal em Grade de 2 Colunas -->
+        <div class="acoes-live">
+          <button id="btn-toggle-monitor-247" class="botao-pri" type="button">▶ Monitorar 24/7</button>
+          <button id="btn-iniciar-live" class="botao-sec" type="button">🔴 Gravação Manual</button>
+          <button id="btn-cortar-agora" class="botao-alerta" type="button" title="Fecha a fatia atual imediatamente e envia para geração de 3 cortes no Drive" hidden>✂️ Cortar Bloco</button>
+          <button id="btn-parar-live" class="botao-perigo" type="button" hidden>⏹ Parar Gravação</button>
         </div>
 
-        <div class="acoes-secundarias-live" style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
+        <!-- Ações Secundárias em Linha Única -->
+        <div class="acoes-secundarias-live">
           <button id="btn-abrir-pasta-gravacoes" class="botao-sec pequeno" type="button" title="Abre a pasta local de vídeos de lives">📂 Abrir Pasta</button>
-          <button id="btn-limpar-retencao" class="botao-sec pequeno" type="button" title="Libera espaço em disco excluindo vídeos com mais de 48h já enviados">🧹 Limpar Disco (&gt; 48h)</button>
+          <button id="btn-limpar-retencao" class="botao-sec pequeno" type="button" title="Libera espaço em disco excluindo vídeos com mais de 48h já enviados">🧹 Limpar (&gt; 48h)</button>
           <button id="btn-forcar-checagem-live" class="botao-sec pequeno" type="button" title="Verifica status online no YouTube agora">🔄 Checar Ao Vivo</button>
         </div>
       </div>
 
       <!-- Configurações do Gravador e Esteira IA -->
-      <div class="card">
+      <div class="card card-live-config">
         <div class="linha-rotulo">
-          <span class="rotulo">⚙️ Configurações do Gravador 24/7</span>
+          <span class="rotulo">⚙️ Configurações 24/7</span>
           <button id="btn-salvar-config-live" class="botao-pri pequeno" type="button">Salvar</button>
         </div>
-        <p class="dica">Monitora automaticamente o canal do YouTube, grava sem sobrecarregar a CPU (-c copy) e fatia em 30 min.</p>
+        <p class="dica dica-compacta">Monitora canal YouTube (-c copy sem CPU) e fatia blocos com IA.</p>
 
-        <label class="campo" style="margin-top: 8px;">Canal ou URL da Live no YouTube
+        <label class="campo">Canal ou URL da Live
           <input type="text" id="live-url" class="campo-texto" placeholder="https://www.youtube.com/@PartidoMissao/live" value="https://www.youtube.com/@PartidoMissao/live">
         </label>
 
-        <div class="auto-campos" style="margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div class="auto-campos">
           <label class="campo">Duração dos Blocos
             <select id="live-duracao">
-              <option value="1800" selected>30 minutos (Padrão)</option>
-              <option value="900">15 minutos</option>
-              <option value="600">10 minutos</option>
-              <option value="120">2 minutos (Teste rápido)</option>
+              <option value="1800" selected>30 min (Padrão)</option>
+              <option value="900">15 min</option>
+              <option value="600">10 min</option>
+              <option value="120">2 min (Teste rápido)</option>
             </select>
           </label>
           <label class="campo">Qualidade
@@ -456,35 +457,38 @@
           </label>
         </div>
 
-        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+        <div class="live-checks-grupo">
           <label class="check" title="Ao finalizar cada fatia, a IA do Indomável transcreve e corta nas 3 modalidades do Google Drive">
-            <input type="checkbox" id="live-auto-cortar" checked> <b>Cortar com IA automaticamente:</b> Gerar as 3 modalidades e subir no Drive
+            <input type="checkbox" id="live-auto-cortar" checked>
+            <span><b>Cortar com IA:</b> 3 modalidades no Drive</span>
           </label>
           <label class="check" title="Inicia automaticamente a gravação assim que o canal abrir transmissão ao vivo">
-            <input type="checkbox" id="live-monitor-auto" checked> <b>Monitoramento 24/7 Ativo:</b> Gravar quando o canal entrar ao vivo
+            <input type="checkbox" id="live-monitor-auto" checked>
+            <span><b>Monitoramento 24/7:</b> Gravar quando abrir live</span>
           </label>
           <label class="check" title="Baixa todo o histórico disponível no buffer da live antes de continuar no ao vivo">
-            <input type="checkbox" id="live-dvr" checked> <b>Catch-up DVR:</b> Baixar buffer gravado da transmissão
+            <input type="checkbox" id="live-dvr" checked>
+            <span><b>Catch-up DVR:</b> Baixar buffer gravado</span>
           </label>
         </div>
       </div>
 
       <!-- Fatias Gravadas e Esteira de Cortes -->
-      <div class="card">
+      <div class="card card-live-fatias">
         <div class="linha-rotulo">
-          <span class="rotulo">📦 Fatias Gravadas &amp; Esteira de Cortes</span>
+          <span class="rotulo">📦 Fatias Gravadas &amp; Esteira</span>
           <span id="live-contador-partes" class="contador">0</span>
         </div>
-        <p class="dica">Cada bloco concluído é enviado para a pasta 'Live 24 hrs' e cortado com IA nas 3 modalidades ('Cortes com headline', 'Cortes originais', 'Cortes com headline e legenda').</p>
-        <ul id="live-lista-partes" class="lista-tarefas" style="max-height: 420px; overflow-y: auto; padding: 0; margin-top: 8px;">
+        <p class="dica dica-compacta">Fatias enviadas para Google Drive e cortadas com IA.</p>
+        <ul id="live-lista-partes" class="lista-tarefas live-lista-partes">
           <li class="vazio-lista">Nenhuma parte gravada nesta sessão.</li>
         </ul>
       </div>
 
       <!-- Log em Tempo Real do Gravador e Cortes -->
-      <div class="card">
+      <div class="card card-live-logs">
         <div class="linha-rotulo">
-          <span class="rotulo">📟 Log em Tempo Real (Gravador &amp; IA)</span>
+          <span class="rotulo">📟 Log em Tempo Real</span>
           <button id="btn-limpar-logs-ui" class="botao-link" type="button">Atualizar</button>
         </div>
         <div id="live-terminal-logs" class="live-terminal">Conectando ao monitor de logs...</div>
