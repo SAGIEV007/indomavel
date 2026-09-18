@@ -68,20 +68,22 @@ class TestGoogleDrive(unittest.TestCase):
                 self.assertTrue(res["sucesso"])
                 self.assertEqual(res["modo"], "fallback_local")
 
-                # Verifica se organizou nas subpastas de categoria no destino local
-                pasta_com = os.path.join(self.pasta_drive_local, "Com headline e legenda")
-                pasta_so = os.path.join(self.pasta_drive_local, "Só legenda")
-                pasta_cru = os.path.join(self.pasta_drive_local, "Cortes crus")
-                pasta_hl = os.path.join(self.pasta_drive_local, "Headlines")
-                pasta_sem = os.path.join(self.pasta_drive_local, "Com headline e sem legenda")
+                # Verifica se organizou na hierarquia Evento / Subpastas de modelo
+                pasta_evento = os.path.join(self.pasta_drive_local, "Cortes Gerais")
+                pasta_com = os.path.join(pasta_evento, "Corte com headline e legenda")
+                pasta_so = os.path.join(pasta_evento, "Corte com legenda")
+                pasta_cru = os.path.join(pasta_evento, "Corte cru")
+                pasta_sem = os.path.join(pasta_evento, "Corte com headline")
 
                 self.assertTrue(os.path.exists(os.path.join(pasta_com, "Fernando01_com_legenda.mp4")))
                 self.assertTrue(os.path.exists(os.path.join(pasta_so, "Fernando01_so_legenda.mp4")))
                 self.assertTrue(os.path.exists(os.path.join(pasta_cru, "Fernando01_cru.mp4")))
                 self.assertTrue(os.path.exists(os.path.join(pasta_cru, "Fernando01_cru.srt")))
-                self.assertTrue(os.path.exists(os.path.join(pasta_hl, "Fernando01_headlines.txt")))
+                self.assertTrue(os.path.exists(os.path.join(pasta_cru, "Fernando01_headlines.txt")))
                 # A pasta sem legenda NÃO deve conter arquivo porque estava desativada
                 self.assertFalse(os.path.exists(os.path.join(pasta_sem, "Fernando01_sem_legenda.mp4")))
+                # Não deve haver subpasta intermediária Fernando01
+                self.assertFalse(os.path.exists(os.path.join(pasta_evento, "Fernando01")))
 
     def test_enviar_pacote_drive_nuvem_sucesso(self):
         pasta_corte = os.path.join(self.temp_dir, "Fernando02")

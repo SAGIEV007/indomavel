@@ -49,9 +49,9 @@ _CACHE_PASTAS = {}
 def identificar_categoria_arquivo(nome_arquivo):
     """Determina a categoria de pasta para um determinado arquivo de corte."""
     nome = os.path.basename(nome_arquivo).lower()
-    if "_com_legenda." in nome:
+    if "_com_headline_e_legenda." in nome or "_com_legenda." in nome:
         return "com_legenda"
-    if "_sem_legenda." in nome or "_headline." in nome or "_com_headline." in nome:
+    if "_com_headline." in nome or "_sem_legenda." in nome or "_headline." in nome:
         return "sem_legenda"
     if "_so_legenda." in nome:
         return "so_legenda"
@@ -506,46 +506,132 @@ def enviar_arquivo_drive(caminho_local, nome_arquivo, id_pasta_destino, token=No
         return None
 
 
+def extrair_nome_evento_principal(titulo: str) -> str:
+    """Extrai o nome do evento/live principal removendo sufixos de partes/blocos.
+    Exemplos:
+    - 'A CAMINHO DE GRAMADO-RS FUTURO GLORIOSO TOUR - Parte 6' -> 'A CAMINHO DE GRAMADO-RS FUTURO GLORIOSO TOUR'
+    - 'FUTURO GLORIOSO TOUR - SANTA CATARINA - Parte 12' -> 'FUTURO GLORIOSO TOUR - SANTA CATARINA'
+    - 'BOM DIA, RIO GRANDE DO SUL | FUTURO GLORIOSO TOUR 2026-09-18 14:04 - Parte 1' -> 'BOM DIA, RIO GRANDE DO SUL | FUTURO GLORIOSO TOUR'
+    - 'parte_000' -> Título da transmissão ao vivo mais recente
+    """
+    if not titulo:
+        return "Cortes Gerais"
+
+    t = str(titulo).strip()
+
+    # Se for apenas 'parte_XXX' ou 'local_parte_XXX', busca título real da live na base SQLite
+    if re.match(r"^(?:local_)?parte_\d+$", t, re.IGNORECASE):
+        try:
+            db_path = os.path.join(config.PASTA_DADOS, "gravador_lives.sqlite3")
+            if os.path.exists(db_path):
+                import sqlite3
+                with sqlite3.connect(db_path, timeout=5.0) as conn:
+                    conn.row_factory = sqlite3.Row
+                    row = conn.execute("SELECT titulo FROM sessoes_live ORDER BY id DESC LIMIT 1").fetchone()
+                    if row and row["titulo"] and not row["titulo"].lower().startswith("live "):
+                        t = row["titulo"]
+        except Exception:
+            pass
+
+    # Remove carimbo de data/hora no formato 2026-09-18 14:04 ou 2026-09-18 1404 ou similar
+    t = re.sub(r"\s+\d{4}-\d{2}-\d{2}(?:\s+\d{2}:?\d{2}(?::?\d{2})?)?", "", t)
+
+    # Remove sufixos de parte, bloco, chunk ou fatia
+    t = re.sub(r"(?i)\s*[-_–]\s*(?:parte|bloco|chunk|fatia)\s*\d+.*$", "", t)
+    t = re.sub(r"(?i)\s+(?:parte|bloco|chunk|fatia)\s*\d+.*$", "", t)
+    t = re.sub(r"(?i)\s*[-_–]\s*p\d+.*$", "", t)
+
+    # Sanitiza caracteres proibidos em caminhos de arquivo no Windows e Drive
+    t = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "", t).strip()
+    t = re.sub(r"\s+", " ", t).strip()
+    return t or "Cortes Gerais"
+
+
 PASTAS_CATEGORIA_HIERARQUICA = {
-    "com_legenda": "Cortes com headline e legenda",
-    "sem_legenda": "Cortes com headline",
-    "so_legenda": "Cortes com legenda",
-    "cru": "Cortes originais",
-    "headlines": "Cortes com headline",
+    "cru": "Corte cru",
+    "headlines": "Corte cru",
+    "sem_legenda": "Corte com headline",
+    "com_headline": "Corte com headline",
+    "com_legenda": "Corte com headline e legenda",
+    "so_legenda": "Corte com legenda",
 }
 
 
 def obter_nome_subpasta_modalidade(categoria, variacoes_ativas=None):
-    """Determina o nome da subpasta hierárquica respeitando a especificação exata do usuário.
-    - Se marcado headline apenas: 'Cortes com headline' + 'Cortes originais'
-    - Se marcado legenda e headlines: 'Cortes com headline' + 'Cortes com headline e legenda' + 'Cortes originais'
-    - Se marcado apenas legenda: 'Cortes com legenda' + 'Cortes originais'
+    """Determina o nome da subpasta de modelo de corte conforme a especificação:
+    - 'Corte cru' (vídeo original cru + srt + sugestões de headlines)
+    - 'Corte com headline' (vídeo com headline sem legenda)
+    - 'Corte com headline e legenda' (vídeo com headline e legenda dinâmicas)
+    - 'Corte com legenda' (se configurado como variação avulsa)
     """
-    if categoria in ("sem_legenda", "headlines"):
-        return "Cortes com headline"
-    if categoria == "cru":
-        return "Cortes originais"
-    if categoria == "so_legenda":
-        return "Cortes com legenda"
+    if categoria in ("cru", "headlines"):
+        return "Corte cru"
+    if categoria in ("sem_legenda", "com_headline"):
+        return "Corte com headline"
     if categoria == "com_legenda":
-        if variacoes_ativas and (variacoes_ativas.get("sem_legenda") or variacoes_ativas.get("headlines")):
-            return "Cortes com headline e legenda"
-        return "Cortes com legenda"
-    return PASTAS_CATEGORIA_HIERARQUICA.get(categoria, "Outros")
+        return "Corte com headline e legenda"
+    if categoria == "so_legenda":
+        return "Corte com legenda"
+    return PASTAS_CATEGORIA_HIERARQUICA.get(categoria, "Corte cru")
+
+
+def mover_arquivo_drive(file_id, novo_pai_id, antigo_pai_id=None, token=None):
+    """Move um arquivo ou pasta no Google Drive alterando seus parents de forma atômica."""
+    if not token:
+        token, _ = obter_token_acesso()
+    if not token or not file_id or not novo_pai_id:
+        return False
+
+    try:
+        if not antigo_pai_id:
+            url_get = f"https://www.googleapis.com/drive/v3/files/{file_id}?fields=parents"
+            req_get = urllib.request.Request(url_get, headers={"Authorization": f"Bearer {token}"})
+            with urllib.request.urlopen(req_get, timeout=15) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                antigo_pai_id = ",".join(data.get("parents", []))
+
+        url_patch = (
+            f"https://www.googleapis.com/drive/v3/files/{file_id}?"
+            f"addParents={urllib.parse.quote(novo_pai_id)}"
+            f"&removeParents={urllib.parse.quote(antigo_pai_id)}"
+            f"&fields=id,parents"
+        )
+        req_patch = urllib.request.Request(url_patch, headers={"Authorization": f"Bearer {token}"}, method="PATCH")
+        with urllib.request.urlopen(req_patch, timeout=15) as resp:
+            return resp.status == 200
+    except Exception as e:
+        log.warning("Erro ao mover arquivo %s no Drive: %s", file_id, e)
+        return False
+
+
+def excluir_arquivo_drive(file_id, token=None):
+    """Exclui ou move para a lixeira um arquivo/pasta no Google Drive."""
+    if not token:
+        token, _ = obter_token_acesso()
+    if not token or not file_id:
+        return False
+    try:
+        url_del = f"https://www.googleapis.com/drive/v3/files/{file_id}"
+        req_del = urllib.request.Request(url_del, headers={"Authorization": f"Bearer {token}"}, method="DELETE")
+        with urllib.request.urlopen(req_del, timeout=15) as resp:
+            return resp.status in (200, 204)
+    except Exception as e:
+        log.debug("Aviso ao excluir arquivo %s no Drive: %s", file_id, e)
+        return False
 
 
 def enviar_pacote_drive(pasta_corte, prefixo, variacoes_ativas=None, pasta_id_raiz=ID_PASTA_PADRAO, titulo_video=None):
-    """Envia todos os arquivos gerados de um pacote FernandoXX para as respectivas pastas no Drive.
+    """Envia todos os arquivos gerados de um pacote FernandoXX para a hierarquia estrita:
+    Pasta Raiz / [Nome do Evento] / [Subpastas de Modelo] / Arquivos FernandoXX
 
-    Quando titulo_video é informado:
-    Cria a pasta com o [Nome do Vídeo] sob a pasta raiz, e dentro dela uma subpasta para cada modalidade:
-    - 'Cortes com headline' (vídeo com headline + arquivo txt com sugestões de headlines)
-    - 'Cortes originais' (vídeo original cru + srt)
-    - 'Cortes com headline e legenda'
-    - 'Cortes com legenda'
+    As 3 (ou 4) subpastas de modelo ficam DIRETAMENTE sob a pasta do evento/vídeo:
+    - 'Corte com headline': FernandoXX_com_headline.mp4 / FernandoXX_sem_legenda.mp4
+    - 'Corte com headline e legenda': FernandoXX_com_headline_e_legenda.mp4 / FernandoXX_com_legenda.mp4
+    - 'Corte cru': FernandoXX_cru.mp4, FernandoXX_cru.srt, FernandoXX_headlines.txt
+    - 'Corte com legenda': FernandoXX_so_legenda.mp4 (se ativado)
 
-    Também organiza localmente com essa mesma hierarquia em PASTA_GOOGLE_DRIVE como fallback
-    garantido ou espelhamento.
+    (Não existe subpasta individual FernandoXX entre o Evento e os modelos).
+    Também organiza localmente com essa mesma hierarquia em PASTA_GOOGLE_DRIVE como espelhamento.
     """
     if not pasta_corte or not os.path.isdir(pasta_corte):
         return {"sucesso": False, "erro": "Pasta de corte não encontrada"}
@@ -556,19 +642,18 @@ def enviar_pacote_drive(pasta_corte, prefixo, variacoes_ativas=None, pasta_id_ra
     pasta_base_local = config.PASTA_GOOGLE_DRIVE
     os.makedirs(pasta_base_local, exist_ok=True)
 
-    if titulo_video:
-        nome_pasta_video = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "", str(titulo_video)).strip() or "Vídeo"
-        pasta_video_local = os.path.join(pasta_base_local, nome_pasta_video)
-        os.makedirs(pasta_video_local, exist_ok=True)
-        id_pasta_video = obter_ou_criar_pasta_drive(nome_pasta_video, id_pai=pasta_id_raiz, token=token) if conectado_nuvem else None
-    else:
-        nome_pasta_video = None
-        pasta_video_local = pasta_base_local
-        id_pasta_video = pasta_id_raiz
+    nome_pasta_evento = extrair_nome_evento_principal(titulo_video) if titulo_video else "Cortes Gerais"
+
+    # 1. Pasta da Live/Evento principal sob a raiz
+    pasta_evento_local = os.path.join(pasta_base_local, nome_pasta_evento)
+    os.makedirs(pasta_evento_local, exist_ok=True)
+    id_pasta_evento = obter_ou_criar_pasta_drive(nome_pasta_evento, id_pai=pasta_id_raiz, token=token) if conectado_nuvem else None
 
     arquivos_locais = [f for f in os.listdir(pasta_corte) if os.path.isfile(os.path.join(pasta_corte, f))]
     resultado_arquivos = {}
     todos_ok = True
+
+    cache_pastas_modelo_drive = {}
 
     for nome_arq in arquivos_locais:
         # Metadados internos (.json) e arquivos ocultos não compõem pacotes de cortes para o usuário
@@ -584,34 +669,33 @@ def enviar_pacote_drive(pasta_corte, prefixo, variacoes_ativas=None, pasta_id_ra
                 if not variacoes_ativas.get(cat, True):
                     continue
 
-        if titulo_video:
-            nome_pasta_cat = obter_nome_subpasta_modalidade(cat, variacoes_ativas)
-            pasta_cat_local = os.path.join(pasta_video_local, nome_pasta_cat)
-            id_pai_cat = id_pasta_video
-        else:
-            nome_pasta_cat = PASTAS_CATEGORIA.get(cat, "Outros")
-            pasta_cat_local = os.path.join(pasta_base_local, nome_pasta_cat)
-            id_pai_cat = pasta_id_raiz
+        nome_subpasta_mod = obter_nome_subpasta_modalidade(cat, variacoes_ativas)
 
-        # 1. Organização local por pasta de categoria (espelhamento garantido)
-        os.makedirs(pasta_cat_local, exist_ok=True)
-        destino_cat_local = os.path.join(pasta_cat_local, nome_arq)
+        # 2. Espelhamento local hierárquico: Evento / Subpasta Modelo / Arquivo
+        pasta_modelo_local = os.path.join(pasta_evento_local, nome_subpasta_mod)
+        os.makedirs(pasta_modelo_local, exist_ok=True)
+        destino_local = os.path.join(pasta_modelo_local, nome_arq)
         try:
-            if not os.path.exists(destino_cat_local) or os.path.getmtime(caminho_origem) > os.path.getmtime(destino_cat_local):
-                shutil.copy2(caminho_origem, destino_cat_local)
+            if not os.path.exists(destino_local) or os.path.getmtime(caminho_origem) > os.path.getmtime(destino_local):
+                shutil.copy2(caminho_origem, destino_local)
         except Exception as e_copy:
             log.debug("Aviso ao copiar espelho local de %s: %s", nome_arq, e_copy)
 
-        # 2. Upload para a nuvem no Google Drive se conectado
-        if conectado_nuvem and id_pai_cat:
-            id_pasta_cat = obter_ou_criar_pasta_drive(nome_pasta_cat, id_pai=id_pai_cat, token=token)
-            if id_pasta_cat:
-                upload_info = enviar_arquivo_drive(caminho_origem, nome_arq, id_pasta_cat, token=token)
+        # 3. Upload para a nuvem no Google Drive na pasta de modelo diretamente no Evento
+        if conectado_nuvem and id_pasta_evento:
+            if nome_subpasta_mod not in cache_pastas_modelo_drive:
+                cache_pastas_modelo_drive[nome_subpasta_mod] = obter_ou_criar_pasta_drive(
+                    nome_subpasta_mod, id_pai=id_pasta_evento, token=token
+                )
+            id_pasta_mod_drive = cache_pastas_modelo_drive[nome_subpasta_mod]
+
+            if id_pasta_mod_drive:
+                upload_info = enviar_arquivo_drive(caminho_origem, nome_arq, id_pasta_mod_drive, token=token)
                 if upload_info:
                     resultado_arquivos[nome_arq] = {
                         "categoria": cat,
-                        "pasta_drive": nome_pasta_cat,
-                        "pasta_video": nome_pasta_video,
+                        "pasta_drive": nome_subpasta_mod,
+                        "pasta_evento": nome_pasta_evento,
                         "drive_id": upload_info["id"],
                         "tamanho": upload_info["tamanho"],
                         "status": "enviado_nuvem",
@@ -632,9 +716,9 @@ def enviar_pacote_drive(pasta_corte, prefixo, variacoes_ativas=None, pasta_id_ra
             # Fallback local
             resultado_arquivos[nome_arq] = {
                 "categoria": cat,
-                "pasta_drive": nome_pasta_cat,
-                "pasta_video": nome_pasta_video,
-                "caminho_local": destino_cat_local,
+                "pasta_drive": nome_subpasta_mod,
+                "pasta_evento": nome_pasta_evento,
+                "caminho_local": destino_local,
                 "status": "salvo_local_fallback",
             }
 
@@ -643,7 +727,8 @@ def enviar_pacote_drive(pasta_corte, prefixo, variacoes_ativas=None, pasta_id_ra
         "sucesso": todos_ok if conectado_nuvem else True,
         "modo": modo,
         "pasta_raiz_id": pasta_id_raiz,
-        "pasta_video": nome_pasta_video,
+        "pasta_video": nome_pasta_evento,
+        "pasta_evento": nome_pasta_evento,
         "arquivos": resultado_arquivos,
         "mensagem": "Arquivos sincronizados na nuvem do Google Drive" if conectado_nuvem else f"Modo local (Google Drive aguardando credenciais: {motivo_sem_token})",
     }
@@ -805,22 +890,40 @@ def subir_cortes_locais_pendentes(pasta_id_raiz=None):
                 erros += 1
             continue
 
-        # 2. Caso hierárquico: pasta com [Nome do Vídeo]
-        # Dentro dela existem subpastas de modalidade (ex: 'Cortes com headline', 'Cortes originais')
+        # 2. Caso hierárquico: pasta com [Nome do Vídeo ou Evento]
+        # Dentro dela existem subpastas de modelo diretamente ('Corte com headline', 'Corte cru', etc.)
+        nome_evento = extrair_nome_evento_principal(item)
+        id_pasta_evento = obter_ou_criar_pasta_drive(nome_evento, id_pai=pasta_id_raiz, token=token)
+
         subpastas = [s for s in os.listdir(pasta_item) if os.path.isdir(os.path.join(pasta_item, s))]
         if subpastas:
-            id_pasta_video = obter_ou_criar_pasta_drive(item, id_pai=pasta_id_raiz, token=token)
             for sub in subpastas:
                 pasta_sub = os.path.join(pasta_item, sub)
-                id_pasta_cat = obter_ou_criar_pasta_drive(sub, id_pai=id_pasta_video, token=token) if id_pasta_video else None
-                for arq in os.listdir(pasta_sub):
-                    caminho_arq = os.path.join(pasta_sub, arq)
-                    if os.path.isfile(caminho_arq) and os.path.getsize(caminho_arq) > 0:
-                        up = enviar_arquivo_drive(caminho_arq, arq, id_pasta_cat, token=token) if id_pasta_cat else None
-                        if up:
-                            enviados += 1
-                        else:
-                            erros += 1
+                if sub.startswith("Fernando"):
+                    # Pasta legada intermediária FernandoXX: envia arquivos para pastas de modelo diretamente no evento
+                    for arq in os.listdir(pasta_sub):
+                        caminho_arq = os.path.join(pasta_sub, arq)
+                        if os.path.isfile(caminho_arq) and os.path.getsize(caminho_arq) > 0 and not arq.endswith(".json") and not arq.startswith("."):
+                            cat = identificar_categoria_arquivo(arq)
+                            sub_mod = obter_nome_subpasta_modalidade(cat)
+                            id_pasta_mod = obter_ou_criar_pasta_drive(sub_mod, id_pai=id_pasta_evento, token=token) if id_pasta_evento else None
+                            if id_pasta_mod:
+                                up = enviar_arquivo_drive(caminho_arq, arq, id_pasta_mod, token=token)
+                                if up:
+                                    enviados += 1
+                                else:
+                                    erros += 1
+                else:
+                    # Subpasta de modelo direta (ex: 'Corte com headline', 'Corte cru')
+                    id_pasta_cat = obter_ou_criar_pasta_drive(sub, id_pai=id_pasta_evento, token=token) if id_pasta_evento else None
+                    for arq in os.listdir(pasta_sub):
+                        caminho_arq = os.path.join(pasta_sub, arq)
+                        if os.path.isfile(caminho_arq) and os.path.getsize(caminho_arq) > 0 and not arq.endswith(".json") and not arq.startswith("."):
+                            up = enviar_arquivo_drive(caminho_arq, arq, id_pasta_cat, token=token) if id_pasta_cat else None
+                            if up:
+                                enviados += 1
+                            else:
+                                erros += 1
 
     return {
         "ok": True,
@@ -899,34 +1002,52 @@ def listar_videos_pasta_drive(id_pasta=ID_PASTA_PADRAO, token=None):
         if not token:
             return []
     query = f"'{id_pasta}' in parents and (mimeType contains 'video/' or name contains '.mp4' or name contains '.mkv' or name contains '.mov') and trashed = false"
-    url = f"https://www.googleapis.com/drive/v3/files?q={urllib.parse.quote(query)}&fields=files(id,name,mimeType,size,createdTime)&pageSize=100"
     headers = {"Authorization": f"Bearer {token}"}
-    try:
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            dados = json.loads(resp.read().decode("utf-8"))
-            return dados.get("files", [])
-    except Exception as e:
-        log.warning("Erro ao listar vídeos da pasta %s no Drive: %s", id_pasta, e)
-        return []
+    itens = []
+    page_token = None
+    while True:
+        url = f"https://www.googleapis.com/drive/v3/files?q={urllib.parse.quote(query)}&fields=nextPageToken,files(id,name,mimeType,size,createdTime)&pageSize=500"
+        if page_token:
+            url += f"&pageToken={urllib.parse.quote(page_token)}"
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                dados = json.loads(resp.read().decode("utf-8"))
+                itens.extend(dados.get("files", []))
+                page_token = dados.get("nextPageToken")
+                if not page_token:
+                    break
+        except Exception as e:
+            log.warning("Erro ao listar vídeos da pasta %s no Drive: %s", id_pasta, e)
+            break
+    return itens
 
 
 def listar_arquivos_subpasta(id_pasta, token=None):
-    """Lista todos os arquivos dentro de uma pasta do Drive."""
+    """Lista todos os arquivos dentro de uma pasta do Drive com paginação completa."""
     if not token:
         token, _ = obter_token_acesso()
         if not token:
             return []
     query = f"'{id_pasta}' in parents and trashed = false"
-    url = f"https://www.googleapis.com/drive/v3/files?q={urllib.parse.quote(query)}&fields=files(id,name,mimeType,size)&pageSize=100"
     headers = {"Authorization": f"Bearer {token}"}
-    try:
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            dados = json.loads(resp.read().decode("utf-8"))
-            return dados.get("files", [])
-    except Exception as e:
-        log.warning("Erro ao listar arquivos da pasta %s no Drive: %s", id_pasta, e)
-        return []
+    itens = []
+    page_token = None
+    while True:
+        url = f"https://www.googleapis.com/drive/v3/files?q={urllib.parse.quote(query)}&fields=nextPageToken,files(id,name,mimeType,size)&pageSize=500"
+        if page_token:
+            url += f"&pageToken={urllib.parse.quote(page_token)}"
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                dados = json.loads(resp.read().decode("utf-8"))
+                itens.extend(dados.get("files", []))
+                page_token = dados.get("nextPageToken")
+                if not page_token:
+                    break
+        except Exception as e:
+            log.warning("Erro ao listar arquivos da pasta %s no Drive: %s", id_pasta, e)
+            break
+    return itens
 
 

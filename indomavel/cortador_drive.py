@@ -103,7 +103,7 @@ def _extrair_numero_parte(nome_arquivo):
 
 
 def _ja_possui_cortes_no_drive(titulo_video, pasta_raiz_id, token, mapa_pastas_destino=None):
-    """Verifica se já existe a pasta com o nome do vídeo e se ela já possui cortes prontos."""
+    """Verifica se já existe a pasta com o nome do vídeo/evento e se ela já possui cortes prontos."""
     # 1. Verifica no histórico persistente local
     caminho_hist = os.path.join(config.PASTA_DADOS, "automacao", "drive_processados.json")
     if os.path.isfile(caminho_hist):
@@ -115,30 +115,57 @@ def _ja_possui_cortes_no_drive(titulo_video, pasta_raiz_id, token, mapa_pastas_d
         except Exception:
             pass
 
-    # 2. Busca na pasta de destino no Drive (via mapa em memória O(1) ou API)
+    nome_evento = google_drive.extrair_nome_evento_principal(titulo_video)
+
+    # 2. Verifica se localmente já existem cortes para o evento
+    pasta_local_evento = os.path.join(config.PASTA_GOOGLE_DRIVE, nome_evento)
+    if os.path.isdir(pasta_local_evento):
+        for r, _, files in os.walk(pasta_local_evento):
+            if any(f.endswith(".mp4") for f in files):
+                return True
+
+    # 3. Busca na pasta de destino no Drive (via mapa em memória O(1) ou API)
     chave_tit = re.sub(r'\s+', ' ', titulo_video).strip().lower()
+    chave_ev = re.sub(r'\s+', ' ', nome_evento).strip().lower()
     id_pasta_video = None
     if mapa_pastas_destino is not None:
-        id_pasta_video = mapa_pastas_destino.get(chave_tit)
+        id_pasta_video = mapa_pastas_destino.get(chave_ev) or mapa_pastas_destino.get(chave_tit)
         if not id_pasta_video:
-            alt = re.sub(r'\s+', '  ', chave_tit)
-            id_pasta_video = mapa_pastas_destino.get(alt)
+            alt_ev = re.sub(r'\s+', '  ', chave_ev)
+            alt_tit = re.sub(r'\s+', '  ', chave_tit)
+            id_pasta_video = mapa_pastas_destino.get(alt_ev) or mapa_pastas_destino.get(alt_tit)
     else:
-        id_pasta_video = google_drive.buscar_pasta_drive(titulo_video, id_pai=pasta_raiz_id, token=token)
+        id_pasta_video = google_drive.buscar_pasta_drive(nome_evento, id_pai=pasta_raiz_id, token=token)
         if not id_pasta_video:
-            alt = re.sub(r'\s+', '  ', titulo_video)
-            id_pasta_video = google_drive.buscar_pasta_drive(alt, id_pai=pasta_raiz_id, token=token)
+            id_pasta_video = google_drive.buscar_pasta_drive(titulo_video, id_pai=pasta_raiz_id, token=token)
 
     if not id_pasta_video:
         return False
 
-    id_pasta_hl = google_drive.buscar_pasta_drive("Cortes com headline", id_pai=id_pasta_video, token=token)
-    if not id_pasta_hl:
-        return False
+    # Procura nas subpastas de modelo conhecidas
+    pastas_modelo = [
+        "Corte com headline", "Cortes com headline",
+        "Corte com headline e legenda", "Cortes com headline e legenda",
+        "Corte cru", "Cortes originais", "Corte com legenda", "Cortes com legenda"
+    ]
+    for p_mod in pastas_modelo:
+        id_pasta_mod = google_drive.buscar_pasta_drive(p_mod, id_pai=id_pasta_video, token=token)
+        if id_pasta_mod:
+            arquivos = google_drive.listar_arquivos_subpasta(id_pasta_mod, token=token)
+            if any(a.get("name", "").endswith(".mp4") for a in arquivos):
+                return True
 
-    arquivos_hl = google_drive.listar_arquivos_subpasta(id_pasta_hl, token=token)
-    tem_mp4 = any(a.get("name", "").endswith(".mp4") for a in arquivos_hl)
-    return tem_mp4
+    # Verifica também se há arquivos diretos ou subpastas legadas
+    itens_dentro = google_drive.listar_arquivos_subpasta(id_pasta_video, token=token)
+    for it in itens_dentro:
+        if it.get("name", "").endswith(".mp4"):
+            return True
+        if it.get("mimeType") == "application/vnd.google-apps.folder":
+            sub_arqs = google_drive.listar_arquivos_subpasta(it.get("id"), token=token)
+            if any(a.get("name", "").endswith(".mp4") for a in sub_arqs):
+                return True
+
+    return False
 
 
 def escanear_videos_pendentes_drive(pasta_destino_id=None, pasta_fonte_id=None):
@@ -167,7 +194,8 @@ def escanear_videos_pendentes_drive(pasta_destino_id=None, pasta_fonte_id=None):
     pastas_ignorar = {
         "outros", "cortes crus", "com headline e sem legenda", "headlines",
         "com headline e legenda", "só legenda", "debate econômico especial",
-        "cortes", "cortes com headline", "cortes originais"
+        "cortes", "cortes com headline", "cortes originais",
+        "corte com headline", "corte com headline e legenda", "corte cru", "corte com legenda"
     }
 
     # 1. Varre a pasta de Lives ('Live 24 hrs') e suas subpastas
@@ -326,38 +354,54 @@ def processar_video_drive(video_info, max_cortes=50, ao_progredir=None):
         cfg_cortes["drive"]["upload_ativo"] = True
         token, _ = google_drive.obter_token_acesso()
 
-        # Garante pastas hierárquicas no Drive conforme especificação exata do usuário:
-        # Raiz / [Nome do Vídeo] / [Modalidades]
-        id_pasta_video_drive = google_drive.obter_ou_criar_pasta_drive(titulo, id_pai=id_pasta_raiz_drive, token=token)
-        id_pasta_hl_drive = google_drive.obter_ou_criar_pasta_drive("Cortes com headline", id_pai=id_pasta_video_drive, token=token)
-        id_pasta_cru_drive = google_drive.obter_ou_criar_pasta_drive("Cortes originais", id_pai=id_pasta_video_drive, token=token)
-        id_pasta_com_drive = google_drive.obter_ou_criar_pasta_drive("Cortes com headline e legenda", id_pai=id_pasta_video_drive, token=token)
+        # Garante pastas hierárquicas no Drive conforme especificação do usuário:
+        # Raiz / [Nome do Evento Consolidado] / [Subpastas de Modelo] / Arquivos FernandoXX
+        nome_pasta_evento = google_drive.extrair_nome_evento_principal(titulo)
+        id_pasta_evento_drive = google_drive.obter_ou_criar_pasta_drive(nome_pasta_evento, id_pai=id_pasta_raiz_drive, token=token)
 
         maior_fernando = google_drive.obter_maior_numero_fernando(pasta_base_drive, id_pasta_raiz_drive, token=token)
         proximo_numero = max(1, maior_fernando + 1)
-        log.info("Processamento Drive '%s': Maior Fernando existente: %d. Iniciando em: %d", titulo, maior_fernando, proximo_numero)
+        log.info("Processamento Drive '%s' (Evento: '%s'): Maior Fernando existente: %d. Iniciando em: %d", titulo, nome_pasta_evento, maior_fernando, proximo_numero)
 
         pacotes_gerados = []
         for idx, bloco in enumerate(top_blocos, start=1):
             prefixo = f"Fernando{proximo_numero:02d}"
-            pasta_corte = os.path.join(pasta_base_drive, prefixo)
-            os.makedirs(pasta_corte, exist_ok=True)
 
-            # REGRA CRÍTICA: Não sobrepor arquivos que já existem no Drive!
-            nome_hl_mp4 = f"{prefixo}_sem_legenda.mp4"
-            nome_cru_mp4 = f"{prefixo}_cru.mp4"
-            nome_com_mp4 = f"{prefixo}_com_legenda.mp4"
-            while (google_drive.arquivo_existe_no_drive(nome_hl_mp4, id_pasta_hl_drive, token=token) or
-                   google_drive.arquivo_existe_no_drive(nome_cru_mp4, id_pasta_cru_drive, token=token) or
-                   google_drive.arquivo_existe_no_drive(nome_com_mp4, id_pasta_com_drive, token=token)):
-                log.info("Corte %s já existe no Drive. Incrementando número para não sobrepor...", prefixo)
+            # REGRA CRÍTICA: Não sobrepor cortes que já existem no Drive ou localmente!
+            while True:
+                pasta_local_evento = os.path.join(pasta_base_drive, nome_pasta_evento)
+                existe_local = False
+                if os.path.isdir(pasta_local_evento):
+                    for r, _, files in os.walk(pasta_local_evento):
+                        if any(f.startswith(prefixo) for f in files):
+                            existe_local = True
+                            break
+                if not existe_local and os.path.isdir(pasta_base_drive):
+                    if os.path.exists(os.path.join(pasta_base_drive, prefixo)):
+                        existe_local = True
+
+                existe_drive = False
+                if token:
+                    if proximo_numero <= maior_fernando:
+                        existe_drive = True
+                    elif id_pasta_evento_drive:
+                        for sub_nome in ["Corte com headline", "Corte com headline e legenda", "Corte cru", "Cortes com headline"]:
+                            id_sub = google_drive.buscar_pasta_drive(sub_nome, id_pai=id_pasta_evento_drive, token=token)
+                            if id_sub:
+                                if google_drive.arquivo_existe_no_drive(f"{prefixo}_sem_legenda.mp4", id_sub, token=token) or \
+                                   google_drive.arquivo_existe_no_drive(f"{prefixo}_com_legenda.mp4", id_sub, token=token) or \
+                                   google_drive.arquivo_existe_no_drive(f"{prefixo}_cru.mp4", id_sub, token=token):
+                                    existe_drive = True
+                                    break
+
+                if not existe_local and not existe_drive:
+                    break
+                log.info("Corte %s já existe no evento '%s'. Incrementando número para não sobrepor...", prefixo, nome_pasta_evento)
                 proximo_numero += 1
                 prefixo = f"Fernando{proximo_numero:02d}"
-                pasta_corte = os.path.join(pasta_base_drive, prefixo)
-                os.makedirs(pasta_corte, exist_ok=True)
-                nome_hl_mp4 = f"{prefixo}_sem_legenda.mp4"
-                nome_cru_mp4 = f"{prefixo}_cru.mp4"
-                nome_com_mp4 = f"{prefixo}_com_legenda.mp4"
+
+            pasta_corte = os.path.join(pasta_base_drive, prefixo)
+            os.makedirs(pasta_corte, exist_ok=True)
 
             if ao_progredir:
                 p_atual = 0.40 + (idx / total) * 0.55
@@ -390,15 +434,15 @@ def processar_video_drive(video_info, max_cortes=50, ao_progredir=None):
 
                 # Também remove arquivos pesados de vídeo do espelho do vídeo em output/google_drive
                 try:
-                    nome_pasta_vid = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "", str(titulo)).strip() or "Vídeo"
-                    pasta_espelho_vid = os.path.join(pasta_base_drive, nome_pasta_vid)
-                    if os.path.isdir(pasta_espelho_vid):
-                        for r, _, fs in os.walk(pasta_espelho_vid):
-                            for f in fs:
-                                if f.startswith(prefixo) and f.endswith((".mp4", ".ts", ".mkv")):
-                                    c_esp = os.path.join(r, f)
-                                    if os.path.isfile(c_esp):
-                                        os.remove(c_esp)
+                    for p_sub in [nome_pasta_evento, re.sub(r'[<>:"/\\|?*\x00-\x1f]', "", str(titulo)).strip()]:
+                        pasta_espelho_vid = os.path.join(pasta_base_drive, p_sub)
+                        if os.path.isdir(pasta_espelho_vid):
+                            for r, _, fs in os.walk(pasta_espelho_vid):
+                                for f in fs:
+                                    if f.startswith(prefixo) and f.endswith((".mp4", ".ts", ".mkv")):
+                                        c_esp = os.path.join(r, f)
+                                        if os.path.isfile(c_esp):
+                                            os.remove(c_esp)
                 except Exception as e_esp:
                     log.debug("Aviso ao limpar espelho do vídeo %s: %s", prefixo, e_esp)
 

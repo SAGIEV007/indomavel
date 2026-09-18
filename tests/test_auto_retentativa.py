@@ -10,7 +10,7 @@ from indomavel import acervo_local, config, processador
 
 class TestAutoRetentativa(unittest.TestCase):
     def setUp(self):
-        self.temp_dir = tempfile.TemporaryDirectory()
+        self.temp_dir = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
         self.patcher_dados = patch.object(config, "PASTA_DADOS", self.temp_dir.name)
         self.patcher_dados.start()
 
